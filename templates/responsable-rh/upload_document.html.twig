@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Télécharger Document - {{ abbreviation }}{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-upload me-2"></i>
+                    {% if templateDocument.filePath %}Modifier{% else %}Télécharger{% endif %} Document : {{ abbreviation }}
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if existingDocument %}
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Document existant</h5>
+                        <p class="mb-0">Ce document existe déjà dans le dossier. En uploadant un nouveau fichier, vous remplacerez l'ancien.</p>
+                    </div>
+                {% endif %}
+                
+                <!-- Document Information -->
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>Informations sur le document</h5>
+                    <ul class="mb-0">
+                        <li><strong>Abréviation :</strong> {{ templateDocument.abbreviation }}</li>
+                        <li><strong>Libellé complet :</strong> {{ templateDocument.libelleComplet }}</li>
+                        <li><strong>Type de document :</strong> {{ templateDocument.typeDocument }}</li>
+                        <li><strong>Usage :</strong> {{ templateDocument.usage }}</li>
+                        <li><strong>Dossier :</strong> {{ dossier.nom }} - {{ dossier.employe.prenom }} {{ dossier.employe.nom }}</li>
+                        {% if existingDocument and existingDocument.uploadedBy %}
+                            <li><strong>Téléchargé par :</strong> {{ existingDocument.uploadedBy }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="dossier" value="{{ dossierId }}">
+                    
+                    <div class="mb-3">
+                        <label for="document_file" class="form-label">
+                            <i class="fas fa-file me-2"></i>Sélectionner le fichier
+                        </label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="document_file" 
+                               name="document_file" 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.txt,.xls,.xlsx,.ppt,.pptx,.zip,.rar"
+                               required>
+                        <div class="form-text">
+                            Formats acceptés : PDF, DOC, DOCX, JPG, JPEG, PNG, GIF, BMP, TIFF, TXT, XLS, XLSX, PPT, PPTX, ZIP, RAR
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('responsable_view_dossier_documents', {'id': dossierId}) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour au Dossier
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-2"></i>
+                            {% if existingDocument %}Remplacer le Document{% else %}Télécharger le Document{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

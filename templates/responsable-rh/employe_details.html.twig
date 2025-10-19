@@ -1,0 +1,365 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'Employé - {{ employe.prenom }} {{ employe.nom }}{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        Détails de l'Employé
+                    </h1>
+                    <p class="mb-0 text-muted">
+                        <strong>{{ employe.prenom }} {{ employe.nom }}</strong> - ID: {{ employe.id }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ path('responsable_manage_employes') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour à la Liste
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Informations personnelles -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Informations Personnelles</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-4"><strong>Nom :</strong></div>
+                                    <div class="col-sm-8">{{ employe.nom }}</div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-4"><strong>Prénom :</strong></div>
+                                    <div class="col-sm-8">{{ employe.prenom }}</div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-4"><strong>Email :</strong></div>
+                                    <div class="col-sm-8">{{ employe.email }}</div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-4"><strong>Organisation :</strong></div>
+                                    <div class="col-sm-8">
+                                        {% if employe.employeeContrats is not empty %}
+                                            {% set currentContrat = employe.employeeContrats|first %}
+                                            {% if currentContrat.organisationEmployeeContrats is not empty %}
+                                                {% set currentOrg = currentContrat.organisationEmployeeContrats|first.organisation %}
+                                                {{ currentOrg.dossierDesignation }}
+                                            {% else %}
+                                                <span class="text-muted">Non assigné</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">Non assigné</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-4"><strong>Rôles :</strong></div>
+                                    <div class="col-sm-8">
+                                        {% for role in employe.roles %}
+                                            <span class="badge bg-info me-1">{{ role }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Statistiques</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="border-end">
+                                            <h3 class="text-primary">{{ employe.employeeContrats|length }}</h3>
+                                            <p class="mb-0">Contrat(s)</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h3 class="text-success">{{ employe.dossier ? 1 : 0 }}</h3>
+                                        <p class="mb-0">Dossier(s)</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="border-end">
+                                            <h3 class="text-info">{{ employe.demandes|length }}</h3>
+                                            <p class="mb-0">Demande(s)</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h3 class="text-warning">{{ employe.dossier ? 1 : 0 }}</h3>
+                                        <p class="mb-0">Dossier(s)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contrats -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Historique des Contrats</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if employe.employeeContrats|length > 0 %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Type</th>
+                                                    <th>Nature du Contrat</th>
+                                                    <th>Organisation</th>
+                                                    <th>Date de Début</th>
+                                                    <th>Date de Fin</th>
+                                                    <th>Statut</th>
+                                                    <th>Durée</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for contrat in employe.employeeContrats %}
+                                                <tr>
+                                                    <td>
+                                                        {% if loop.first %}
+                                                            <span class="badge bg-primary">Principal</span>
+                                                        {% else %}
+                                                            <span class="badge bg-info">Secondaire</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-primary">{{ contrat.natureContrat }}</span>
+                                                    </td>
+                                                    <td>
+                                                        {% if contrat.organisationEmployeeContrats is not empty %}
+                                                            {% for orgContrat in contrat.organisationEmployeeContrats %}
+                                                                <span class="badge bg-secondary">{{ orgContrat.organisation.dossierDesignation }}</span>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            <span class="text-muted">Non assigné</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ contrat.dateDebut|date('d/m/Y') }}</td>
+                                                    <td>
+                                                        {% if contrat.dateFin %}
+                                                            {{ contrat.dateFin|date('d/m/Y') }}
+                                                        {% else %}
+                                                            <span class="text-muted">Non définie</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if contrat.statut == 'actif' %}
+                                                            <span class="badge bg-success">Actif</span>
+                                                        {% elseif contrat.statut == 'expire' %}
+                                                            <span class="badge bg-danger">Expiré</span>
+                                                        {% elseif contrat.statut == 'suspendu' %}
+                                                            <span class="badge bg-warning">Suspendu</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">{{ contrat.statut }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if contrat.dateFin %}
+                                                            {% set duree = contrat.dateFin.diff(contrat.dateDebut) %}
+                                                            {{ duree.y }} an(s), {{ duree.m }} mois
+                                                        {% else %}
+                                                            <span class="text-muted">En cours</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info text-center">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Aucun contrat trouvé pour cet employé.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dossiers récents -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-folder me-2"></i>Dossier de l'Employé</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if employe.dossier %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Titre</th>
+                                                    <th>Placard</th>
+                                                    <th>Documents</th>
+                                                    <th>Date de Création</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% set dossier = employe.dossier %}
+                                                <tr>
+                                                    <td>{{ dossier.id }}</td>
+                                                    <td>{{ dossier.nom }}</td>
+                                                    <td>
+                                                        {% if dossier.placard %}
+                                                            <span class="badge bg-secondary">{{ dossier.placard.name }}</span>
+                                                        {% else %}
+                                                            <span class="text-muted">Aucun</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-primary">Dossier</span>
+                                                    </td>
+                                                    <td>{{ dossier.createdAt|date('d/m/Y H:i') }}</td>
+                                                    <td>
+                                                        <a href="{{ path('responsable_view_dossier_documents', {'id': dossier.id}) }}" class="btn btn-sm btn-info" title="Voir les documents">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info text-center">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Aucun dossier trouvé pour cet employé.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demandes récentes -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card border-secondary">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>Demandes Récentes</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if employe.demandes|length > 0 %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Sujet</th>
+                                                    <th>Statut</th>
+                                                    <th>Date de Création</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for demande in employe.demandes|slice(0, 5) %}
+                                                <tr>
+                                                    <td>{{ demande.id }}</td>
+                                                    <td>{{ demande.titre }}</td>
+                                                    <td>
+                                                        {% if demande.statut == 'en_attente' %}
+                                                            <span class="badge bg-warning">En attente</span>
+                                                        {% elseif demande.statut == 'acceptee' %}
+                                                            <span class="badge bg-success">Acceptée</span>
+                                                        {% elseif demande.statut == 'refusee' %}
+                                                            <span class="badge bg-danger">Refusée</span>
+                                                        {% else %}
+                                                            <span class="badge bg-info">{{ demande.statut }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ demande.dateCreation|date('d/m/Y H:i') }}</td>
+                                                    <td>
+                                                        <a href="{{ path('responsable_voir_demande', {'id': demande.id}) }}" class="btn btn-sm btn-info" title="Voir la demande">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% if employe.demandes|length > 5 %}
+                                        <div class="text-center mt-3">
+                                            <small class="text-muted">Affichage des 5 demandes les plus récentes sur {{ employe.demandes|length }} au total</small>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="alert alert-info text-center">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Aucune demande trouvée pour cet employé.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 767px) {
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .card-header .d-flex {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .card-header .btn {
+            width: 100%;
+        }
+        
+        .col-md-6 {
+            margin-bottom: 1rem;
+        }
+        
+        .card-header h5 {
+            font-size: 1rem !important;
+        }
+        
+        .table {
+            font-size: 0.85rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.5rem !important;
+        }
+        
+        .badge {
+            font-size: 0.75rem !important;
+        }
+        
+        h3 {
+            font-size: 1.5rem !important;
+        }
+    }
+</style>
+{% endblock %}

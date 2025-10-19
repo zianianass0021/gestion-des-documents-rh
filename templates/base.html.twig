@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Système RH Professionnel{% endblock %}</title>
+    <meta name="description" content="{% block description %}Système de gestion des ressources humaines moderne et professionnel{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+    
+    <!-- Bootstrap 5.3.2 -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6.5.1 -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Animate.css -->
+        <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+        {% block stylesheets %}
+        <style>
+            /* ===== PAGINATION STYLES ===== */
+            .pagination {
+                margin-bottom: 0;
+            }
+            
+            .pagination .page-link {
+                color: var(--primary-600);
+                border-color: var(--primary-200);
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+                transition: all 0.2s ease;
+            }
+            
+            .pagination .page-link:hover {
+                color: var(--primary-700);
+                background-color: var(--primary-50);
+                border-color: var(--primary-300);
+            }
+            
+            .pagination .page-item.active .page-link {
+                background-color: var(--primary-600);
+                border-color: var(--primary-600);
+                color: white;
+            }
+            
+            .pagination .page-item.disabled .page-link {
+                color: var(--secondary-400);
+                background-color: var(--secondary-50);
+                border-color: var(--secondary-200);
+            }
+            
+            .pagination-info {
+                font-size: 0.875rem;
+            }
+            
+            @media (max-width: 768px) {
+                .pagination .page-link {
+                    padding: 0.375rem 0.5rem;
+                    font-size: 0.8rem;
+                }
+                
+                .pagination-info {
+                    font-size: 0.75rem;
+                }
+            }
+            /* ===== LIGHT MODE ONLY SYSTEM ===== */
+            
+            /* Light Theme Colors */
+            :root {
+                /* Primary Colors */
+                --primary-50: #f0f9ff;
+                --primary-100: #e0f2fe;
+                --primary-200: #bae6fd;
+                --primary-300: #7dd3fc;
+                --primary-400: #38bdf8;
+                --primary-500: #0ea5e9;
+                --primary-600: #0284c7;
+                --primary-700: #0369a1;
+                --primary-800: #075985;
+                --primary-900: #0c4a6e;
+                
+                /* Secondary Colors */
+                --secondary-50: #f8fafc;
+                --secondary-100: #f1f5f9;
+                --secondary-200: #e2e8f0;
+                --secondary-300: #cbd5e1;
+                --secondary-400: #94a3b8;
+                --secondary-500: #64748b;
+                --secondary-600: #475569;
+                --secondary-700: #334155;
+                --secondary-800: #1e293b;
+                --secondary-900: #0f172a;
+                
+                /* Light Theme Colors */
+                --bg-primary: #ffffff;
+                --bg-secondary: #f8fafc;
+                --bg-tertiary: #e2e8f0;
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --text-muted: #94a3b8;
+                --border-color: #e2e8f0;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                --radius: 0.5rem;
+                --radius-lg: 0.75rem;
+                --transition: all 0.3s ease;
+            }
+            
+            /* Global Styles */
+            * {
+                box-sizing: border-box;
+            }
+            
+            html, body {
+                margin: 0;
+                padding: 0;
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+            
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: var(--bg-secondary);
+                color: var(--text-primary);
+            }
+            
+            .container-fluid {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            /* App Layout */
+            .app-wrapper {
+                display: flex;
+                min-height: 100vh;
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+            
+            .main-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                margin-left: 180px;
+                transition: margin-left 0.3s ease;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            .main-content.expanded {
+                margin-left: 0;
+        }
+        
+            .main-area {
+                flex: 1;
+                padding: 1rem 0;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            /* Card Styles */
+            .card {
+                background-color: var(--bg-primary);
+                border-color: var(--border-color);
+                color: var(--text-primary);
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            .row {
+                margin-left: 0;
+                margin-right: 0;
+                max-width: 100%;
+            }
+            
+            .row > * {
+                padding-left: calc(var(--bs-gutter-x) * 0.5);
+                padding-right: calc(var(--bs-gutter-x) * 0.5);
+            }
+            
+            .card-header {
+                background-color: var(--bg-tertiary);
+                border-bottom-color: var(--border-color);
+                color: var(--text-primary);
+            }
+
+            .card-body {
+                color: var(--text-primary);
+            }
+            
+            .card-title {
+            color: var(--text-primary);
+            }
+            
+            .card-text {
+            color: var(--text-secondary);
+            }
+            
+            /* Table Styles */
+            .table {
+                color: var(--text-primary);
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .table-responsive {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        
+        .table thead th {
+                background-color: var(--bg-tertiary);
+                border-color: var(--border-color);
+                color: var(--text-primary);
+            }
+            
+            .table tbody tr {
+                background-color: var(--bg-primary);
+                border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .table tbody tr:hover {
+                background-color: var(--bg-tertiary);
+            }
+            
+            .table td {
+                border-color: var(--border-color);
+                color: var(--text-primary);
+            }
+            
+            /* Form Styles */
+            .form-control,
+            .form-select {
+                background-color: var(--bg-primary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+            .form-control::placeholder {
+                color: var(--text-muted);
+            }
+            
+            /* Button Styles */
+            .btn-outline-primary,
+            .btn-outline-secondary,
+            .btn-outline-info,
+            .btn-outline-success,
+            .btn-outline-warning,
+            .btn-outline-danger {
+            color: var(--text-primary);
+            border-color: var(--border-color);
+            }
+            
+            .btn-outline-primary:hover,
+            .btn-outline-secondary:hover,
+            .btn-outline-info:hover,
+            .btn-outline-success:hover,
+            .btn-outline-warning:hover,
+            .btn-outline-danger:hover {
+                background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            }
+            
+            /* User Dropdown Styles */
+            .user-dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .user-dropdown-menu {
+                position: absolute;
+                top: calc(100% + 5px);
+                right: 0;
+                background-color: var(--bg-primary);
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-lg);
+                min-width: 200px;
+                z-index: 9999;
+                display: none;
+                margin-top: 0;
+            }
+            
+            .user-dropdown-menu.show {
+                display: block;
+            }
+            
+            .user-dropdown-item {
+                display: block;
+                padding: 0.75rem 1rem;
+                color: var(--text-primary);
+                text-decoration: none;
+                transition: var(--transition);
+                border-radius: var(--radius);
+                margin: 0.25rem;
+            }
+            
+            .user-dropdown-item:hover {
+                background-color: var(--bg-tertiary);
+                color: var(--text-primary);
+                text-decoration: none;
+            }
+            
+            .user-dropdown-item i {
+                width: 20px;
+                text-align: center;
+            }
+            
+            /* Ensure dropdown is always visible */
+            .navbar-area .d-flex {
+                overflow: visible;
+            }
+            
+            .navbar-area .d-flex > div {
+                overflow: visible;
+            }
+
+                /* Sidebar Styles */
+        .sidebar {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 180px;
+                    height: 100vh;
+                    background: var(--primary-900);
+                    z-index: 1000;
+                    transition: transform 0.3s ease;
+        }
+
+            .sidebar.collapsed {
+                transform: translateX(-180px);
+            }
+            
+            .sidebar-header {
+                background: var(--primary-800);
+                border-bottom: 1px solid var(--primary-700);
+                padding: 0.75rem;
+            }
+            
+            .sidebar-brand {
+            color: white;
+                font-size: 1rem;
+                font-weight: 600;
+            }
+            
+            .sidebar-menu {
+                padding: 0.5rem 0;
+            }
+            
+            .sidebar-menu a {
+                color: rgba(255, 255, 255, 0.9);
+                text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .sidebar-menu a:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+            
+            .sidebar-menu a.active {
+                background: rgba(255, 255, 255, 0.2);
+                border-right: 4px solid #ffffff;
+                color: white;
+                font-weight: 600;
+            }
+            
+            .sidebar-menu a.active i {
+                color: #ffffff;
+            }
+            
+            /* Navbar Styles */
+            .navbar-area {
+                background-color: var(--bg-primary);
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.5rem 0;
+                box-shadow: var(--shadow);
+                overflow: visible;
+                position: relative;
+            }
+            
+            .nav-toggle-btn {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: color 0.3s ease;
+            }
+            
+            .nav-toggle-btn:hover {
+                color: var(--text-primary);
+            }
+            
+            .nav-title {
+                color: var(--text-primary);
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            
+            .nav-user-btn {
+                background-color: var(--bg-tertiary);
+                border: 1px solid var(--border-color);
+                color: var(--text-primary);
+                padding: 0.5rem 1rem;
+                border-radius: var(--radius);
+            transition: all 0.3s ease;
+        }
+
+            .nav-user-btn:hover {
+                background-color: var(--bg-secondary);
+                color: var(--text-primary);
+            }
+            
+            /* ===== RESPONSIVE MEDIA QUERIES ===== */
+            
+            /* Large Desktop (1400px and up) */
+            @media (min-width: 1400px) {
+                .container-fluid {
+                    max-width: 1320px;
+                    margin: 0 auto;
+                }
+            }
+            
+            /* Desktop (992px to 1399px) */
+            @media (min-width: 992px) and (max-width: 1399px) {
+                .sidebar {
+                    width: 180px;
+                }
+                
+                .main-content {
+                    margin-left: 180px;
+                }
+                
+                .container-fluid {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+            }
+            
+            /* Tablet (768px to 991px) */
+            @media (max-width: 991px) {
+                .sidebar {
+                    width: 200px;
+                    transform: translateX(-200px);
+                    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+                }
+                
+                .sidebar.show {
+                    transform: translateX(0);
+                }
+                
+                .main-content {
+                    margin-left: 0 !important;
+                    width: 100%;
+                }
+                
+                .navbar-area {
+                    padding: 0.75rem 0;
+                }
+                
+                .nav-title {
+                    font-size: 1rem;
+                }
+                
+                .container-fluid {
+                    padding-left: 0.75rem;
+                    padding-right: 0.75rem;
+                }
+                
+                /* Make tables scrollable on tablet */
+                .table-responsive {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+                
+                /* Adjust card spacing */
+                .card {
+                    margin-bottom: 1rem;
+                }
+                
+                /* Stack columns on tablet */
+                .row > [class*="col-"] {
+                    margin-bottom: 1rem;
+                }
+            }
+            
+            /* Mobile (576px to 767px) */
+            @media (max-width: 767px) {
+                .sidebar {
+                    width: 250px;
+                    transform: translateX(-250px);
+                }
+                
+                .sidebar.show {
+                    transform: translateX(0);
+                }
+                
+                .main-content {
+                    margin-left: 0 !important;
+                }
+                
+                .main-area {
+                    padding: 0.75rem 0;
+                }
+                
+                .container-fluid {
+                    padding-left: 0.5rem !important;
+                    padding-right: 0.5rem !important;
+                }
+                
+                .navbar-area {
+                    padding: 0.5rem 0;
+                }
+                
+                .nav-title {
+                    font-size: 0.9rem;
+                }
+                
+                .nav-user-btn {
+                    padding: 0.4rem 0.8rem;
+                    font-size: 0.85rem;
+                }
+                
+                .container-fluid {
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+                }
+                
+                /* Card adjustments */
+                .card {
+                    margin-bottom: 0.75rem;
+                }
+                
+                .card-header {
+                    padding: 0.75rem;
+                }
+                
+                .card-body {
+                    padding: 0.75rem;
+                }
+                
+                /* Button adjustments */
+                .btn {
+                    font-size: 0.85rem;
+                    padding: 0.4rem 0.8rem;
+                }
+                
+                .btn-group .btn {
+                    padding: 0.3rem 0.6rem;
+                }
+                
+                /* Table adjustments */
+                .table {
+                    font-size: 0.85rem;
+                }
+                
+                .table th,
+                .table td {
+                    padding: 0.5rem;
+                }
+                
+                /* Form adjustments */
+                .form-control,
+                .form-select {
+                    font-size: 0.9rem;
+                }
+                
+                /* Hide long text on mobile */
+                .text-truncate-mobile {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    max-width: 150px;
+                }
+                
+                /* Stack action buttons vertically */
+                .btn-group-vertical-mobile {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+                }
+                
+                .btn-group-vertical-mobile .btn {
+                    width: 100%;
+                }
+                
+                /* User dropdown mobile fixes */
+                .user-dropdown-menu {
+                    width: 180px !important;
+                    max-width: 180px !important;
+                }
+            }
+            
+            /* Small Mobile (up to 575px) */
+            @media (max-width: 575px) {
+                .sidebar {
+                    width: 280px;
+                    transform: translateX(-280px);
+                }
+                
+                .sidebar.show {
+                    transform: translateX(0);
+                }
+                
+                .sidebar-menu a {
+                    padding: 0.75rem 1rem !important;
+                    font-size: 0.9rem;
+                }
+                
+                .main-area {
+                    padding: 0.5rem 0;
+                }
+                
+                .container-fluid {
+                    padding-left: 0.25rem !important;
+                    padding-right: 0.25rem !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    overflow-x: hidden !important;
+                }
+                
+                /* User dropdown small mobile fixes */
+                .user-dropdown-menu {
+                    width: 160px !important;
+                    max-width: 160px !important;
+                }
+                
+                .row {
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+                
+                .card {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    overflow-x: hidden !important;
+                }
+                
+                .card-body {
+                    padding: 0.75rem !important;
+                    overflow-x: hidden !important;
+                }
+                
+                .table-responsive {
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch;
+                    width: 100%;
+                    max-width: 100%;
+                }
+                
+                /* Simple responsive fixes */
+                img, video, iframe, embed, object {
+                    max-width: 100%;
+                    height: auto;
+                }
+                
+                .table-responsive {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+                
+                .btn {
+                    font-size: 0.85rem;
+                    padding: 0.4rem 0.8rem;
+                }
+                
+                .badge {
+                    font-size: 0.75rem;
+                }
+                
+                /* Navbar adjustments */
+                .navbar-area .d-flex {
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                }
+                
+                .nav-title {
+                    font-size: 0.85rem;
+                }
+                
+                .nav-user-btn {
+                    padding: 0.3rem 0.6rem;
+                    font-size: 0.8rem;
+                }
+                
+                /* Card adjustments */
+                .card-header h1,
+                .card-header h2,
+                .card-header h3 {
+                    font-size: 1.1rem !important;
+                }
+                
+                .card-header h4,
+                .card-header h5 {
+                    font-size: 1rem !important;
+                }
+                
+                /* Table adjustments */
+                .table {
+                    font-size: 0.75rem;
+                }
+                
+                .table th,
+                .table td {
+                    padding: 0.4rem;
+                }
+                
+                /* Hide less important columns on small mobile */
+                .hide-on-small-mobile {
+                    display: none !important;
+                }
+                
+                /* Badge adjustments */
+                .badge {
+                    font-size: 0.7rem;
+                    padding: 0.25rem 0.4rem;
+                }
+                
+                /* Form adjustments */
+                .form-label {
+                    font-size: 0.85rem;
+                }
+                
+                .form-control,
+                .form-select {
+                    font-size: 0.85rem;
+                    padding: 0.4rem 0.6rem;
+                }
+                
+                /* Alert adjustments */
+                .alert {
+                    font-size: 0.85rem;
+                    padding: 0.75rem;
+                }
+                
+                /* Progress bar adjustments */
+                .progress {
+                    height: 20px !important;
+                }
+                
+                /* Modal adjustments */
+                .modal-dialog {
+                    margin: 0.5rem;
+                }
+                
+                .modal-content {
+                    font-size: 0.85rem;
+                }
+            }
+            
+            /* Sidebar overlay for mobile/tablet */
+            @media (max-width: 991px) {
+                .sidebar-overlay {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    z-index: 999;
+                }
+                
+                .sidebar-overlay.show {
+                    display: block;
+                }
+            }
+            
+            /* Print styles */
+            @media print {
+                .sidebar,
+                .navbar-area,
+                .btn,
+                .nav-toggle-btn {
+                    display: none !important;
+                }
+                
+                .main-content {
+                    margin-left: 0 !important;
+                }
+                
+                .card {
+                    break-inside: avoid;
+                }
+            }
+        </style>
+        {% endblock %}
+    </head>
+    <body>
+        <div class="app-wrapper">
+            <!-- Sidebar Overlay (for mobile/tablet) -->
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-brand">
+                        <i class="fas fa-building me-2"></i>
+                        Système RH
+                </div>
+                </div>
+                <nav class="sidebar-menu">
+                    {% if 'ROLE_ADMINISTRATEUR_RH' not in app.user.roles and 'ROLE_MANAGER' not in app.user.roles %}
+                        <a href="{{ path('app_dashboard') }}" class="d-flex align-items-center px-4 py-3{% if app.request.get('_route') == 'app_dashboard' %} active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="ms-3">Dashboard</span>
+                        </a>
+                    {% endif %}
+                    
+                    {% if 'ROLE_RESPONSABLE_RH' in app.user.roles %}
+                        <a href="{{ path('responsable_manage_employes') }}" class="d-flex align-items-center px-4 py-3{% if 'responsable_manage_employes' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-users"></i>
+                            <span class="ms-3">Employés</span>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_contrats') }}" class="d-flex align-items-center px-4 py-3{% if 'responsable_manage_contrats' in app.request.get('_route') %} active{% endif %}">
+                                <i class="fas fa-file-contract"></i>
+                            <span class="ms-3">Contrats</span>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_dossiers') }}" class="d-flex align-items-center px-4 py-3{% if 'responsable_manage_dossiers' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="ms-3">Documents</span>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_organisations') }}" class="d-flex align-items-center px-4 py-3{% if 'responsable_manage_organisations' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-sitemap"></i>
+                            <span class="ms-3">Organisations</span>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_placards') }}" class="d-flex align-items-center px-4 py-3{% if 'responsable_manage_placards' in app.request.get('_route') or 'responsable_view_placard' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-folder"></i>
+                            <span class="ms-3">Placards</span>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_demandes') }}" class="d-flex align-items-center px-4 py-3{% if 'responsable_manage_demandes' in app.request.get('_route') %} active{% endif %}">
+                                <i class="fas fa-envelope"></i>
+                            <span class="ms-3">Demandes</span>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_reclamations') }}" class="d-flex align-items-center px-4 py-3{% if 'responsable_manage_reclamations' in app.request.get('_route') or 'responsable_traiter_reclamation' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span class="ms-3">Réclamations</span>
+                        </a>
+                            {% endif %}
+                    
+                            {% if 'ROLE_EMPLOYEE' in app.user.roles %}
+                        <a href="{{ path('employee_profile') }}" class="d-flex align-items-center px-4 py-3{% if 'employee_profile' in app.request.get('_route') %} active{% endif %}">
+                                <i class="fas fa-user"></i>
+                            <span class="ms-3">Mon Profil</span>
+                            </a>
+
+                        <a href="{{ path('employee_contrats') }}" class="d-flex align-items-center px-4 py-3{% if 'employee_contrats' in app.request.get('_route') %} active{% endif %}">
+                                <i class="fas fa-file-contract"></i>
+                            <span class="ms-3">Mes Contrats</span>
+                        </a>
+
+                        <a href="{{ path('employee_dossiers') }}" class="d-flex align-items-center px-4 py-3{% if 'employee_dossiers' in app.request.get('_route') %} active{% endif %}">
+                                <i class="fas fa-folder"></i>
+                            <span class="ms-3">Mon Dossier</span>
+                        </a>
+
+                        <a href="{{ path('employee_demandes') }}" class="d-flex align-items-center px-4 py-3{% if 'employee_demandes' in app.request.get('_route') %} active{% endif %}">
+                                <i class="fas fa-envelope"></i>
+                            <span class="ms-3">Mes Demandes</span>
+                            </a>
+                            {% endif %}
+
+                    {% if 'ROLE_MANAGER' in app.user.roles %}
+                        <a href="{{ path('manager_dashboard') }}" class="d-flex align-items-center px-4 py-3{% if 'manager_dashboard' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="ms-3">Dashboard</span>
+                        </a>
+
+                        <a href="{{ path('manager_reclamations') }}" class="d-flex align-items-center px-4 py-3{% if 'manager_reclamations' in app.request.get('_route') or 'manager_add_reclamation' in app.request.get('_route') or 'manager_view_reclamation' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span class="ms-3">Réclamations</span>
+                        </a>
+                    {% endif %}
+
+                    {% if 'ROLE_ADMINISTRATEUR_RH' in app.user.roles %}
+                        <a href="{{ path('administrateur_rh_dashboard') }}" class="d-flex align-items-center px-4 py-3{% if 'administrateur_rh_dashboard' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="ms-3">Dashboard</span>
+                        </a>
+
+                        <a href="{{ path('admin_manage_responsables') }}" class="d-flex align-items-center px-4 py-3{% if 'admin_manage_responsables' in app.request.get('_route') or 'admin_add_responsable' in app.request.get('_route') or 'admin_edit_responsable' in app.request.get('_route') %} active{% endif %}">
+                            <i class="fas fa-user-tie"></i>
+                            <span class="ms-3">Responsables RH</span>
+                        </a>
+                    {% endif %}
+        </nav>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content" id="mainContent">
+                <!-- Top Navbar -->
+                <div class="navbar-area">
+                    <div class="container-fluid" style="overflow: visible;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <button class="nav-toggle-btn" id="navToggleBtn">
+                                    <i class="fas fa-bars"></i>
+                                </button>
+                                <h4 class="nav-title mb-0 ms-3">{% block page_title %}Dashboard{% endblock %}</h4>
+                </div>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if 'ROLE_ADMINISTRATEUR_RH' in app.user.roles %}
+                                <a href="{{ path('admin_download_module_excel') }}" class="btn btn-success btn-sm" title="Télécharger le fichier Excel des employés">
+                                    <i class="fas fa-file-excel me-2"></i>
+                                    <span class="d-none d-md-inline">Exporter Excel</span>
+                                    <span class="d-inline d-md-none">Excel</span>
+                                </a>
+                                {% elseif 'ROLE_RESPONSABLE_RH' in app.user.roles %}
+                                <a href="{{ path('responsable_download_module_excel') }}" class="btn btn-success btn-sm" title="Télécharger le fichier Excel des employés">
+                                    <i class="fas fa-file-excel me-2"></i>
+                                    <span class="d-none d-md-inline">Exporter Excel</span>
+                                    <span class="d-inline d-md-none">Excel</span>
+                                </a>
+                                {% endif %}
+                                <div class="user-dropdown">
+                                    <button class="nav-user-btn" type="button" id="userDropdownBtn">
+                                        <i class="fas fa-user me-2"></i>
+                                        {{ app.user.prenom }} {{ app.user.nom }}
+                                        <i class="fas fa-chevron-down ms-2"></i>
+                                    </button>
+                                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                                        <a class="user-dropdown-item" href="{{ path('app_logout') }}">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                                        </a>
+                                    </div>
+                    </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+
+                <!-- Main Area -->
+                <div class="main-area">
+                    <div class="container-fluid">
+                {% block body %}{% endblock %}
+            </div>
+            </div>
+        </div>
+        </div>
+
+        {% block javascripts %}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+        <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+                once: true
+            });
+
+            // Sidebar toggle with responsive behavior
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const navToggleBtn = document.getElementById('navToggleBtn');
+            const mainContent = document.getElementById('mainContent');
+            
+            function toggleSidebar() {
+                const isDesktop = window.innerWidth > 991;
+                
+                if (isDesktop) {
+                    // Desktop behavior: collapse/expand sidebar
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                } else {
+                    // Mobile/Tablet behavior: show/hide sidebar with overlay
+                    sidebar.classList.toggle('show');
+                    sidebarOverlay.classList.toggle('show');
+                }
+            }
+            
+            navToggleBtn.addEventListener('click', toggleSidebar);
+            
+            // Close sidebar when clicking overlay (mobile/tablet)
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+            });
+            
+            // Close sidebar when clicking a link on mobile/tablet
+            if (window.innerWidth <= 991) {
+                const sidebarLinks = sidebar.querySelectorAll('a');
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        sidebar.classList.remove('show');
+                        sidebarOverlay.classList.remove('show');
+                    });
+                });
+            }
+
+            // Keep session alive
+        {% if app.user %}
+            setInterval(function() {
+                fetch('{{ path('app_dashboard') }}', { method: 'HEAD' })
+                    .then(response => {
+                        if (!response.ok) {
+                        window.location.href = '{{ path('app_login') }}';
+                    }
+                }).catch(function() {
+                    window.location.href = '{{ path('app_login') }}';
+                });
+        }, 30000);
+        {% endif %}
+        
+        // User Dropdown Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const userDropdownBtn = document.getElementById('userDropdownBtn');
+            const userDropdownMenu = document.getElementById('userDropdownMenu');
+            
+            if (userDropdownBtn && userDropdownMenu) {
+                // Toggle dropdown on button click
+                userDropdownBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Toggle dropdown
+                    userDropdownMenu.classList.toggle('show');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.user-dropdown')) {
+                        userDropdownMenu.classList.remove('show');
+                    }
+                });
+                
+                // Close dropdown on escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        userDropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+        {% endblock %}
+    </body>
+</html>

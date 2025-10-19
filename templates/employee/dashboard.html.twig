@@ -1,0 +1,439 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Employé{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .border-left-primary { border-left: 0.25rem solid var(--primary-600) !important; }
+        .border-left-success { border-left: 0.25rem solid var(--success-500) !important; }
+        .border-left-info { border-left: 0.25rem solid var(--primary-400) !important; }
+        .border-left-warning { border-left: 0.25rem solid var(--warning-500) !important; }
+        .text-xs { font-size: 0.7rem; }
+        .text-gray-800 { color: var(--text-primary) !important; }
+        .text-gray-300 { color: var(--text-tertiary) !important; }
+        .chart-area { position: relative; height: 10rem; width: 100%; }
+        .chart-pie { position: relative; height: 15rem; width: 100%; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4 animate-fade-in-down">
+    <h1 class="h3 mb-0 text-gray-800 animate-fade-in-left">
+        <i class="fas fa-tachometer-alt me-2 animate-bounce"></i>Dashboard Employé
+    </h1>
+    <div class="text-muted animate-fade-in-right">
+        <i class="fas fa-user me-1 animate-float"></i>{{ employee.prenom }} {{ employee.nom }}
+    </div>
+</div>
+
+<!-- KPIs Personnels -->
+<div class="row mb-4 animate-stagger">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary h-100 animate-fade-in-up">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Mes Contrats
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ contrats|length }}
+                        </div>
+                        <div class="text-xs text-muted">
+                            Contrats actifs
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-contract fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Progression Dossier
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ completionRate }}%
+                        </div>
+                        <div class="text-xs text-muted">
+                            {{ uploadedRequiredDocsCount }}/{{ requiredDocsCount }} documents
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-pie fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Documents Consultables
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ employeeDocuments|length }}
+                        </div>
+                        <div class="text-xs text-muted">
+                            Dans mon dossier
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-eye fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Mes Demandes
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ demandesCount }}
+                        </div>
+                        <div class="text-xs text-muted">
+                            Demandes envoyées
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-envelope fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphiques et Informations -->
+<div class="row">
+    <!-- Graphique des Contrats -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-pie me-2"></i>Statut des Contrats
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie">
+                    <canvas id="contratsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique des Dossiers -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-chart-pie me-2"></i>Progression des Documents
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie">
+                    <canvas id="dossiersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations Personnelles -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-info">
+                    <i class="fas fa-user me-2"></i>Informations Personnelles
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-4x text-gray-300"></i>
+                    </div>
+                    <h5 class="font-weight-bold text-gray-800">{{ employee.prenom }} {{ employee.nom }}</h5>
+                    {% if employee.employeeContrats is not empty %}
+                        {% set currentContrat = employee.employeeContrats|first %}
+                        {% if currentContrat.organisationEmployeeContrats is not empty %}
+                            {% set currentOrg = currentContrat.organisationEmployeeContrats|first.organisation %}
+                            <p class="text-muted mb-3">{{ currentOrg.dossierDesignation }}</p>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <div class="row text-center">
+                        <div class="col-12 mb-2">
+                            <small class="text-muted">Email</small><br>
+                            <strong>{{ employee.email }}</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Actif
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions Rapides -->
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header dark-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-bolt me-2"></i>Actions Rapides
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 col-sm-6 mb-3">
+                        <a href="{{ path('employee_profile') }}" class="btn btn-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="min-height: 120px;">
+                            <i class="fas fa-user fa-2x mb-2"></i>
+                            <span>Mon Profil</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-3">
+                        <a href="{{ path('employee_contrats') }}" class="btn btn-success w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="min-height: 120px;">
+                            <i class="fas fa-file-contract fa-2x mb-2"></i>
+                            <span>Mes Contrats</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-3">
+                        <a href="{{ path('employee_dossiers') }}" class="btn btn-info w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="min-height: 120px;">
+                            <i class="fas fa-folder fa-2x mb-2"></i>
+                            <span>Mon Dossier</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-3">
+                        <a href="{{ path('employee_demandes') }}" class="btn btn-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="min-height: 120px;">
+                            <i class="fas fa-envelope fa-2x mb-2"></i>
+                            <span>Mes Demandes</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-3">
+                        <a href="{{ path('employee_nouvelle_demande') }}" class="btn btn-danger w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="min-height: 120px;">
+                            <i class="fas fa-plus fa-2x mb-2"></i>
+                            <span>Nouvelle Demande</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts pour les graphiques -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Graphique des contrats
+const contratsCtx = document.getElementById('contratsChart').getContext('2d');
+const contratsChart = new Chart(contratsCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Actifs', 'Expirés', 'Suspendus'],
+        datasets: [{
+            data: [
+                {{ contrats|filter(c => c.statut == 'actif')|length }},
+                {{ contrats|filter(c => c.statut == 'expire')|length }},
+                {{ contrats|filter(c => c.statut == 'suspendu')|length }}
+            ],
+            backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e'],
+            hoverBackgroundColor: ['#17a673', '#c0392b', '#d68910'],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+        }],
+    },
+    options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Graphique des dossiers
+const dossiersCtx = document.getElementById('dossiersChart').getContext('2d');
+const dossiersChart = new Chart(dossiersCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Complétés', 'En cours', 'En attente'],
+        datasets: [{
+            data: [
+                {{ dossiersWithRealStatus|filter(d => d.realStatus == 'completed')|length }},
+                {{ dossiersWithRealStatus|filter(d => d.realStatus == 'in_progress')|length }},
+                {{ dossiersWithRealStatus|filter(d => d.realStatus == 'pending')|length }}
+            ],
+            backgroundColor: ['#1cc88a', '#36b9cc', '#858796'],
+            hoverBackgroundColor: ['#17a673', '#2c9faf', '#6c757d'],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+        }],
+    },
+    options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+
+<style>
+    /* Dark Mode Styles for Employee Dashboard */
+    [data-bs-theme="dark"] .card {
+        background: var(--bg-primary) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .card-header {
+        background: var(--bg-secondary) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .card-body {
+        background: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .btn {
+        color: white !important;
+    }
+
+    [data-bs-theme="dark"] .text-primary {
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .text-muted {
+        color: var(--text-secondary) !important;
+    }
+
+    /* Dark Header Styles for Actions Rapides */
+    .dark-header {
+        background: #0f172a !important;
+        border-bottom: 1px solid #334155 !important;
+        color: #f8fafc !important;
+    }
+
+    .dark-header h6 {
+        color: #f8fafc !important;
+    }
+
+    .dark-header i {
+        color: #f8fafc !important;
+    }
+
+    /* Dark mode specific styles */
+    [data-bs-theme="dark"] .dark-header {
+        background: #0f172a !important;
+        border-bottom: 1px solid #334155 !important;
+        color: #f8fafc !important;
+    }
+
+    [data-bs-theme="dark"] .dark-header h6 {
+        color: #f8fafc !important;
+    }
+
+    [data-bs-theme="dark"] .dark-header i {
+        color: #f8fafc !important;
+    }
+
+    /* Light mode - keep normal appearance */
+    [data-bs-theme="light"] .dark-header {
+        background: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    [data-bs-theme="light"] .dark-header h6 {
+        color: #1e293b !important;
+    }
+
+    [data-bs-theme="light"] .dark-header i {
+        color: #1e293b !important;
+    }
+    
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 767px) {
+        h1.h3 {
+            font-size: 1.25rem !important;
+        }
+        
+        .d-sm-flex {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .col-xl-3,
+        .col-md-6 {
+            margin-bottom: 1rem;
+        }
+        
+        .card-body .h5 {
+            font-size: 1.25rem !important;
+        }
+        
+        .text-xs {
+            font-size: 0.7rem !important;
+        }
+        
+        .fa-2x {
+            font-size: 1.5rem !important;
+        }
+        
+        .table {
+            font-size: 0.85rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.5rem !important;
+        }
+        
+        .badge {
+            font-size: 0.75rem !important;
+        }
+        
+        .btn {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.8rem !important;
+        }
+        
+        .btn-sm {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .card-header h6 {
+            font-size: 0.95rem !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,292 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Dossiers{% endblock %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="mb-0">
+                            <i class="fas fa-folder me-2"></i>
+                            Gestion des Dossiers
+                        </h1>
+                        <small class="text-muted">Suivi de la conformité documentaire des employés</small>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="{{ path('responsable_add_dossier') }}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Ajouter un Dossier
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Barre de recherche -->
+                <div class="mt-3 pt-3 border-top">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="search" 
+                                   value="{{ search }}" 
+                                   placeholder="Rechercher par dossier, employé, documents, placard, statut...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i>Rechercher
+                        </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                {% if search %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-search me-2"></i>
+                        Recherche pour : "<strong>{{ search }}</strong>" 
+                        ({{ dossiers|length }} résultat{{ dossiers|length > 1 ? 's' : '' }})
+                        <a href="{{ path('responsable_manage_dossiers') }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="fas fa-times"></i> Effacer
+                        </a>
+                    </div>
+                {% endif %}
+                
+                {% if dossiers is empty %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun dossier trouvé. 
+                        <a href="{{ path('responsable_add_dossier') }}" class="alert-link">Ajouter le premier dossier</a>
+                    </div>
+                {% else %}
+                    <!-- Desktop Table View -->
+                    <div class="table-responsive desktop-view">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titre</th>
+                                    <th>Employé</th>
+                                    <th>Statut</th>
+                                    <th>Placard</th>
+                                    <th>Documents</th>
+                                    <th>Description</th>
+                                    <th>Date de Création</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dossier in dossiers %}
+                                <tr>
+                                    <td>{{ dossier.id }}</td>
+                                    <td>{{ dossier.nom }}</td>
+                                    <td>{{ dossier.employe.prenom }} {{ dossier.employe.nom }}</td>
+                                    <td>
+                                        {% if dossier.status == 'completed' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Complété
+                                            </span>
+                                        {% elseif dossier.status == 'in_progress' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>En cours
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-hourglass-half me-1"></i>En attente
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if dossier.placard %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-archive me-1"></i>
+                                                {{ dossier.placard.name }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Aucun placard</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if dossier.documentCount > 0 %}
+                                            <span class="badge bg-info">{{ dossier.documentCount }} document(s)</span>
+                                        {% else %}
+                                            <span class="text-muted">Aucun document</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ dossier.description|length > 50 ? dossier.description|slice(0, 50) ~ '...' : dossier.description }}</td>
+                                    <td>{{ dossier.createdAt|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ path('responsable_view_dossier_documents', {'id': dossier.id}) }}" class="btn btn-sm btn-info" title="Voir les documents">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('responsable_edit_dossier', {'id': dossier.id}) }}" class="btn btn-sm btn-warning" title="Modifier le dossier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ path('responsable_delete_dossier', {'id': dossier.id}) }}" 
+                                               class="btn btn-sm btn-danger"
+                                               title="Supprimer le dossier"
+                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce dossier ?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Section documents supprimée car la relation dossier-document n'existe plus -->
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mobile Card View -->
+                    <div class="mobile-view">
+                        {% for dossier in dossiers %}
+                        <div class="dossier-card mb-3">
+                            <div class="dossier-card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-folder me-2"></i>
+                                            {{ dossier.nom }}
+                                        </h6>
+                                        <small class="text-muted">{{ dossier.employe.prenom }} {{ dossier.employe.nom }}</small>
+                                    </div>
+                                    {% if dossier.status == 'completed' %}
+                                        <span class="badge bg-success">Complété</span>
+                                    {% elseif dossier.status == 'in_progress' %}
+                                        <span class="badge bg-warning">En cours</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">En attente</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="dossier-card-body">
+                                {% if dossier.placard %}
+                                <div class="info-row">
+                                    <i class="fas fa-archive text-secondary"></i>
+                                    <span>{{ dossier.placard.name }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="info-row">
+                                    <i class="fas fa-file text-info"></i>
+                                    <span>{{ dossier.documentCount > 0 ? dossier.documentCount ~ ' document(s)' : 'Aucun document' }}</span>
+                                </div>
+                                {% if dossier.description %}
+                                <div class="info-row">
+                                    <i class="fas fa-info-circle text-muted"></i>
+                                    <span class="text-truncate">{{ dossier.description|length > 60 ? dossier.description|slice(0, 60) ~ '...' : dossier.description }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="info-row">
+                                    <i class="fas fa-calendar text-primary"></i>
+                                    <span>{{ dossier.createdAt|date('d/m/Y') }}</span>
+                                </div>
+                            </div>
+                            <div class="dossier-card-actions">
+                                <a href="{{ path('responsable_view_dossier_documents', {'id': dossier.id}) }}" 
+                                   class="btn btn-sm btn-outline-primary flex-fill">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <a href="{{ path('responsable_edit_dossier', {'id': dossier.id}) }}" 
+                                   class="btn btn-sm btn-outline-warning flex-fill">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if dossiers is defined and dossiers.pageCount > 1 %}
+                {% include '_pagination.html.twig' with {'pagination': dossiers} %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .mobile-view { display: none; }
+    
+    .dossier-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dossier-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .dossier-card-header h6 {
+        margin: 0;
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .dossier-card-body {
+        padding: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-row span {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    
+    .dossier-card-actions {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 767px) {
+        .desktop-view { display: none !important; }
+        .mobile-view { display: block !important; }
+        
+        .card-header .d-flex {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .card-header .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

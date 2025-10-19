@@ -1,0 +1,361 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documents du Dossier - {{ dossier.nom }}{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Documents du Dossier
+                    </h1>
+                    <p class="mb-0 text-muted">
+                        <strong>{{ dossier.nom }}</strong> - {{ dossier.employe.prenom }} {{ dossier.employe.nom }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ path('responsable_manage_dossiers') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour aux Dossiers
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Document Requirements Section -->
+                {% if documentRequirements is not empty %}
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">Progression des documents</span>
+                            <span class="badge bg-primary">{{ completionPercentage }}%</span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar {% if completionPercentage == 100 %}bg-success{% elseif completionPercentage >= 70 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ completionPercentage }}%" 
+                                 aria-valuenow="{{ completionPercentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ completionPercentage }}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Requirements List -->
+                    <h5><i class="fas fa-list me-2"></i>Documents Requis par Contrat</h5>
+                    
+                    <!-- Documents Obligatoires -->
+                    <h6 class="text-danger mb-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Documents Obligatoires
+                    </h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-danger">
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Contrat</th>
+                                    <th>Statut d'Ajout</th>
+                                    <th>Statut Téléchargement</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for requirement in documentRequirements %}
+                                    {% if requirement.required %}
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>{{ requirement.abbreviation }}</strong>
+                                                {% if requirement.document %}
+                                                    <br><small class="text-muted">{{ requirement.document.libelleComplet }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ requirement.contractType }}</span>
+                                        </td>
+                                        <td>
+                                            {% if requirement.document %}
+                                                <a href="{{ path('responsable_toggle_statut_ajout', {'id': requirement.document.id}) }}" 
+                                                   class="badge {% if requirement.document.statutAjout == 'ajoute' %}bg-success{% else %}bg-danger{% endif %} text-decoration-none"
+                                                   style="cursor: pointer;"
+                                                   title="Cliquer pour marquer comme {% if requirement.document.statutAjout == 'ajoute' %}non ajouté{% else %}ajouté{% endif %}">
+                                                    <i class="fas {% if requirement.document.statutAjout == 'ajoute' %}fa-check{% else %}fa-times{% endif %} me-1"></i>
+                                                    {% if requirement.document.statutAjout == 'ajoute' %}Ajouté{% else %}Non ajouté{% endif %}
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ path('responsable_toggle_statut_ajout_new', {'dossier_id': dossier.id, 'abbreviation': requirement.abbreviation}) }}" 
+                                                   class="badge bg-danger text-decoration-none"
+                                                   style="cursor: pointer;"
+                                                   title="Cliquer pour marquer comme ajouté">
+                                                    <i class="fas fa-times me-1"></i>Non ajouté
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if requirement.document %}
+                                                <span class="badge {% if requirement.document.statutTelechargement == 'telecharge' %}bg-success{% else %}bg-warning{% endif %}">
+                                                    <i class="fas {% if requirement.document.statutTelechargement == 'telecharge' %}fa-check{% else %}fa-clock{% endif %} me-1"></i>
+                                                    {% if requirement.document.statutTelechargement == 'telecharge' %}Téléchargé{% else %}Non téléchargé{% endif %}
+                                                </span>
+                                                {% if requirement.document.uploadedBy and requirement.document.statutTelechargement == 'telecharge' %}
+                                                    <br><small class="text-muted">Par: {{ requirement.document.uploadedBy }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-clock me-1"></i>Non téléchargé
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                {% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}
+                                                    <a href="{{ path('responsable_download_document', {'id': requirement.document.id}) }}" 
+                                                       class="btn btn-sm btn-outline-success" title="Télécharger">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{{ path('responsable_upload_document', {'dossier_id': dossier.id, 'abbreviation': requirement.abbreviation}) }}" 
+                                                   class="btn btn-sm {% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}btn-warning{% else %}btn-primary{% endif %}"
+                                                   title="{% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}Modifier le fichier{% else %}Uploader un fichier{% endif %}">
+                                                    <i class="fas {% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}fa-edit{% else %}fa-upload{% endif %}"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Documents Complémentaires -->
+                    <h6 class="text-secondary mb-3">
+                        <i class="fas fa-plus-circle me-2"></i>Documents Complémentaires
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Contrat</th>
+                                    <th>Statut d'Ajout</th>
+                                    <th>Statut Téléchargement</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for requirement in documentRequirements %}
+                                    {% if not requirement.required %}
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>{{ requirement.abbreviation }}</strong>
+                                                {% if requirement.document %}
+                                                    <br><small class="text-muted">{{ requirement.document.libelleComplet }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ requirement.contractType }}</span>
+                                        </td>
+                                        <td>
+                                            {% if requirement.document %}
+                                                <a href="{{ path('responsable_toggle_statut_ajout', {'id': requirement.document.id}) }}" 
+                                                   class="badge {% if requirement.document.statutAjout == 'ajoute' %}bg-success{% else %}bg-secondary{% endif %} text-decoration-none"
+                                                   style="cursor: pointer;"
+                                                   title="Cliquer pour marquer comme {% if requirement.document.statutAjout == 'ajoute' %}non ajouté{% else %}ajouté{% endif %}">
+                                                    <i class="fas {% if requirement.document.statutAjout == 'ajoute' %}fa-check{% else %}fa-minus{% endif %} me-1"></i>
+                                                    {% if requirement.document.statutAjout == 'ajoute' %}Ajouté{% else %}Non ajouté{% endif %}
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ path('responsable_toggle_statut_ajout_new', {'dossier_id': dossier.id, 'abbreviation': requirement.abbreviation}) }}" 
+                                                   class="badge bg-secondary text-decoration-none"
+                                                   style="cursor: pointer;"
+                                                   title="Cliquer pour marquer comme ajouté">
+                                                    <i class="fas fa-minus me-1"></i>Non ajouté
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if requirement.document %}
+                                                <span class="badge {% if requirement.document.statutTelechargement == 'telecharge' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                    <i class="fas {% if requirement.document.statutTelechargement == 'telecharge' %}fa-check{% else %}fa-clock{% endif %} me-1"></i>
+                                                    {% if requirement.document.statutTelechargement == 'telecharge' %}Téléchargé{% else %}Non téléchargé{% endif %}
+                                                </span>
+                                                {% if requirement.document.uploadedBy and requirement.document.statutTelechargement == 'telecharge' %}
+                                                    <br><small class="text-muted">Par: {{ requirement.document.uploadedBy }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-clock me-1"></i>Non téléchargé
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                {% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}
+                                                    <a href="{{ path('responsable_download_document', {'id': requirement.document.id}) }}" 
+                                                       class="btn btn-sm btn-outline-success" title="Télécharger">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{{ path('responsable_upload_document', {'dossier_id': dossier.id, 'abbreviation': requirement.abbreviation}) }}" 
+                                                   class="btn btn-sm {% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}btn-warning{% else %}btn-outline-primary{% endif %}"
+                                                   title="{% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}Modifier le fichier{% else %}Uploader un fichier{% endif %}">
+                                                    <i class="fas {% if requirement.document and requirement.document.statutTelechargement == 'telecharge' %}fa-edit{% else %}fa-upload{% endif %}"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <hr>
+                {% endif %}
+
+                {% if documents is empty %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun document uploadé dans ce dossier.
+                    </div>
+                {% else %}
+                    <!-- Résumé des documents existants -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-chart-pie me-2"></i>Résumé des Documents</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-file-alt fa-2x mb-2"></i>
+                                        <h4>{{ documents|length }}</h4>
+                                        <p class="mb-0">Document(s) total</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-file fa-2x mb-2"></i>
+                                        <h4>{{ documents|filter(d => d.filePath)|length }}</h4>
+                                        <p class="mb-0">Document(s) avec fichier</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-tag fa-2x mb-2"></i>
+                                        <h4>{{ documents|filter(d => d.typeDocument)|length }}</h4>
+                                        <p class="mb-0">Document(s) typé(s)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-question-circle fa-2x mb-2"></i>
+                                        <h4>{{ documents|filter(d => not d.typeDocument)|length }}</h4>
+                                        <p class="mb-0">Document(s) non typé(s)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liste des documents -->
+                    <h5><i class="fas fa-list me-2"></i>Documents du Dossier ({{ documents|length }})</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Abréviation</th>
+                                    <th>Libellé Complet</th>
+                                    <th>Type de Document</th>
+                                    <th>Statut d'Ajout</th>
+                                    <th>Statut Téléchargement</th>
+                                    <th>Fichier</th>
+                                    <th>Uploadé par</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for document in documents %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">{{ document.abbreviation }}</span>
+                                    </td>
+                                    <td>{{ document.libelleComplet }}</td>
+                                    <td>
+                                        {% if document.typeDocument %}
+                                            <span class="badge bg-info">{{ document.typeDocument }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Non défini</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('responsable_toggle_statut_ajout', {'id': document.id}) }}" 
+                                           class="badge {% if document.statutAjout == 'ajoute' %}bg-success{% else %}bg-danger{% endif %} text-decoration-none"
+                                           style="cursor: pointer;"
+                                           title="Cliquer pour marquer comme {% if document.statutAjout == 'ajoute' %}non ajouté{% else %}ajouté{% endif %}">
+                                            <i class="fas {% if document.statutAjout == 'ajoute' %}fa-check{% else %}fa-times{% endif %} me-1"></i>
+                                            {% if document.statutAjout == 'ajoute' %}Ajouté{% else %}Non ajouté{% endif %}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if document.statutTelechargement == 'telecharge' %}bg-success{% else %}bg-warning{% endif %}">
+                                            <i class="fas {% if document.statutTelechargement == 'telecharge' %}fa-check{% else %}fa-clock{% endif %} me-1"></i>
+                                            {% if document.statutTelechargement == 'telecharge' %}Téléchargé{% else %}Non téléchargé{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if document.filePath %}
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-file me-2 text-success"></i>
+                                                <small class="text-muted">{{ document.fileType|default('Fichier') }}</small>
+                                            </div>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Aucun fichier</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if document.uploadedBy %}
+                                            <small class="text-muted">{{ document.uploadedBy }}</small>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Non défini</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            {% if document.filePath %}
+                                                <a href="{{ path('responsable_download_document', {'id': document.id}) }}" class="btn btn-sm btn-outline-success" title="Télécharger">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            {% endif %}
+                                            <a href="{{ path('responsable_edit_document', {'id': document.id}) }}" class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ path('responsable_delete_document', {'id': document.id}) }}" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Supprimer"
+                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,359 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Réclamation{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Détails de la Réclamation
+                </h1>
+                <a href="{{ path('manager_reclamations') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="reclamation-details">
+                            <div class="detail-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-user me-2"></i>
+                                    Informations Employé
+                                </h5>
+                                <div class="detail-content">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="user-avatar me-3">
+                                            <span class="avatar-text">{{ reclamation.employe.prenom|first|upper }}{{ reclamation.employe.nom|first|upper }}</span>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">{{ reclamation.employe.prenom }} {{ reclamation.employe.nom }}</h6>
+                                            <p class="text-muted mb-0">{{ reclamation.employe.email }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Détails de la Réclamation
+                                </h5>
+                                <div class="detail-content">
+                                    <div class="row">
+                                        <div class="col-sm-6 mb-3">
+                                            <strong>Type:</strong>
+                                            <span class="type-badge type-{{ reclamation.typeReclamation }}">
+                                                {{ reclamation.typeReclamationLabel }}
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <strong>Statut:</strong>
+                                            <span class="status-badge status-{{ reclamation.statutBadgeClass }}">
+                                                <i class="fas fa-circle me-1"></i>
+                                                {{ reclamation.statutLabel }}
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <strong>Date de création:</strong>
+                                            <span>{{ reclamation.dateCreation|date('d/m/Y à H:i') }}</span>
+                                        </div>
+                                        {% if reclamation.dateTraitement %}
+                                        <div class="col-sm-6 mb-3">
+                                            <strong>Date de traitement:</strong>
+                                            <span>{{ reclamation.dateTraitement|date('d/m/Y à H:i') }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-comment me-2"></i>
+                                    Commentaire
+                                </h5>
+                                <div class="detail-content">
+                                    <div class="comment-box">
+                                        {{ reclamation.commentaire|nl2br }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if reclamation.reponseRh %}
+                            <div class="detail-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-reply me-2"></i>
+                                    Réponse RH
+                                </h5>
+                                <div class="detail-content">
+                                    <div class="response-box">
+                                        {{ reclamation.reponseRh|nl2br }}
+                                    </div>
+                                    {% if reclamation.traitePar %}
+                                    <small class="text-muted">
+                                        Traité par: {{ reclamation.traitePar.prenom }} {{ reclamation.traitePar.nom }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="sidebar-info">
+                            {% if reclamation.documentPath %}
+                            <div class="info-card">
+                                <h6 class="card-title">
+                                    <i class="fas fa-file me-2"></i>
+                                    Document Joint
+                                </h6>
+                                <div class="document-preview">
+                                    <a href="/uploads/reclamations/{{ reclamation.documentPath|split('/')|last }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-download me-2"></i>
+                                        Télécharger le document
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="info-card">
+                                <h6 class="card-title">
+                                    <i class="fas fa-history me-2"></i>
+                                    Historique
+                                </h6>
+                                <div class="timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker bg-primary"></div>
+                                        <div class="timeline-content">
+                                            <strong>Réclamation créée</strong>
+                                            <small class="text-muted d-block">{{ reclamation.dateCreation|date('d/m/Y H:i') }}</small>
+                                        </div>
+                                    </div>
+                                    {% if reclamation.dateTraitement %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <strong>Réclamation traitée</strong>
+                                            <small class="text-muted d-block">{{ reclamation.dateTraitement|date('d/m/Y H:i') }}</small>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .reclamation-details {
+        padding-right: 1rem;
+    }
+    
+    .detail-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .detail-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    
+    .section-title {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #007bff;
+        display: inline-block;
+    }
+    
+    .detail-content {
+        padding-left: 1rem;
+    }
+    
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .avatar-text {
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .type-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-block;
+    }
+    
+    .type-assiduite {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .type-accident_travail {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .status-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .comment-box, .response-box {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        white-space: pre-wrap;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .response-box {
+        background: #e8f5e8;
+        border-color: #c3e6c3;
+    }
+    
+    .sidebar-info {
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .info-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .info-card .card-title {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+    
+    .document-preview {
+        text-align: center;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.75rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -2rem;
+        top: 0.25rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 0 0 2px #e9ecef;
+    }
+    
+    .timeline-content {
+        padding-left: 0.5rem;
+    }
+    
+    .timeline-content strong {
+        display: block;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+    
+    .timeline-content small {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    @media (max-width: 767px) {
+        .reclamation-details {
+            padding-right: 0;
+        }
+        
+        .sidebar-info {
+            position: static;
+            margin-top: 2rem;
+        }
+        
+        .card-header {
+            flex-direction: column !important;
+            gap: 0.75rem;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .card-header .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

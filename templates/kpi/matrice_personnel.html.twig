@@ -1,0 +1,224 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Matrice Personnel - Système RH{% endblock %}
+{% block page_title %}Matrice Personnel{% endblock %}
+
+{% block body %}
+<div class="kpi-report-wrapper">
+    <div class="container-fluid">
+    <!-- Back Navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb" class="animate-fade-in-up">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('kpi_index') }}">Rapports de Performance</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Matrice Personnel</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Rapport Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg animate-fade-in-up">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-th me-2"></i>
+                        {{ page_title }}
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 matrix-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Contrat / DAS</th>
+                                    {% for das in das_list %}
+                                        <th class="text-center">{{ das }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contract in contract_list %}
+                                    <tr class="animate-fade-in-up" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                                        <td class="fw-bold">
+                                            {{ contract }}
+                                        </td>
+                                        {% for das in das_list %}
+                                            <td class="text-center">
+                                                {% set key = contract ~ '_' ~ das %}
+                                                {% if data[key] is defined %}
+                                                    <span class="badge bg-success fs-6">
+                                                        {{ data[key] }}%
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary fs-6">
+                                                        N/A
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<style>
+    /* KPI Report Wrapper - Force Light Mode */
+    .kpi-report-wrapper {
+        background: #f8fafc !important;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    /* Force light mode for all elements */
+    .kpi-report-wrapper .card {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    .kpi-report-wrapper .card-header {
+        background-color: #f8fafc !important;
+        border-bottom-color: #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    .kpi-report-wrapper .card-body {
+        background-color: #ffffff !important;
+        color: #1e293b !important;
+    }
+
+    /* Matrix table */
+    .matrix-table {
+        transition: var(--transition);
+    }
+
+    .matrix-table thead th {
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .matrix-table tbody tr {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        transition: var(--transition);
+    }
+
+    .matrix-table tbody tr:hover {
+        background-color: #f8fafc !important;
+        color: #1e293b !important;
+    }
+
+    .matrix-table td {
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        vertical-align: middle;
+        transition: var(--transition);
+    }
+
+    .matrix-table td:hover {
+        background: var(--bg-tertiary);
+        transform: scale(1.05);
+        z-index: 10;
+        position: relative;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius);
+        transition: var(--transition);
+    }
+
+    .badge.fs-6 {
+        font-size: 1rem !important;
+        font-weight: 600;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: #ffffff !important;
+        border-radius: var(--radius);
+        padding: 1rem;
+        transition: var(--transition);
+    }
+
+    .breadcrumb-item a {
+        color: #0ea5e9 !important;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .breadcrumb-item a:hover {
+        color: #0284c7 !important;
+        text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+        color: #64748b !important;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate badges
+        const badges = document.querySelectorAll('.badge');
+        badges.forEach((badge, index) => {
+            badge.style.opacity = '0';
+            badge.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                badge.style.transition = 'all 0.3s ease';
+                badge.style.opacity = '1';
+                badge.style.transform = 'scale(1)';
+            }, index * 20 + 300);
+        });
+
+        // Add hover effects to table cells
+        const tableCells = document.querySelectorAll('.matrix-table td');
+        tableCells.forEach(cell => {
+            cell.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.zIndex = '10';
+                this.style.position = 'relative';
+            });
+            
+            cell.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.zIndex = 'auto';
+                this.style.position = 'relative';
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,357 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Réclamations{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Gestion des Réclamations
+                </h1>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('responsable_manage_reclamations') }}?filter=en_attente" 
+                       class="btn {% if currentFilter == 'en_attente' %}btn-warning active{% else %}btn-outline-warning{% endif %}">
+                        <i class="fas fa-clock me-2"></i>En Attente
+                    </a>
+                    <a href="{{ path('responsable_manage_reclamations') }}?filter=traitees" 
+                       class="btn {% if currentFilter == 'traitees' %}btn-success active{% else %}btn-outline-success{% endif %}">
+                        <i class="fas fa-check me-2"></i>Traitées
+                    </a>
+                    <a href="{{ path('responsable_manage_reclamations') }}" 
+                       class="btn {% if currentFilter == 'all' %}btn-primary active{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-list me-2"></i>Toutes
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if reclamations is empty %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Aucune réclamation</h3>
+                        <p class="text-muted">Aucune réclamation n'a été soumise pour le moment.</p>
+                    </div>
+                {% else %}
+                    <!-- Desktop Table View -->
+                    <div class="table-responsive desktop-view">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Employé</th>
+                                    <th>Manager</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Document</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reclamation in reclamations %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-2">
+                                                <span class="avatar-text">{{ reclamation.employe.prenom|first|upper }}{{ reclamation.employe.nom|first|upper }}</span>
+                                            </div>
+                                            <div>
+                                                <strong>{{ reclamation.employe.prenom }} {{ reclamation.employe.nom }}</strong><br>
+                                                <small class="text-muted">{{ reclamation.employe.email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="manager-avatar me-2">
+                                                <span class="avatar-text">{{ reclamation.manager.prenom|first|upper }}{{ reclamation.manager.nom|first|upper }}</span>
+                                            </div>
+                                            <div>
+                                                <strong>{{ reclamation.manager.prenom }} {{ reclamation.manager.nom }}</strong><br>
+                                                <small class="text-muted">{{ reclamation.manager.email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="type-badge type-{{ reclamation.typeReclamation }}">
+                                            {{ reclamation.typeReclamationLabel }}
+                                        </span>
+                                    </td>
+                                    <td>{{ reclamation.dateCreation|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ reclamation.statutBadgeClass }}">
+                                            <i class="fas fa-circle me-1"></i>
+                                            {{ reclamation.statutLabel }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if reclamation.documentPath %}
+                                            <a href="/uploads/reclamations/{{ reclamation.documentPath|split('/')|last }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-file"></i> Voir
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">Aucun</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('responsable_traiter_reclamation', {'id': reclamation.id}) }}" 
+                                           class="btn btn-sm {% if reclamation.statut == 'en_attente' %}btn-warning{% else %}btn-outline-primary{% endif %}">
+                                            <i class="fas fa-{% if reclamation.statut == 'en_attente' %}edit{% else %}eye{% endif %}"></i> 
+                                            {% if reclamation.statut == 'en_attente' %}Traiter{% else %}Voir{% endif %}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mobile Card View -->
+                    <div class="mobile-view">
+                        {% for reclamation in reclamations %}
+                        <div class="reclamation-card mb-3">
+                            <div class="reclamation-card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-user me-2"></i>
+                                            {{ reclamation.employe.prenom }} {{ reclamation.employe.nom }}
+                                        </h6>
+                                        <small class="text-muted">{{ reclamation.employe.email }}</small>
+                                    </div>
+                                    <span class="status-badge status-{{ reclamation.statutBadgeClass }}">
+                                        {{ reclamation.statutLabel }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="reclamation-card-body">
+                                <div class="info-row">
+                                    <i class="fas fa-user-tie text-primary"></i>
+                                    <span><strong>Manager:</strong> {{ reclamation.manager.prenom }} {{ reclamation.manager.nom }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <i class="fas fa-tag text-info"></i>
+                                    <span class="type-badge type-{{ reclamation.typeReclamation }}">
+                                        {{ reclamation.typeReclamationLabel }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <i class="fas fa-calendar text-warning"></i>
+                                    <span>{{ reclamation.dateCreation|date('d/m/Y H:i') }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <i class="fas fa-file text-secondary"></i>
+                                    <span>
+                                        {% if reclamation.documentPath %}
+                                            <a href="/uploads/reclamations/{{ reclamation.documentPath|split('/')|last }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-file"></i> Document
+                                            </a>
+                                        {% else %}
+                                            Aucun document
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                {% if reclamation.commentaire %}
+                                <div class="info-row">
+                                    <i class="fas fa-comment text-muted"></i>
+                                    <span class="comment-preview">{{ reclamation.commentaire|length > 50 ? reclamation.commentaire|slice(0, 50) ~ '...' : reclamation.commentaire }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="reclamation-card-actions">
+                                <a href="{{ path('responsable_traiter_reclamation', {'id': reclamation.id}) }}" 
+                                   class="btn btn-sm {% if reclamation.statut == 'en_attente' %}btn-warning{% else %}btn-outline-primary{% endif %} flex-fill">
+                                    <i class="fas fa-{% if reclamation.statut == 'en_attente' %}edit{% else %}eye{% endif %}"></i> 
+                                    {% if reclamation.statut == 'en_attente' %}Traiter{% else %}Voir{% endif %}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mobile-view { display: none; }
+    
+    .reclamation-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .reclamation-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .reclamation-card-header h6 {
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .reclamation-card-body {
+        padding: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-row span {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    
+    .reclamation-card-actions {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .user-avatar, .manager-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .manager-avatar {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    
+    .avatar-text {
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    
+    .type-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+    }
+    
+    .type-assiduite {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .type-accident_travail {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .status-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .comment-preview {
+        font-style: italic;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .empty-state-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .empty-state-icon i {
+        font-size: 1.5rem;
+        color: #6c757d;
+    }
+    
+    .empty-state h3 {
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    @media (max-width: 767px) {
+        .desktop-view { display: none !important; }
+        .mobile-view { display: block !important; }
+        
+        .card-header {
+            flex-direction: column !important;
+            gap: 0.75rem;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .card-header .d-flex {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}

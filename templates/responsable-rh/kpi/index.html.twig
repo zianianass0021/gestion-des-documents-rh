@@ -1,0 +1,144 @@
+{% extends 'base_sidebar.html.twig' %}
+
+{% block title %}Tableaux de Bord KPI{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="fas fa-chart-line me-2"></i>
+                Tableaux de Bord - Indicateurs Clés de Performance (KPI)
+            </h1>
+            <p class="text-muted">Analyses et statistiques sur la fiabilisation des dossiers RH</p>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-4">
+        <!-- A. Fiabilisation par Nature de Contrat -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body text-center">
+                    <div class="icon-circle bg-primary-subtle mb-3 mx-auto" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-file-contract fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Par Nature de Contrat</h5>
+                    <p class="card-text text-muted">Fiabilisation des dossiers RH par type de contrat</p>
+                    <a href="{{ path('responsable_kpi_by_contract') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        Voir le rapport
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- B. Fiabilisation par DAS -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body text-center">
+                    <div class="icon-circle bg-success-subtle mb-3 mx-auto" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-building fa-2x text-success"></i>
+                    </div>
+                    <h5 class="card-title">Par DAS</h5>
+                    <p class="card-text text-muted">Fiabilisation des dossiers RH par division activités stratégiques</p>
+                    <a href="{{ path('responsable_kpi_by_das') }}" class="btn btn-success mt-3">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        Voir le rapport
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- C. Détails par DAS -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body text-center">
+                    <div class="icon-circle bg-info-subtle mb-3 mx-auto" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-list-check fa-2x text-info"></i>
+                    </div>
+                    <h5 class="card-title">Détails par DAS</h5>
+                    <p class="card-text text-muted">Détail document par document pour chaque DAS</p>
+                    <a href="{{ path('responsable_kpi_details_das') }}" class="btn btn-info mt-3">
+                        <i class="fas fa-table me-1"></i>
+                        Voir les détails
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- D. Détails par Nature de Contrat -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body text-center">
+                    <div class="icon-circle bg-warning-subtle mb-3 mx-auto" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-clipboard-list fa-2x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">Détails par Contrat</h5>
+                    <p class="card-text text-muted">Détail document par document pour chaque type de contrat</p>
+                    <a href="{{ path('responsable_kpi_details_contract') }}" class="btn btn-warning mt-3">
+                        <i class="fas fa-table me-1"></i>
+                        Voir les détails
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        À propos des indicateurs
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary"><i class="fas fa-folder me-2"></i>Dossier Personnel</h6>
+                            <p class="small text-muted">Documents essentiels pour la gestion administrative de l'employé (CIN, CV, Diplômes, Contrat, etc.)</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success"><i class="fas fa-users me-2"></i>Ayant Droits</h6>
+                            <p class="small text-muted">Documents concernant la famille de l'employé (Acte de mariage, CIN conjoint, Actes de naissance enfants, etc.)</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Note :</strong> Les taux d'avancement sont calculés en fonction des documents requis pour chaque type de contrat selon la matrice documentaire définie.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+
+.icon-circle {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+</style>
+{% endblock %}
+

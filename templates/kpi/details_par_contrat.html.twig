@@ -1,0 +1,244 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails par Contrat - Système RH{% endblock %}
+{% block page_title %}Détails par Contrat{% endblock %}
+
+{% block body %}
+<div class="kpi-report-wrapper">
+    <div class="container-fluid">
+    <!-- Back Navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb" class="animate-fade-in-up">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('kpi_index') }}">Rapports de Performance</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Détails par Contrat</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Rapport Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg animate-fade-in-up">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        {{ page_title }}
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Type de Contrat</th>
+                                    <th class="text-center">Document</th>
+                                    <th class="text-center">Pourcentage</th>
+                                    <th class="text-center">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data %}
+                                    <tr class="animate-fade-in-up" style="animation-delay: {{ loop.index0 * 0.05 }}s;">
+                                        <td class="fw-bold">
+                                            {{ item.contract_type }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ item.document_name }}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="progress-container">
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                                         style="width: {{ item.percentage }}%"
+                                                         aria-valuenow="{{ item.percentage }}" 
+                                                         aria-valuemin="0" aria-valuemax="100">
+                                                        {{ item.percentage }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if item.percentage >= 80 %}
+                                                <span class="badge bg-success fs-6">Excellent</span>
+                                            {% elseif item.percentage >= 60 %}
+                                                <span class="badge bg-warning fs-6">Bon</span>
+                                            {% else %}
+                                                <span class="badge bg-danger fs-6">À améliorer</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<style>
+    /* KPI Report Wrapper - Force Light Mode */
+    .kpi-report-wrapper {
+        background: #f8fafc !important;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    /* Force light mode for all elements */
+    .kpi-report-wrapper .card {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    .kpi-report-wrapper .card-header {
+        background-color: #f8fafc !important;
+        border-bottom-color: #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    .kpi-report-wrapper .card-body {
+        background-color: #ffffff !important;
+        color: #1e293b !important;
+    }
+
+    /* Progress bars */
+    .progress {
+        border-radius: var(--radius);
+        background: var(--bg-tertiary);
+        transition: var(--transition);
+    }
+
+    .progress-bar {
+        border-radius: var(--radius);
+        transition: var(--transition);
+    }
+
+    /* Badges */
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius);
+        transition: var(--transition);
+    }
+
+    .badge.fs-6 {
+        font-size: 1rem !important;
+        font-weight: 600;
+    }
+
+    /* Table styles */
+    .table {
+        transition: var(--transition);
+    }
+
+    .table thead th {
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .table tbody tr {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        transition: var(--transition);
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc !important;
+        color: #1e293b !important;
+    }
+
+    .table td {
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        vertical-align: middle;
+        transition: var(--transition);
+    }
+
+    /* Force light mode for progress bars */
+    .progress {
+        background-color: #e2e8f0 !important;
+    }
+
+    .progress-bar {
+        background-color: #0ea5e9 !important;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: #ffffff !important;
+        border-radius: var(--radius);
+        padding: 1rem;
+        transition: var(--transition);
+    }
+
+    .breadcrumb-item a {
+        color: #0ea5e9 !important;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .breadcrumb-item a:hover {
+        color: #0284c7 !important;
+        text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+        color: #64748b !important;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress bars
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach((bar, index) => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width 1s ease-out';
+                bar.style.width = width;
+            }, index * 50 + 300);
+        });
+
+        // Animate badges
+        const badges = document.querySelectorAll('.badge');
+        badges.forEach((badge, index) => {
+            badge.style.opacity = '0';
+            badge.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                badge.style.transition = 'all 0.3s ease';
+                badge.style.opacity = '1';
+                badge.style.transform = 'scale(1)';
+            }, index * 50 + 300);
+        });
+    });
+</script>
+{% endblock %}

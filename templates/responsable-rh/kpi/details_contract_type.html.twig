@@ -1,0 +1,69 @@
+{% extends 'base_sidebar.html.twig' %}
+
+{% block title %}KPI - Détails par Type de Contrat{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ path('responsable_kpi_index') }}" class="btn btn-outline-secondary mb-3">
+                <i class="fas fa-arrow-left me-1"></i>
+                Retour aux KPI
+            </a>
+            <h1 class="mb-3">
+                <i class="fas fa-clipboard-list me-2"></i>
+                D. Détails Fiabilisation par Nature de Contrat
+            </h1>
+            <p class="text-muted">Détail document par document pour chaque type de contrat</p>
+        </div>
+    </div>
+
+    {% for contractType, documents in data %}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">{{ contractType }}</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Document</th>
+                            <th class="text-center">Taux</th>
+                            <th class="text-center">Uploadés / Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for abbr, doc in documents %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-secondary me-2">{{ abbr }}</span>
+                                {{ doc.document_name }}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge 
+                                    {% if doc.percentage >= 80 %}bg-success
+                                    {% elseif doc.percentage >= 50 %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ doc.percentage|number_format(2) }}%
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                {{ doc.uploaded }} / {{ doc.total }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Aucune donnée disponible
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

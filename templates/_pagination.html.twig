@@ -1,0 +1,58 @@
+{# Template de pagination personnalisé - Compatible avec KnpPaginator et objet personnalisé #}
+{% if pagination.pageCount > 1 %}
+    {# Détection du type d'objet de pagination - utilise 'queryParams' qui n'existe que dans l'objet personnalisé #}
+    {% if pagination.queryParams is defined %}
+        {# Objet personnalisé stdClass #}
+        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+            <div class="pagination-info text-muted">
+                Affichage de {{ pagination.firstItemNumber }} à {{ pagination.lastItemNumber }} sur {{ pagination.totalCount }} éléments
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    {% if pagination.current > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ path(pagination.route, pagination.queryParams|merge({(pagination.pageParameterName): pagination.current - 1})) }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&laquo;</span>
+                        </li>
+                    {% endif %}
+
+                    {% for page in 1..pagination.pageCount %}
+                        {% if page == pagination.current %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ path(pagination.route, pagination.queryParams|merge({(pagination.pageParameterName): page})) }}">
+                                    {{ page }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.current < pagination.pageCount %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ path(pagination.route, pagination.queryParams|merge({(pagination.pageParameterName): pagination.current + 1})) }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&raquo;</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% else %}
+        {# KnpPaginator SlidingPagination - Utilise le rendu standard de KnpPaginator #}
+        <div class="d-flex justify-content-center mt-3">
+            {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+        </div>
+    {% endif %}
+{% endif %}

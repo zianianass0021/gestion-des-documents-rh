@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Télécharger Document - {{ abbreviation }}{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-upload me-2"></i>
+                    Télécharger Document : {{ abbreviation }}
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if requirement %}
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle me-2"></i>Informations sur le document</h5>
+                        <ul class="mb-0">
+                            <li><strong>Abbréviation :</strong> {{ requirement.abbreviation }}</li>
+                            <li><strong>Type de Contrat :</strong> {{ requirement.contractType }}</li>
+                            <li><strong>Statut :</strong> 
+                                {% if requirement.required %}
+                                    <span class="badge bg-warning text-dark">Obligatoire</span>
+                                {% else %}
+                                    <span class="badge bg-info">Optionnel</span>
+                                {% endif %}
+                            </li>
+                            {% if requirement.uploaded %}
+                                <li><strong>Statut actuel :</strong> <span class="badge bg-success">Déjà téléchargé</span></li>
+                                <li><strong>Dernière modification :</strong> 
+                                    {% if requirement.document.uploadedBy %}
+                                        Par {{ requirement.document.uploadedBy }}
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data">
+                    {% if dossierId %}
+                        <input type="hidden" name="dossier" value="{{ dossierId }}">
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="document_file" class="form-label">
+                            <i class="fas fa-file me-2"></i>Sélectionner le fichier
+                        </label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="document_file" 
+                               name="document_file" 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.txt,.xls,.xlsx,.ppt,.pptx,.zip,.rar"
+                               required>
+                        <div class="form-text">
+                            Formats acceptés : PDF, DOC, DOCX, JPG, JPEG, PNG, GIF, BMP, TIFF, TXT, XLS, XLSX, PPT, PPTX, ZIP, RAR
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        {% if dossierId %}
+                            <a href="{{ path('employee_dossier_detail', {'id': dossierId}) }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour au Dossier
+                            </a>
+                        {% else %}
+                            <a href="{{ path('employee_dossiers') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour aux Dossiers
+                            </a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-2"></i>
+                            {% if requirement.uploaded %}Modifier le Document{% else %}Télécharger le Document{% endif %}
+                        </button>
+                    </div>
+                </form>
+
+                {% if requirement.uploaded and requirement.document %}
+                    <hr>
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check-circle me-2"></i>Document actuellement téléchargé</h6>
+                        <p class="mb-2">
+                            <strong>Fichier :</strong> {{ requirement.document.filename }}<br>
+                            <strong>Type :</strong> {{ requirement.document.fileType }}<br>
+                            {% if requirement.document.uploadedBy %}
+                                <strong>Téléchargé par :</strong> {{ requirement.document.uploadedBy }}
+                            {% endif %}
+                        </p>
+                        <a href="{{ path('employee_download_document', {'id': requirement.document.id}) }}" 
+                           class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-download me-1"></i>Télécharger le document actuel
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

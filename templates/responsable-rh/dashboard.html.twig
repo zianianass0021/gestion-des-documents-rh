@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Responsable RH{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0">
+                    <i class="fas fa-user-friends me-2"></i>
+                    Dashboard Responsable RH
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Informations responsable RH
+                                </h5>
+                                <div class="alert alert-info">
+                                    <strong>Rôle :</strong> {{ app.user.roles|join(', ') }}
+                                </div>
+                                <div class="alert alert-success">
+                                    <strong>Statut :</strong> Phase d'authentification terminée
+                                </div>
+                                <p>Bienvenue dans le dashboard Responsable RH. Gérez tous les aspects des ressources humaines.</p>
+                                <div class="mt-4">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('responsable_manage_employes') }}" class="btn btn-primary w-100">
+                                                <i class="fas fa-users me-2"></i>Gérer les Employés
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('responsable_manage_contrats') }}" class="btn btn-success w-100">
+                                                <i class="fas fa-file-contract me-2"></i>Gérer les Contrats
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('responsable_manage_dossiers') }}" class="btn btn-info w-100">
+                                                <i class="fas fa-folder me-2"></i>Gérer les Dossiers
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('responsable_manage_dossiers') }}" class="btn btn-warning w-100">
+                                                <i class="fas fa-file-alt me-2"></i>Gérer les Documents
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('responsable_manage_demandes') }}" class="btn btn-secondary w-100">
+                                                <i class="fas fa-envelope me-2"></i>Gérer les Demandes et Réclamations
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('responsable_manage_placards') }}" class="btn btn-dark w-100">
+                                                <i class="fas fa-archive me-2"></i>Gérer les Placards
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('responsable_kpi_index') }}" class="btn btn-danger w-100">
+                                                <i class="fas fa-chart-line me-2"></i>Tableaux de Bord KPI
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <a href="{{ path('performance_index') }}" class="btn btn-primary w-100">
+                                                <i class="fas fa-chart-bar me-2"></i>Rapports de Performance
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="alert alert-info">
+                                        <strong>Fonctionnalités disponibles :</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>Gestion complète des employés (CRUD)</li>
+                                            <li>Gestion des contrats et types de contrats</li>
+                                            <li>Organisation des dossiers par catégories</li>
+                                            <li>Upload et gestion des documents</li>
+                                            <li>Organisation des placards documentaires</li>
+                                            <li>Gestion des demandes et réclamations des employés</li>
+                                            <li>Organisation des placards pour le stockage physique</li>
+                                            <li>Rapports de performance détaillés (A, B, C, D, E, F)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+parameters:
+    documents_directory: '%kernel.project_dir%/public/uploads/documents'
+    reclamations_directory: '%kernel.project_dir%/public/uploads/reclamations/'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    App\Command\CreateUserCommand:
+        tags: ['console.command']

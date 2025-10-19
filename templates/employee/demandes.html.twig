@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Demandes et Réclamations{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>Mes Demandes et Réclamations
+                    </h5>
+                    <a href="{{ path('employee_nouvelle_demande') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Nouvelle Demande/Réclamation
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if demandes is empty %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Vous n'avez encore envoyé aucune demande ou réclamation.
+                            <a href="{{ path('employee_nouvelle_demande') }}" class="alert-link">Envoyer votre première demande</a>
+                        </div>
+                    {% else %}
+                        <!-- Desktop Table View -->
+                        <div class="table-responsive desktop-view">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Titre</th>
+                                        <th>Date d'envoi</th>
+                                        <th>Statut</th>
+                                        <th>Date de réponse</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for demande in demandes %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ demande.titre }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ demande.contenu|slice(0, 100) }}{% if demande.contenu|length > 100 %}...{% endif %}</small>
+                                        </td>
+                                        <td>{{ demande.dateCreation|date('d/m/Y H:i') }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ demande.statutCouleur }}">
+                                                {{ demande.statutLibelle }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if demande.dateReponse %}
+                                                {{ demande.dateReponse|date('d/m/Y H:i') }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('employee_voir_demande', {'id': demande.id}) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Voir
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Mobile Card View -->
+                        <div class="mobile-view">
+                            {% for demande in demandes %}
+                            <div class="demande-card mb-3">
+                                <div class="demande-card-header">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h6 class="mb-1">{{ demande.titre }}</h6>
+                                        <span class="badge bg-{{ demande.statutCouleur }}">{{ demande.statutLibelle }}</span>
+                                    </div>
+                                </div>
+                                <div class="demande-card-body">
+                                    <div class="info-row">
+                                        <i class="fas fa-comment text-muted"></i>
+                                        <span class="text-truncate">{{ demande.contenu|slice(0, 80) }}...</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <i class="fas fa-calendar text-primary"></i>
+                                        <span>Envoyé: {{ demande.dateCreation|date('d/m/Y') }}</span>
+                                    </div>
+                                    {% if demande.dateReponse %}
+                                    <div class="info-row">
+                                        <i class="fas fa-check text-success"></i>
+                                        <span>Répondu: {{ demande.dateReponse|date('d/m/Y') }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="demande-card-actions">
+                                    <a href="{{ path('employee_voir_demande', {'id': demande.id}) }}" 
+                                       class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="fas fa-eye me-1"></i>Voir Détails
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mobile-view { display: none; }
+    
+    .demande-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .demande-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .demande-card-header h6 {
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .demande-card-body {
+        padding: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-row span {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    
+    .demande-card-actions {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    @media (max-width: 767px) {
+        .desktop-view { display: none !important; }
+        .mobile-view { display: block !important; }
+        
+        .card-header {
+            flex-direction: column !important;
+            gap: 0.75rem;
+        }
+        
+        .card-header h5 {
+            font-size: 1.1rem !important;
+        }
+        
+        .card-header .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

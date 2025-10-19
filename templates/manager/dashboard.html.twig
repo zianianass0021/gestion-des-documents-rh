@@ -1,0 +1,524 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Manager{% endblock %}
+
+{% block body %}
+<div class="container-fluid dashboard-manager">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="dashboard-title">
+                            <i class="fas fa-tachometer-alt me-3"></i>
+                            Dashboard Manager
+                        </h1>
+                        <p class="dashboard-subtitle text-muted mb-0">
+                            Gestion des réclamations et suivi des employés
+                        </p>
+                    </div>
+                    <div class="dashboard-stats-badge">
+                        <span class="badge bg-primary fs-6 px-3 py-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ totalReclamations }} Réclamation{{ totalReclamations > 1 ? 's' : '' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="section-title mb-4">
+                <i class="fas fa-chart-bar me-2"></i>
+                Indicateurs Clés
+            </h2>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card kpi-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="kpi-icon-wrapper bg-primary">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-number">{{ totalReclamations }}</h3>
+                        <p class="kpi-label">Total Réclamations</p>
+                        <small class="kpi-trend text-primary">
+                            <i class="fas fa-list me-1"></i>
+                            Toutes mes réclamations
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card kpi-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="kpi-icon-wrapper bg-warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-number">{{ reclamationsEnAttente }}</h3>
+                        <p class="kpi-label">En Attente</p>
+                        <small class="kpi-trend text-warning">
+                            <i class="fas fa-hourglass-half me-1"></i>
+                            En cours de traitement
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card kpi-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="kpi-icon-wrapper bg-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-number">{{ reclamationsTraitees }}</h3>
+                        <p class="kpi-label">Traitées</p>
+                        <small class="kpi-trend text-success">
+                            <i class="fas fa-check me-1"></i>
+                            Résolues par RH
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card kpi-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="kpi-icon-wrapper bg-info">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3 class="kpi-number">{{ reclamationsCeMois }}</h3>
+                        <p class="kpi-label">Ce Mois</p>
+                        <small class="kpi-trend text-info">
+                            <i class="fas fa-calendar me-1"></i>
+                            Réclamations récentes
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Réclamations récentes -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="section-title mb-4">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Mes Réclamations Récentes
+            </h2>
+            {% if reclamationsRecentes is empty %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Aucune réclamation</h3>
+                    <p class="text-muted">Commencez par créer votre première réclamation</p>
+                    <a href="{{ path('manager_add_reclamation') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Créer une Réclamation
+                    </a>
+                </div>
+            {% else %}
+                <div class="card modern-table-card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th class="border-0">
+                                            <i class="fas fa-user me-2"></i>
+                                            Employé
+                                        </th>
+                                        <th class="border-0">
+                                            <i class="fas fa-tag me-2"></i>
+                                            Type
+                                        </th>
+                                        <th class="border-0">
+                                            <i class="fas fa-calendar me-2"></i>
+                                            Date
+                                        </th>
+                                        <th class="border-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Statut
+                                        </th>
+                                        <th class="border-0 text-center">
+                                            <i class="fas fa-cog me-2"></i>
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reclamation in reclamationsRecentes %}
+                                    <tr class="table-row">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="user-avatar">
+                                                    <span class="avatar-text">{{ reclamation.employe.prenom|first|upper }}{{ reclamation.employe.nom|first|upper }}</span>
+                                                </div>
+                                                <div class="user-info">
+                                                    <h6 class="user-name mb-0">{{ reclamation.employe.prenom }} {{ reclamation.employe.nom }}</h6>
+                                                    <small class="text-muted">{{ reclamation.employe.email }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="type-badge type-{{ reclamation.typeReclamation }}">
+                                                {{ reclamation.typeReclamationLabel }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="date-info">
+                                                {{ reclamation.dateCreation|date('d/m/Y H:i') }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-{{ reclamation.statutBadgeClass }}">
+                                                <i class="fas fa-circle me-1"></i>
+                                                {{ reclamation.statutLabel }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="action-buttons">
+                                                <a href="{{ path('manager_view_reclamation', {'id': reclamation.id}) }}" 
+                                                   class="btn btn-sm btn-outline-primary me-1" 
+                                                   title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Manager Dashboard Styles */
+.dashboard-manager {
+    padding: 2rem 0;
+}
+
+/* Header Styles */
+.dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+.dashboard-stats-badge {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    backdrop-filter: blur(10px);
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* KPI Cards */
+.kpi-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.kpi-icon-wrapper i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.kpi-content {
+    flex: 1;
+}
+
+.kpi-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #495057;
+}
+
+.kpi-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0.25rem 0;
+    font-weight: 500;
+}
+
+.kpi-trend {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+
+/* Table Styles */
+.modern-table-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.table-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.table-header th {
+    font-weight: 600;
+    color: #495057;
+    padding: 1rem;
+    border: none;
+}
+
+.table-row {
+    transition: all 0.2s ease;
+}
+
+.table-row:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.01);
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.avatar-text {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #495057;
+}
+
+.type-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.type-assiduite {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.type-accident_travail {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+}
+
+.status-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.date-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.action-buttons .btn {
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: scale(1.1);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.empty-state-icon i {
+    font-size: 2rem;
+    color: #6c757d;
+}
+
+.empty-state h3 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+
+/* Mobile Responsive */
+@media (max-width: 767px) {
+    .dashboard-title {
+        font-size: 1.25rem !important;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 0.85rem !important;
+    }
+    
+    .dashboard-header .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .dashboard-stats-badge {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .section-title {
+        font-size: 1.1rem !important;
+    }
+    
+    .kpi-card .card-body {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem !important;
+    }
+    
+    .kpi-icon-wrapper {
+        margin-bottom: 1rem;
+    }
+    
+    .kpi-number {
+        font-size: 1.75rem !important;
+    }
+    
+    .kpi-label {
+        font-size: 0.9rem !important;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem !important;
+    }
+    
+    .btn {
+        font-size: 0.85rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+}
+</style>
+{% endblock %}

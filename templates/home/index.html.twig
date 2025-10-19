@@ -1,0 +1,525 @@
+{% extends 'base_minimal.html.twig' %}
+
+{% block title %}Accueil - Système RH{% endblock %}
+
+{% block body %}
+<!-- Test Script -->
+<script>
+    console.log('Page loading...');
+    window.addEventListener('load', function() {
+        console.log('Page fully loaded!');
+        console.log('Current theme:', document.documentElement.getAttribute('data-bs-theme'));
+    });
+</script>
+
+<!-- Home Page Layout -->
+<div class="home-page-wrapper" style="min-height: 100vh; background: var(--gradient-hero); color: white; padding: 20px 0;">
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-12">
+                <div class="text-center">
+                    <!-- Logo -->
+                    <div class="logo-section mb-5">
+                        <div class="logo-circle animate-float">
+                            <i class="fas fa-building fa-4x"></i>
+                        </div>
+                    </div>
+
+                    <!-- Hero Content -->
+                    <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
+                    <!-- Main Title -->
+                        <h1 class="hero-title mb-4">
+                        Système RH Professionnel
+                    </h1>
+                    
+                    <!-- Subtitle -->
+                        <p class="hero-subtitle mb-4">
+                        Gestion Moderne des Ressources Humaines
+                    </p>
+
+                    <!-- Description -->
+                        <div class="hero-description mb-5">
+                            <p>
+                                Découvrez notre solution complète de gestion des ressources humaines. 
+                                Interface moderne, sécurisée et intuitive pour une gestion efficace de vos employés, 
+                                contrats, documents et processus RH.
+                            </p>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                        <div class="cta-buttons mb-5">
+                        <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg px-5 py-3 me-3 mb-3 cta-button-login">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Se connecter
+                        </a>
+                            <button class="btn btn-outline-light btn-lg px-5 py-3 mb-3 cta-button-discover" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+                            <i class="fas fa-arrow-down me-2"></i>
+                            Découvrir
+                        </button>
+                    </div>
+                    </div>
+
+                    <!-- Trust Indicators -->
+                    <div class="trust-indicators">
+                        <div class="row justify-content-center">
+                                <div class="col-md-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="1000">
+                                    <div class="trust-item">
+                                        <div class="trust-icon">
+                                            <i class="fas fa-shield-alt fa-2x"></i>
+                                        </div>
+                                    <div class="trust-label">Sécurisé</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="1200">
+                                    <div class="trust-item">
+                                        <div class="trust-icon">
+                                            <i class="fas fa-clock fa-2x"></i>
+                                        </div>
+                                    <div class="trust-label">Disponible</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="1400">
+                                    <div class="trust-item">
+                                        <div class="trust-icon">
+                                            <i class="fas fa-users fa-2x"></i>
+                                        </div>
+                                    <div class="trust-label">Professionnel</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">
+        <button class="btn btn-outline-light btn-circle" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        </div>
+    </div>
+
+<!-- Features Section -->
+<section id="features" class="features-section py-5" style="background: var(--bg-primary); backdrop-filter: blur(10px);">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-4 fw-bold text-gradient mb-4" data-aos="fade-up" style="color: var(--text-primary);">
+                    Fonctionnalités Principales
+                </h2>
+                <p class="lead" data-aos="fade-up" data-aos-delay="200" style="color: var(--text-secondary);">
+                    Une suite complète d'outils pour gérer efficacement vos ressources humaines
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                            </div>
+                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion des Employés</h4>
+                    <p class="card-text" style="color: var(--text-secondary);">
+                            Gérez efficacement les profils, informations personnelles et professionnelles 
+                            de tous vos employés avec une interface intuitive et sécurisée.
+                        </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-file-contract fa-3x text-success"></i>
+                            </div>
+                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion des Contrats</h4>
+                    <p class="card-text" style="color: var(--text-secondary);">
+                        Suivez et gérez tous les contrats de travail, renouvellements et modifications
+                        avec un système de notifications automatiques.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-chart-line fa-3x text-info"></i>
+                            </div>
+                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Tableaux de Bord</h4>
+                    <p class="card-text" style="color: var(--text-secondary);">
+                        Visualisez les métriques clés et les indicateurs de performance
+                        avec des graphiques interactifs et des rapports personnalisables.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="feature-card h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-calendar-alt fa-3x text-danger"></i>
+                            </div>
+                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion des Congés</h4>
+                    <p class="card-text" style="color: var(--text-secondary);">
+                        Planifiez et suivez les demandes de congés, absences et temps de travail
+                        avec un système de validation automatisé.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="800">
+                <div class="feature-card h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-file-alt fa-3x text-secondary"></i>
+                            </div>
+                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion Documentaire</h4>
+                    <p class="card-text" style="color: var(--text-secondary);">
+                        Centralisez et organisez tous les documents RH : CV, diplômes, attestations
+                        et contrats dans un espace sécurisé.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="800">
+                <div class="feature-card h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-bell fa-3x text-warning"></i>
+                            </div>
+                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Notifications & Alertes</h4>
+                    <p class="card-text" style="color: var(--text-secondary);">
+                        Recevez des alertes automatiques pour les échéances importantes,
+                        renouvellements et événements RH critiques.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing...');
+
+        // Initialize AOS
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+        }
+
+        console.log('Initialization complete');
+    });
+</script>
+
+<style>
+    /* Hero Section Styles */
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: #ffffff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        letter-spacing: 2px;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #ffffff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+        letter-spacing: 1px;
+        margin-bottom: 2rem;
+    }
+
+    .hero-description p {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #ffffff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+
+    /* Logo Styles */
+    .logo-circle {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .logo-circle i {
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Trust Items */
+    .trust-item {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        transition: none;
+        cursor: default;
+    }
+
+    .trust-icon {
+        margin-bottom: 1rem;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .trust-label {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+
+    /* CTA Buttons */
+    .cta-button-login {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta-button-login:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    .cta-button-discover {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        transition: all 0.3s ease;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta-button-discover:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+
+    /* Scroll Indicator */
+    .btn-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card:hover {
+            transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        text-align: center;
+}
+
+.card-text {
+        flex: 1;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .card-title {
+        color: var(--text-primary);
+}
+
+.features-section {
+        background: var(--bg-primary);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Animations */
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.4rem;
+        }
+        
+        .hero-description p {
+            font-size: 1rem;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .cta-buttons .btn {
+            width: 100%;
+            max-width: 300px;
+            margin: 0.5rem 0;
+        }
+        
+        .trust-indicators .row {
+            margin: 0 -10px;
+        }
+        
+        .trust-item {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .logo-circle i {
+            font-size: 2.5rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .hero-description p {
+            font-size: 0.9rem;
+            padding: 0 1rem;
+        }
+        
+        .cta-buttons .btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .trust-item {
+            padding: 1rem;
+        }
+        
+        .trust-icon i {
+            font-size: 1.5rem;
+        }
+        
+        .trust-label {
+            font-size: 1rem;
+        }
+        
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .logo-circle i {
+            font-size: 2rem;
+        }
+        
+        .scroll-indicator {
+            bottom: 20px;
+        }
+        
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+        }
+    }
+    
+    /* Features section responsive */
+    @media (max-width: 768px) {
+        .features-section {
+            padding: 3rem 0;
+        }
+        
+        .feature-card {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-icon i {
+            font-size: 2rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+        }
+        
+        .card-text {
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .features-section {
+            padding: 2rem 0;
+        }
+        
+        .feature-card {
+            padding: 1rem;
+        }
+        
+        .feature-icon i {
+            font-size: 1.8rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+        }
+        
+        .card-text {
+            font-size: 0.85rem;
+        }
+    }
+}
+</style>
+{% endblock %}

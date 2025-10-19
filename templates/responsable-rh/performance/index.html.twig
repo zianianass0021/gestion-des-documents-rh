@@ -1,0 +1,112 @@
+{% extends 'base_sidebar.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('responsable_rh_dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Rapports de Performance</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">{{ title }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Rapports de Performance Disponibles</h5>
+                    <p class="text-muted">Sélectionnez un rapport pour consulter les données de performance détaillées.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-bar fa-3x text-primary mb-3"></i>
+                                    <h5 class="card-title">Rapport A</h5>
+                                    <p class="card-text">Performance par Nature de Contrat</p>
+                                    <a href="{{ path('performance_rapport_a') }}" class="btn btn-primary">
+                                        <i class="fas fa-eye me-1"></i>Consulter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-building fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Rapport B</h5>
+                                    <p class="card-text">Performance par Organisation</p>
+                                    <a href="{{ path('performance_rapport_b') }}" class="btn btn-success">
+                                        <i class="fas fa-eye me-1"></i>Consulter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                                    <h5 class="card-title">Rapport C</h5>
+                                    <p class="card-text">Performance Détaillée par Organisation</p>
+                                    <a href="{{ path('performance_rapport_c') }}" class="btn btn-info">
+                                        <i class="fas fa-eye me-1"></i>Consulter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-file-alt fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title">Rapport D</h5>
+                                    <p class="card-text">Performance Détaillée par Nature de Contrat</p>
+                                    <a href="{{ path('performance_rapport_d') }}" class="btn btn-warning">
+                                        <i class="fas fa-eye me-1"></i>Consulter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-danger">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-pie fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title">Rapport E</h5>
+                                    <p class="card-text">Performance par Organisation et Nature de Contrat</p>
+                                    <a href="{{ path('performance_rapport_e') }}" class="btn btn-danger">
+                                        <i class="fas fa-eye me-1"></i>Consulter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-secondary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-table fa-3x text-secondary mb-3"></i>
+                                    <h5 class="card-title">Rapport F</h5>
+                                    <p class="card-text">Performance Détaillée par Organisation et Nature</p>
+                                    <a href="{{ path('performance_rapport_f') }}" class="btn btn-secondary">
+                                        <i class="fas fa-eye me-1"></i>Consulter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

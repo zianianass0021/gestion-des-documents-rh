@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Demande/Réclamation{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>Détails de la Demande/Réclamation
+                    </h5>
+                    <span class="badge bg-{{ demande.statutCouleur }} fs-6">
+                        {{ demande.statutLibelle }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-user me-2"></i>Employé</h6>
+                            <p class="text-muted">
+                                <strong>{{ demande.employe.prenom }} {{ demande.employe.nom }}</strong><br>
+                                {{ demande.employe.email }}<br>
+                                {% if demande.employe.employeeContrats is not empty %}
+                                    {% set currentContrat = demande.employe.employeeContrats|first %}
+                                    {% if currentContrat.organisationEmployeeContrats is not empty %}
+                                        {% set currentOrg = currentContrat.organisationEmployeeContrats|first.organisation %}
+                                        {{ currentOrg.dossierDesignation }}
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar me-2"></i>Date d'envoi</h6>
+                            <p class="text-muted">{{ demande.dateCreation|date('d/m/Y à H:i') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h6><i class="fas fa-tag me-2"></i>Titre</h6>
+                            <p class="text-muted fs-5">{{ demande.titre }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h6><i class="fas fa-file-text me-2"></i>Contenu de la demande/réclamation</h6>
+                            <div class="bg-light p-3 rounded">
+                                {{ demande.contenu|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if demande.reponse %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h6><i class="fas fa-reply me-2"></i>Votre Réponse</h6>
+                            <div class="alert alert-{{ demande.statut == 'acceptee' ? 'success' : 'warning' }}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>Vous</strong>
+                                        <br>
+                                        <small class="text-muted">{{ demande.dateReponse|date('d/m/Y à H:i') }}</small>
+                                    </div>
+                                    <span class="badge bg-{{ demande.statutCouleur }}">
+                                        {{ demande.statutLibelle }}
+                                    </span>
+                                </div>
+                                <hr>
+                                {{ demande.reponse|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('responsable_manage_demandes') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour aux demandes et réclamations
+                        </a>
+                        {% if demande.statut == 'en_attente' %}
+                        <a href="{{ path('responsable_repondre_demande', {'id': demande.id}) }}" class="btn btn-success">
+                            <i class="fas fa-reply me-2"></i>Répondre à cette demande/réclamation
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

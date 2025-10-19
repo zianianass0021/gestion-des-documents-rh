@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un Contrat{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0">
+                    <i class="fas fa-plus me-2"></i>
+                    Ajouter un Contrat
+                </h1>
+            </div>
+            <div class="card-body">
+                {{ form_start(form) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.employe, 'Employé', {'class': 'form-label'}) }}
+                            {{ form_widget(form.employe, {'class': 'form-select'}) }}
+                            {{ form_errors(form.employe) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.natureContrat, 'Type de Contrat', {'class': 'form-label'}) }}
+                            {{ form_widget(form.natureContrat, {'class': 'form-select'}) }}
+                            {{ form_errors(form.natureContrat) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.dateDebut, 'Date de Début', {'class': 'form-label'}) }}
+                            {{ form_widget(form.dateDebut, {'class': 'form-control'}) }}
+                            {{ form_errors(form.dateDebut) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.dateFin, 'Date de Fin', {'class': 'form-label'}) }}
+                            {{ form_widget(form.dateFin, {'class': 'form-control'}) }}
+                            {{ form_errors(form.dateFin) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.statut, 'Statut', {'class': 'form-label'}) }}
+                            {{ form_widget(form.statut, {'class': 'form-select'}) }}
+                            {{ form_errors(form.statut) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('responsable_manage_contrats') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

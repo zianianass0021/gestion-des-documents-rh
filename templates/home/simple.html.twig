@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Système RH</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 Système RH - Test Simple</h1>
+        
+        <div class="test-info">
+            <strong>✅ Test réussi !</strong><br>
+            Si vous voyez cette page, le serveur Symfony fonctionne correctement.
+        </div>
+        
+        <h2>Navigation :</h2>
+        <a href="{{ path('app_login') }}" class="btn">Se connecter</a>
+        <a href="{{ path('app_home') }}" class="btn">Page d'accueil complète</a>
+        
+        <h2>Informations du serveur :</h2>
+        <ul>
+            <li><strong>Date/Heure :</strong> {{ 'now'|date('d/m/Y H:i:s') }}</li>
+            <li><strong>Route :</strong> {{ app.request.get('_route') }}</li>
+            <li><strong>URL :</strong> {{ app.request.uri }}</li>
+            <li><strong>Méthode :</strong> {{ app.request.method }}</li>
+        </ul>
+    </div>
+</body>
+</html>

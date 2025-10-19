@@ -1,0 +1,612 @@
+{% extends 'base_minimal.html.twig' %}
+
+{% block title %}Connexion - Système RH{% endblock %}
+{% block description %}Connectez-vous à votre espace personnel du système de gestion des ressources humaines.{% endblock %}
+
+{% block body %}
+<!-- Force light mode for login page -->
+<script>
+    document.documentElement.setAttribute('data-bs-theme', 'light');
+    localStorage.setItem('theme', 'light');
+</script>
+{% if app.user %}
+<script>
+    window.location.href = '{{ path('app_dashboard') }}';
+</script>
+{% endif %}
+
+<div class="login-page min-vh-100 d-flex align-items-center">
+    <!-- Background Elements -->
+    <div class="login-background">
+        <div class="login-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+        <div class="gradient-overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-8 col-sm-10">
+                <!-- Login Card -->
+                <div class="login-card card border-0 shadow-2xl animate-fade-in-up" data-aos="fade-up" data-aos-duration="1000">
+                    <!-- Card Header -->
+                    <div class="card-header text-center login-header animate-fade-in-down">
+                        <div class="logo-container mb-3">
+                            <div class="logo-circle animate-scale-in">
+                                <i class="fas fa-building fa-2x animate-float"></i>
+                            </div>
+                        </div>
+                        <h1 class="h3 fw-bold mb-2 animate-fade-in-up" style="animation-delay: 0.2s;">Connexion</h1>
+                        <p class="mb-0 animate-fade-in-up" style="animation-delay: 0.3s;">Accédez à votre espace personnel</p>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body p-5">
+                        {% if error %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ error.messageKey|trans(error.messageData, 'security') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+
+                        <form method="post" action="{{ path('app_login') }}" class="login-form">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                            <!-- Username Field -->
+                            <div class="form-group mb-4">
+                                <label for="inputUsername" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2 text-primary"></i>Nom d'utilisateur
+                                </label>
+                                <input 
+                                    type="text" 
+                                    value="{{ last_username }}" 
+                                    name="username" 
+                                    id="inputUsername" 
+                                    class="form-control form-control-lg" 
+                                    placeholder="votre_nom_utilisateur"
+                                    required 
+                                    autofocus
+                                    autocomplete="username"
+                                >
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-group mb-4">
+                                <label for="inputPassword" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-primary"></i>Mot de passe
+                                </label>
+                                <div class="password-input-group">
+                                    <input 
+                                        type="password" 
+                                        name="password" 
+                                        id="inputPassword" 
+                                        class="form-control form-control-lg" 
+                                        placeholder="Votre mot de passe"
+                                        required
+                                        autocomplete="current-password"
+                                    >
+                                    <button type="button" class="password-toggle-btn" id="passwordToggle">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Remember Me -->
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" name="_remember_me" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">
+                                    Se souvenir de moi
+                                </label>
+                            </div>
+
+                    <!-- Submit Button -->
+                    <button class="btn btn-primary btn-lg w-100 mb-4" type="submit" id="loginBtn">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Se connecter
+                    </button>
+                        </form>
+
+                        <!-- Additional Links -->
+                        <div class="text-center">
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Connexion sécurisée
+                            </p>
+                            <small class="text-muted">
+                                En vous connectant, vous acceptez nos conditions d'utilisation
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="card-footer bg-light border-0 text-center py-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Besoin d'aide ? Contactez votre administrateur
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Back to Home Link -->
+                <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="300">
+                    <a href="{{ path('app_home') }}" class="btn btn-outline-light" id="backToHome">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .login-page {
+        background: var(--gradient-hero);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .login-shapes {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .shape-1 {
+        width: 100px;
+        height: 100px;
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .shape-2 {
+        width: 150px;
+        height: 150px;
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    .shape-3 {
+        width: 80px;
+        height: 80px;
+        top: 80%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+
+    .shape-4 {
+        width: 120px;
+        height: 120px;
+        top: 20%;
+        right: 30%;
+        animation-delay: 1s;
+    }
+
+    .gradient-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 50%, rgba(240, 147, 251, 0.9) 100%);
+    }
+
+    .login-card {
+        position: relative;
+        z-index: 10;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+    }
+
+    .logo-circle {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-circle i {
+        color: white !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-bottom: none !important;
+        padding: 2rem 1.5rem !important;
+    }
+
+    .login-header h1 {
+        color: white !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        font-weight: 700 !important;
+    }
+
+    .login-header p {
+        color: rgba(255, 255, 255, 0.9) !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control-lg {
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        border-radius: var(--radius-lg);
+        border: 2px solid #e2e8f0;
+        background: white;
+        color: #1e293b;
+        transition: all 0.3s ease;
+    }
+
+    .form-control-lg:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+        color: #1e293b;
+    }
+
+    .form-label {
+        color: #1e293b !important;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .form-check-label {
+        color: #475569 !important;
+        font-weight: 500;
+    }
+
+    .password-input-group {
+        position: relative;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0.5rem;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+    }
+
+    .password-toggle-btn:hover {
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .password-toggle-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+    }
+
+    .password-toggle-btn i {
+        font-size: 1rem;
+        pointer-events: none;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-600);
+        border-color: var(--primary-600);
+    }
+
+    .btn-lg {
+        padding: 1rem 2rem;
+        font-weight: 600;
+        border-radius: var(--radius-lg);
+        transition: var(--transition-normal);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+        color: white !important;
+    }
+
+    .btn-primary:focus {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3) !important;
+        color: white !important;
+    }
+
+    .btn-outline-light {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .alert {
+        border-radius: var(--radius-lg);
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+
+    .alert-danger {
+        background: var(--error-50);
+        color: var(--error-800);
+        border-left: 4px solid var(--error-500);
+    }
+
+    /* Dark Theme Adjustments */
+    [data-bs-theme="dark"] .login-card {
+        background: rgba(30, 41, 59, 0.95);
+        border: 1px solid var(--neutral-800);
+    }
+
+    [data-bs-theme="dark"] .form-control-lg {
+        background: rgba(30, 41, 59, 0.9);
+        border-color: var(--neutral-800);
+        color: var(--neutral-200);
+    }
+
+    [data-bs-theme="dark"] .form-control-lg:focus {
+        background: rgba(30, 41, 59, 1);
+        border-color: var(--primary-500);
+        color: var(--neutral-200);
+    }
+
+    [data-bs-theme="dark"] .card-footer {
+        background: var(--neutral-800) !important;
+        border-top: 1px solid var(--neutral-700) !important;
+    }
+
+    /* Text Contrast Fixes */
+    .text-muted {
+        color: #64748b !important;
+    }
+
+    .card-footer {
+        background: #f8fafc !important;
+        border-top: 1px solid #e2e8f0 !important;
+    }
+
+    .card-footer .text-muted {
+        color: #475569 !important;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .login-card {
+            margin: 1rem;
+        }
+
+        .card-body {
+            padding: 2rem !important;
+        }
+
+        .logo-circle {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .login-header {
+            padding: 1.5rem 1rem !important;
+        }
+        
+        .form-control-lg {
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-lg {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .login-card {
+            margin: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .logo-circle i {
+            font-size: 1.5rem;
+        }
+        
+        .login-header {
+            padding: 1rem 0.5rem !important;
+        }
+        
+        .login-header h1 {
+            font-size: 1.5rem !important;
+        }
+        
+        .login-header p {
+            font-size: 0.9rem !important;
+        }
+        
+        .form-control-lg {
+            padding: 0.7rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .btn-lg {
+            padding: 0.7rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .form-label {
+            font-size: 0.9rem;
+        }
+        
+        .btn-outline-light {
+            font-size: 0.8rem;
+            padding: 0.6rem 1rem;
+        }
+    }
+
+    /* Animation for form elements */
+    .form-group {
+        opacity: 0;
+        animation: slideInUp 0.6s ease-out forwards;
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password toggle functionality - with retry mechanism
+        function initPasswordToggle() {
+            const passwordToggle = document.getElementById('passwordToggle');
+            const passwordInput = document.getElementById('inputPassword');
+            
+            if (passwordToggle && passwordInput) {
+                console.log('Password toggle elements found, initializing...');
+                
+                passwordToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const currentType = passwordInput.getAttribute('type');
+                    const newType = currentType === 'password' ? 'text' : 'password';
+                    
+                    passwordInput.setAttribute('type', newType);
+                    
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        if (newType === 'text') {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    }
+                    
+                    console.log('Password visibility toggled to:', newType);
+                });
+                
+                // Ensure initial state
+                const icon = passwordToggle.querySelector('i');
+                if (icon && passwordInput.getAttribute('type') === 'password') {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            } else {
+                console.log('Password toggle elements not found, retrying...');
+                // Retry after a short delay
+                setTimeout(initPasswordToggle, 100);
+            }
+        }
+        
+        // Initialize password toggle
+        initPasswordToggle();
+
+        // Form submission with loading state
+        const form = document.querySelector('.login-form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                const loginBtn = document.getElementById('loginBtn');
+                if (loginBtn && !loginBtn.disabled) {
+                    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Connexion...';
+                    loginBtn.disabled = true;
+                }
+            });
+        }
+
+        // Ensure back to home button works
+        const backToHomeBtn = document.getElementById('backToHome');
+        if (backToHomeBtn) {
+            backToHomeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '{{ path('app_home') }}';
+            });
+        }
+
+        // Auto-focus on username field
+        if (usernameInput && !usernameInput.value) {
+            usernameInput.focus();
+        }
+
+        // Add floating animation to shapes
+        const shapes = document.querySelectorAll('.shape');
+        shapes.forEach((shape, index) => {
+            shape.style.animationDelay = `${index * 0.5}s`;
+        });
+    });
+</script>
+{% endblock %}

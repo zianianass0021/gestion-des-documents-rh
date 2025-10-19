@@ -1,0 +1,22 @@
+{
+  "name": "rh-projet-test",
+  "description": "Système de Gestion Documentaire RH - Test",
+  "repository": "https://github.com/anass21ziani/rh_projet",
+  "keywords": ["php", "symfony", "postgresql", "rh"],
+  "addons": ["heroku-postgresql:hobby-dev"],
+  "buildpacks": [
+    {
+      "url": "heroku/php"
+    }
+  ],
+  "env": {
+    "APP_ENV": {
+      "description": "Environment",
+      "value": "prod"
+    },
+    "SYMFONY_ENV": {
+      "description": "Symfony Environment",
+      "value": "prod"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Responsable RH{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Modifier le Responsable RH
+                </h1>
+            </div>
+            <div class="card-body">
+                {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.prenom) }}
+                        {{ form_widget(form.prenom) }}
+                        {{ form_errors(form.prenom) }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.nom) }}
+                        {{ form_widget(form.nom) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.telephone) }}
+                        {{ form_widget(form.telephone) }}
+                        {{ form_errors(form.telephone) }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.password) }}
+                        {{ form_widget(form.password) }}
+                        <small class="form-text text-muted">Laissez vide pour conserver le mot de passe actuel</small>
+                        {{ form_errors(form.password) }}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ path('admin_manage_responsables') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 767px) {
+        .col-md-6 {
+            padding: 0 0.5rem;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .d-grid {
+            flex-direction: column !important;
+        }
+        
+        .d-grid .btn {
+            width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .d-grid .btn:last-child {
+            margin-bottom: 0 !important;
+        }
+    }
+</style>
+{% endblock %}

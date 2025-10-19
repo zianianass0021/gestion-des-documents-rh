@@ -1,0 +1,3435 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - Système RH{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block body %}
+<!-- Welcome Section -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="welcome-card card border-0 shadow-lg animate-fade-in-up">
+            <div class="card-body py-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h4 class="mb-2 animate-fade-in-left">
+                            <i class="fas fa-sun me-2 text-warning animate-float"></i>
+                            Bonjour, {{ app.user.email|split('@')[0]|title }} !
+                        </h4>
+                        <p class="text-muted mb-0 animate-fade-in-left" style="animation-delay: 0.2s;">
+                            Bienvenue sur votre tableau de bord. Voici un aperçu de votre système RH.
+                        </p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="current-time animate-fade-in-right">
+                            <div class="time-display h4 mb-0 text-primary" id="currentTime"></div>
+                            <small class="text-muted" id="currentDate"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row g-3 mb-3 animate-stagger">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up">
+            <div class="card-body text-center py-3">
+                <div class="stat-icon bg-primary mb-2 animate-scale-in">
+                    <i class="fas fa-users fa-lg text-white"></i>
+                </div>
+                <h4 class="stat-number text-primary mb-1 animate-fade-in-up" style="animation-delay: 0.3s;">{{ kpis.total_employees }}</h4>
+                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.4s;">Employés</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.1s;">
+            <div class="card-body text-center py-3">
+                <div class="stat-icon bg-success mb-2 animate-scale-in" style="animation-delay: 0.4s;">
+                    <i class="fas fa-file-contract fa-lg text-white"></i>
+                </div>
+                <h4 class="stat-number text-success mb-1 animate-fade-in-up" style="animation-delay: 0.5s;">{{ kpis.total_contrats }}</h4>
+                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.6s;">Contrats</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.2s;">
+            <div class="card-body text-center py-3">
+                <div class="stat-icon bg-warning mb-2 animate-scale-in" style="animation-delay: 0.5s;">
+                    <i class="fas fa-envelope fa-lg text-white"></i>
+                </div>
+                <h4 class="stat-number text-warning mb-1 animate-fade-in-up" style="animation-delay: 0.6s;">{{ kpis.total_demandes }}</h4>
+                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.7s;">Demandes</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.3s;">
+            <div class="card-body text-center py-3">
+                <div class="stat-icon bg-info mb-2 animate-scale-in" style="animation-delay: 0.6s;">
+                    <i class="fas fa-folder fa-lg text-white"></i>
+                </div>
+                <h4 class="stat-number text-info mb-1 animate-fade-in-up" style="animation-delay: 0.7s;">{{ kpis.total_documents }}</h4>
+                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.8s;">Documents</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Reports Section -->
+{% if 'ROLE_RESPONSABLE_RH' in app.user.roles or 'ROLE_ADMINISTRATEUR_RH' in app.user.roles %}
+<div class="row g-3 mb-3">
+    <div class="col-12">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header py-2">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-line me-2 animate-pulse"></i>
+                    Rapports de Performance
+                </h6>
+            </div>
+            <div class="card-body p-3">
+                <div class="row g-3">
+                    <!-- KPI Card A: Fiabilisation par Nature de Contrat -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.1s;">
+                            <div class="kpi-icon kpi-icon-blue" style="width: 50px; height: 50px;">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="kpi-card-body py-2">
+                                <div>
+                                    <h6 class="kpi-title">A. Fiabilisation par Nature de Contrat</h6>
+                                    <p class="kpi-description">Rapport de fiabilisation des dossiers RH organisés par type de contrat</p>
+                                </div>
+                                <button class="btn kpi-btn kpi-btn-blue" onclick="openReportModal('rapport-a')">
+                                    <i class="fas fa-chart-bar me-2"></i>Voir le Rapport
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card B: Fiabilisation par DAS -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.2s;">
+                            <div class="kpi-icon kpi-icon-green">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="kpi-card-body">
+                                <div>
+                                    <h6 class="kpi-title">B. Fiabilisation par DAS</h6>
+                                    <p class="kpi-description">Rapport de fiabilisation des dossiers RH organisés par Direction/Service</p>
+                                </div>
+                                <button class="btn kpi-btn kpi-btn-green" onclick="openReportModal('rapport-b')">
+                                    <i class="fas fa-chart-pie me-2"></i>Voir le Rapport
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card C: Détails par DAS -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.3s;">
+                            <div class="kpi-icon kpi-icon-cyan">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="kpi-card-body">
+                                <div>
+                                    <h6 class="kpi-title">C. Détails par DAS</h6>
+                                    <p class="kpi-description">Rapport détaillé des documents par Direction/Service avec pourcentages individuels</p>
+                                </div>
+                                <button class="btn kpi-btn kpi-btn-cyan" onclick="openReportModal('rapport-c')">
+                                    <i class="fas fa-list-alt me-2"></i>Voir le Rapport
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card D: Détails par Contrat -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.4s;">
+                            <div class="kpi-icon kpi-icon-orange">
+                                <i class="fas fa-users-cog"></i>
+                            </div>
+                            <div class="kpi-card-body">
+                                <div>
+                                    <h6 class="kpi-title">D. Détails par Contrat</h6>
+                                    <p class="kpi-description">Rapport détaillé des documents par type de contrat avec pourcentages individuels</p>
+                                </div>
+                                <button class="btn kpi-btn kpi-btn-orange" onclick="openReportModal('rapport-d')">
+                                    <i class="fas fa-users-cog me-2"></i>Voir le Rapport
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card E: Matrice Personnel -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.5s;">
+                            <div class="kpi-icon kpi-icon-red">
+                                <i class="fas fa-th"></i>
+                            </div>
+                            <div class="kpi-card-body">
+                                <div>
+                                    <h6 class="kpi-title">E. Matrice Personnel</h6>
+                                    <p class="kpi-description">Rapport croisé des documents "Personnel" par contrat et DAS</p>
+                                </div>
+                                <button class="btn kpi-btn kpi-btn-red" onclick="openReportModal('rapport-e')">
+                                    <i class="fas fa-th me-2"></i>Voir le Rapport
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Card F: Matrice Ayant Droits -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.6s;">
+                            <div class="kpi-icon kpi-icon-dark">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="kpi-card-body">
+                                <div>
+                                    <h6 class="kpi-title">F. Matrice Ayant Droits</h6>
+                                    <p class="kpi-description">Rapport croisé des documents "Ayant Droits" par contrat et DAS</p>
+                                </div>
+                                <button class="btn kpi-btn kpi-btn-dark" onclick="openReportModal('rapport-f')">
+                                    <i class="fas fa-users me-2"></i>Voir le Rapport
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Main Content -->
+<div class="row g-3">
+    <!-- Quick Actions -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-lg h-100 animate-fade-in-left">
+            <div class="card-header dark-header py-2">
+                <h6 class="mb-0">
+                    <i class="fas fa-bolt me-2 animate-bounce"></i>
+                    Actions Rapides
+                </h6>
+            </div>
+            <div class="card-body py-3">
+                <div class="quick-actions animate-stagger">
+                    {% if 'ROLE_RESPONSABLE_RH' in app.user.roles %}
+                        <a href="{{ path('responsable_manage_employes') }}" class="quick-action-item">
+                            <div class="quick-action-icon bg-primary">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="quick-action-content">
+                                <h6 class="mb-1">Gérer les Employés</h6>
+                                <small class="text-muted">Voir et gérer tous les employés</small>
+                            </div>
+                            <i class="fas fa-chevron-right quick-action-arrow"></i>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_contrats') }}" class="quick-action-item">
+                            <div class="quick-action-icon bg-success">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <div class="quick-action-content">
+                                <h6 class="mb-1">Gérer les Contrats</h6>
+                                <small class="text-muted">Créer et gérer les contrats</small>
+                            </div>
+                            <i class="fas fa-chevron-right quick-action-arrow"></i>
+                        </a>
+
+                        <a href="{{ path('responsable_manage_demandes') }}" class="quick-action-item">
+                            <div class="quick-action-icon bg-warning">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="quick-action-content">
+                                <h6 class="mb-1">Voir les Demandes</h6>
+                                <small class="text-muted">Traiter les demandes</small>
+                            </div>
+                            <i class="fas fa-chevron-right quick-action-arrow"></i>
+                        </a>
+
+                    {% endif %}
+
+                    {% if 'ROLE_EMPLOYEE' in app.user.roles %}
+                        <a href="{{ path('employee_profile') }}" class="quick-action-item">
+                            <div class="quick-action-icon bg-primary">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="quick-action-content">
+                                <h6 class="mb-1">Mon Profil</h6>
+                                <small class="text-muted">Consulter mon profil</small>
+                            </div>
+                            <i class="fas fa-chevron-right quick-action-arrow"></i>
+                        </a>
+
+                        <a href="{{ path('employee_contrats') }}" class="quick-action-item">
+                            <div class="quick-action-icon bg-success">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <div class="quick-action-content">
+                                <h6 class="mb-1">Mes Contrats</h6>
+                                <small class="text-muted">Voir mes contrats</small>
+                            </div>
+                            <i class="fas fa-chevron-right quick-action-arrow"></i>
+                        </a>
+
+                        <a href="{{ path('employee_demandes') }}" class="quick-action-item">
+                            <div class="quick-action-icon bg-warning">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div class="quick-action-content">
+                                <h6 class="mb-1">Nouvelle Demande</h6>
+                                <small class="text-muted">Soumettre une demande</small>
+                            </div>
+                            <i class="fas fa-chevron-right quick-action-arrow"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-lg h-100 animate-fade-in-right">
+            <div class="card-header dark-header py-2">
+                <h6 class="mb-0">
+                    <i class="fas fa-clock me-2 animate-pulse"></i>
+                    Activité Récente
+                </h6>
+            </div>
+            <div class="card-body py-3">
+                <div class="activity-list animate-stagger">
+                    {% if recent_demandes|length > 0 %}
+                        {% for demande in recent_demandes|slice(0, 3) %}
+                            <div class="activity-item">
+                                <div class="activity-icon bg-warning">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h6 class="mb-1">Nouvelle demande</h6>
+                                    <p class="text-muted mb-1">{{ demande.type|default('Demande') }} - {{ demande.employe.nom }} {{ demande.employe.prenom }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ demande.dateCreation|date('d/m/Y H:i') }}
+                                    </small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="activity-item">
+                            <div class="activity-icon bg-success">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6 class="mb-1">Connexion réussie</h6>
+                                <p class="text-muted mb-1">Vous vous êtes connecté au système</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Maintenant
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon bg-info">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6 class="mb-1">Accès au dashboard</h6>
+                                <p class="text-muted mb-1">Page d'accueil chargée</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Il y a quelques secondes
+                                </small>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .welcome-card {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border-left: 4px solid #0284c7;
+        color: #1e293b;
+    }
+
+    .welcome-card h2 {
+        color: #1e293b !important;
+    }
+
+    .welcome-card .text-muted {
+        color: #475569 !important;
+    }
+
+    .stat-card {
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        box-shadow: var(--shadow-md);
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+        color: #0284c7 !important;
+    }
+
+    .stat-label {
+        font-weight: 500;
+        margin: 0;
+        color: #64748b !important;
+    }
+
+
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .quick-action-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        text-decoration: none;
+        color: #1e293b;
+        transition: var(--transition);
+        border: 1px solid #e2e8f0;
+        background: white;
+    }
+
+    .quick-action-item:hover {
+        background: #f0f9ff;
+        border-color: #bae6fd;
+        transform: translateX(8px);
+        color: #1e293b;
+        text-decoration: none;
+    }
+
+    .quick-action-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-right: 1rem;
+    }
+
+    .quick-action-content {
+        flex: 1;
+    }
+
+    .quick-action-content h6 {
+        margin-bottom: 0.25rem;
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .quick-action-content p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .quick-action-arrow {
+        color: var(--secondary-400);
+        transition: var(--transition);
+    }
+
+    .quick-action-item:hover .quick-action-arrow {
+        color: var(--primary-600);
+        transform: translateX(4px);
+    }
+
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-right: 1rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .activity-content h6 {
+        margin-bottom: 0.25rem;
+        color: var(--secondary-900);
+        font-weight: 600;
+    }
+
+    .activity-content p {
+        margin-bottom: 0.25rem;
+        color: var(--secondary-600);
+    }
+
+    .current-time {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Dark Theme */
+    [data-bs-theme="dark"] .welcome-card {
+        background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-800) 100%);
+        color: white !important;
+    }
+
+    [data-bs-theme="dark"] .welcome-card h2 {
+        color: white !important;
+    }
+
+    [data-bs-theme="dark"] .welcome-card .text-muted {
+        color: white !important;
+    }
+
+    [data-bs-theme="dark"] .current-time .text-muted {
+        color: white !important;
+    }
+
+    [data-bs-theme="dark"] .quick-action-item {
+        border-color: var(--border-color) !important;
+        background: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .quick-action-item:hover {
+        background: var(--bg-secondary) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .quick-action-content h6 {
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .quick-action-content small {
+        color: var(--text-secondary) !important;
+    }
+
+    [data-bs-theme="dark"] .quick-action-arrow {
+        color: var(--text-secondary) !important;
+    }
+
+    [data-bs-theme="dark"] .quick-action-item:hover .quick-action-arrow {
+        color: var(--text-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .current-time {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* KPI Cards Styles */
+    .kpi-card {
+        transition: var(--transition);
+        border: none;
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+        background: var(--bg-primary);
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .kpi-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.3rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-icon::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+        border-radius: 16px;
+    }
+
+    .kpi-icon i {
+        position: relative;
+        z-index: 1;
+    }
+
+    .kpi-icon-blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+    .kpi-icon-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .kpi-icon-cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+    .kpi-icon-orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .kpi-icon-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    .kpi-icon-dark { background: linear-gradient(135deg, #374151 0%, #1f2937 100%); }
+
+    .kpi-title {
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.3;
+    }
+
+    .kpi-description {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+        min-height: 2.5rem;
+    }
+
+    .kpi-btn {
+        border: none;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-transform: none;
+        letter-spacing: 0.025em;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .kpi-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .kpi-card-body {
+        padding: 2rem 1.5rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-btn-blue { 
+        background: #3b82f6; 
+        color: white; 
+    }
+    .kpi-btn-green { 
+        background: #10b981; 
+        color: white; 
+    }
+    .kpi-btn-cyan { 
+        background: #06b6d4; 
+        color: white; 
+    }
+    .kpi-btn-orange { 
+        background: #f59e0b; 
+        color: white; 
+    }
+    .kpi-btn-red { 
+        background: #ef4444; 
+        color: white; 
+    }
+    .kpi-btn-dark { 
+        background: #374151; 
+        color: white; 
+    }
+
+    .kpi-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .kpi-btn-blue:hover { box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
+    .kpi-btn-green:hover { box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4); }
+    .kpi-btn-cyan:hover { box-shadow: 0 10px 20px rgba(6, 182, 212, 0.4); }
+    .kpi-btn-orange:hover { box-shadow: 0 10px 20px rgba(245, 158, 11, 0.4); }
+    .kpi-btn-red:hover { box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4); }
+    .kpi-btn-dark:hover { box-shadow: 0 10px 20px rgba(55, 65, 81, 0.4); }
+
+    /* Dark Theme for KPI Cards */
+    [data-bs-theme="dark"] .kpi-card {
+        background: var(--secondary-800);
+        border-color: var(--secondary-700);
+    }
+
+    [data-bs-theme="dark"] .kpi-title {
+        color: white;
+    }
+
+    [data-bs-theme="dark"] .kpi-description {
+        color: var(--secondary-400);
+    }
+
+        /* Modal positioning fixes - No internal scroll */
+        .modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 1055 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            outline: 0 !important;
+        }
+
+        /* Chart Styling */
+        .bg-gradient {
+            background: linear-gradient(45deg, #007bff, #0056b3) !important;
+        }
+        
+        .chart-bar {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+        
+        /* Chart title positioning */
+        .chart-title {
+            position: relative;
+            z-index: 10;
+            margin-bottom: 25px !important;
+            padding-bottom: 10px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .chart-container {
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+            padding-top: 15px;
+        }
+        
+        .progress-bar {
+            transition: width 0.6s ease;
+        }
+        
+        .chart-pie {
+            transition: transform 0.3s ease;
+        }
+        
+        .chart-pie:hover {
+            transform: scale(1.1);
+        }
+
+    .modal-dialog {
+        position: relative !important;
+        width: auto !important;
+        margin: 0.5rem auto !important;
+        pointer-events: none !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        min-height: calc(100% - 1rem) !important;
+        padding: 1rem 0 !important;
+    }
+
+    .modal-dialog-centered {
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        min-height: calc(100% - 1rem) !important;
+        padding: 1rem 0 !important;
+    }
+
+    .modal-content {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        pointer-events: auto !important;
+        background-color: #fff !important;
+        background-clip: padding-box !important;
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+        border-radius: 0.5rem !important;
+        outline: 0 !important;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+        max-height: none !important;
+        overflow: visible !important;
+        margin: auto !important;
+    }
+
+    /* Ensure modal backdrop covers full viewport */
+    .modal-backdrop {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 1050 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Responsive modal sizing - No scroll needed */
+    @media (min-width: 576px) {
+        .modal-dialog {
+            max-width: 95% !important;
+            margin: 1rem auto !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .modal-dialog {
+            max-width: 90% !important;
+            margin: 1.5rem auto !important;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .modal-xl {
+            max-width: 1200px !important;
+            margin: 2rem auto !important;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .modal-xl {
+            max-width: 1400px !important;
+            margin: 2rem auto !important;
+        }
+    }
+
+    /* Modal body adjustments for better content flow */
+    .modal-body {
+        padding: 1.5rem !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    /* Compact table for better space usage */
+    .modal .table {
+        font-size: 0.9rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    .modal .table th,
+    .modal .table td {
+        padding: 0.5rem !important;
+        vertical-align: middle !important;
+    }
+
+    /* Compact cards in modal */
+    .modal .card-body {
+        padding: 1rem !important;
+    }
+
+    /* Better spacing for modal elements */
+    .modal .row {
+        margin-bottom: 1rem !important;
+    }
+
+    .modal .row:last-child {
+        margin-bottom: 0 !important;
+    }
+    
+    /* ===== DASHBOARD RESPONSIVE STYLES ===== */
+    
+    /* Tablet (768px to 991px) */
+    @media (max-width: 991px) {
+        .welcome-card h4 {
+            font-size: 1.1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.75rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .kpi-icon {
+            width: 45px !important;
+            height: 45px !important;
+            font-size: 1.1rem !important;
+        }
+        
+        .kpi-title {
+            font-size: 0.95rem !important;
+        }
+        
+        .kpi-description {
+            font-size: 0.8rem !important;
+        }
+        
+        .kpi-btn {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.85rem !important;
+        }
+    }
+    
+    /* Mobile (576px to 767px) */
+    @media (max-width: 767px) {
+        .welcome-card {
+            padding: 0.5rem;
+        }
+        
+        .welcome-card h4 {
+            font-size: 1rem;
+        }
+        
+        .welcome-card p {
+            font-size: 0.85rem;
+        }
+        
+        .current-time {
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .time-display {
+            font-size: 1.1rem !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 1rem 0.75rem !important;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+        }
+        
+        .stat-icon i {
+            font-size: 1rem !important;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem !important;
+        }
+        
+        /* KPI Cards */
+        .kpi-card {
+            margin-bottom: 1rem;
+        }
+        
+        .kpi-icon {
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 1rem !important;
+            margin: 0.75rem !important;
+        }
+        
+        .kpi-card-body {
+            padding: 0.75rem !important;
+        }
+        
+        .kpi-title {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+        
+        .kpi-description {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .kpi-btn {
+            padding: 0.4rem 0.8rem !important;
+            font-size: 0.8rem !important;
+        }
+        
+        /* Quick Actions */
+        .quick-action-item {
+            padding: 0.75rem;
+        }
+        
+        .quick-action-icon {
+            width: 35px;
+            height: 35px;
+            margin-right: 0.75rem;
+        }
+        
+        .quick-action-content h6 {
+            font-size: 0.9rem;
+        }
+        
+        .quick-action-content p {
+            font-size: 0.75rem;
+        }
+        
+        /* Activity Items */
+        .activity-icon {
+            width: 35px;
+            height: 35px;
+            margin-right: 0.75rem;
+        }
+        
+        .activity-content h6 {
+            font-size: 0.9rem;
+        }
+        
+        .activity-content p {
+            font-size: 0.75rem;
+        }
+        
+        /* Charts */
+        .chart-container {
+            height: 250px !important;
+        }
+        
+        .bar-chart-container,
+        .pie-chart-container {
+            padding: 0.75rem !important;
+        }
+        
+        .chart-title {
+            font-size: 0.85rem !important;
+        }
+        
+        .bar-label {
+            font-size: 0.7rem !important;
+        }
+        
+        .pie-legend {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    /* Small Mobile (up to 575px) */
+    @media (max-width: 575px) {
+        .welcome-card h4 {
+            font-size: 0.95rem;
+        }
+        
+        .welcome-card p {
+            font-size: 0.8rem;
+        }
+        
+        .current-time {
+            text-align: center !important;
+        }
+        
+        .time-display {
+            font-size: 1rem !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.75rem 0.5rem !important;
+        }
+        
+        .stat-number {
+            font-size: 1.3rem;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .stat-icon i {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem !important;
+        }
+        
+        /* KPI Cards - Stack vertically */
+        .col-lg-4,
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        .kpi-icon {
+            width: 35px !important;
+            height: 35px !important;
+            font-size: 0.9rem !important;
+            margin: 0.5rem !important;
+        }
+        
+        .kpi-card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .kpi-title {
+            font-size: 0.85rem !important;
+        }
+        
+        .kpi-description {
+            font-size: 0.7rem !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .kpi-btn {
+            padding: 0.35rem 0.7rem !important;
+            font-size: 0.75rem !important;
+            width: 100%;
+        }
+        
+        .kpi-btn i {
+            display: none;
+        }
+        
+        /* Quick Actions - Compact */
+        .quick-action-item {
+            padding: 0.5rem;
+        }
+        
+        .quick-action-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .quick-action-content h6 {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+        
+        .quick-action-content p {
+            display: none;
+        }
+        
+        /* Activity Items - Compact */
+        .activity-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .activity-content h6 {
+            font-size: 0.85rem;
+        }
+        
+        .activity-content p {
+            font-size: 0.7rem;
+        }
+        
+        .activity-content small {
+            font-size: 0.65rem;
+        }
+        
+        /* Charts - Smaller */
+        .chart-container {
+            height: 200px !important;
+        }
+        
+        .bar-chart-container,
+        .pie-chart-container {
+            padding: 0.5rem !important;
+        }
+        
+        .chart-title {
+            font-size: 0.8rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .bar-label {
+            font-size: 0.65rem !important;
+            min-height: 20px !important;
+        }
+        
+        .pie-legend {
+            font-size: 0.7rem !important;
+        }
+        
+        .pie-legend-item {
+            padding: 0.25rem !important;
+        }
+        
+        /* Modal adjustments for dashboard */
+        #kpiModal .modal-dialog {
+            margin: 0.25rem;
+        }
+        
+        #kpiModal .modal-header h5 {
+            font-size: 0.95rem;
+        }
+        
+        #kpiModal .modal-body {
+            padding: 0.75rem;
+        }
+        
+        /* Hide less important info on small screens */
+        .hide-on-mobile {
+            display: none !important;
+        }
+    }
+    
+    /* Landscape Mobile */
+    @media (max-width: 767px) and (orientation: landscape) {
+        .stat-card {
+            margin-bottom: 0.5rem;
+        }
+        
+        .chart-container {
+            height: 180px !important;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update time and date
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fr-FR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            const dateString = now.toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            const timeElement = document.getElementById('currentTime');
+            const dateElement = document.getElementById('currentDate');
+            
+            if (timeElement) timeElement.textContent = timeString;
+            if (dateElement) dateElement.textContent = dateString;
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Add hover effects to stat cards
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Add click effects to quick actions
+        const quickActions = document.querySelectorAll('.quick-action-item');
+        quickActions.forEach(action => {
+            action.addEventListener('click', function() {
+                this.style.transform = 'translateX(8px) scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = 'translateX(8px) scale(1)';
+                }, 200);
+            });
+        });
+
+        // Add hover effects to KPI cards
+        const kpiCards = document.querySelectorAll('.kpi-card');
+        kpiCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    });
+
+    // KPI Report Functions
+    async function getKPIContent(reportType) {
+        const fileMap = {
+            'fiabilisation-contrat': 'A.json',
+            'fiabilisation-das': 'B.json',
+            'details-das': 'C.json',
+            'details-contrat': 'D.json',
+            'matrice-personnel': 'E.json',
+            'matrice-ayant-droits': 'F.json'
+        };
+
+        try {
+            const fileName = fileMap[reportType];
+            if (!fileName) {
+                throw new Error(`Unknown report type: ${reportType}`);
+            }
+            console.log(`Loading KPI data from: /${fileName}`);
+            const response = await fetch(`/${fileName}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log(`Loaded data for ${reportType}:`, data);
+            console.log(`Data has ${data.length} rows`);
+            
+            const processed = processKPIData(reportType, data);
+            console.log(`Processed data:`, processed);
+            return processed;
+        } catch (error) {
+            console.error('Error loading KPI data:', error);
+            alert('ERREUR: ' + error.message + '\nType: ' + reportType);
+            throw error;
+        }
+    }
+
+    function processKPIData(reportType, data) {
+        switch(reportType) {
+            case 'fiabilisation-contrat':
+                return processContractData(data);
+            case 'fiabilisation-das':
+                return processDASData(data);
+            case 'details-das':
+                return processDASDetailsData(data);
+            case 'details-contrat':
+                return processContractDetailsData(data);
+            case 'matrice-personnel':
+                return processPersonnelMatrixData(data);
+            case 'matrice-ayant-droits':
+                return processAyantDroitsMatrixData(data);
+            default:
+                return getDefaultKPIContent(reportType);
+        }
+    }
+
+    function getContractLabel(contractName, index) {
+        if (!contractName) return `Type ${index + 1}`;
+        
+        const name = contractName.toString().toUpperCase();
+        
+        // Create specific labels to avoid confusion
+        if (name.includes('CDI')) return 'CDI';
+        if (name.includes('CDD')) return 'CDD';
+        if (name.includes('SALARIÉ CONTRACTUEL')) return 'SAL. CONTRACTUEL';
+        if (name.includes('PRATICIEN PERMANENT CONTRACTUEL')) return 'PRAT. CONTRACTUEL';
+        if (name.includes('ENSEIGNANT PERMANENT CONTRACTUEL')) return 'ENS. CONTRACTUEL';
+        if (name.includes('HONORAIRE VARIABLE')) return 'HON. VARIABLE';
+        if (name.includes('HONORAIRE FORFAITAIRE')) return 'HON. FORFAITAIRE';
+        if (name.includes('VACATAIRE')) return 'VACATAIRE';
+        if (name.includes('AUTO-ENTREPRENEUR')) return 'AUTO-ENTREPRENEUR';
+        if (name.includes('STAGIAIRE PROFESSIONNEL')) return 'STAG. PRO';
+        if (name.includes('STAGIAIRE ETUDIANT')) return 'STAG. ETUDIANT';
+        if (name.includes('ETRANGER ENSEIGNANT')) return 'ETR. ENSEIGNANT';
+        if (name.includes('ETRANGER PRATICIEN')) return 'ETR. PRATICIEN';
+        
+        // Fallback to last word
+        return contractName.split(' ').pop() || `Type ${index + 1}`;
+    }
+
+    function processContractData(data) {
+        // A.json structure: 
+        // Row 0: contract names
+        // Row 1: personnel percentages
+        // Row 2: personnel missing documents (numbers)
+        // Row 3: ayant droits percentages  
+        // Row 4: ayant droits missing documents (numbers)
+        const contractNames = data[0].slice(2).filter(contract => contract && contract.trim() !== '');
+        const personnelMissingDocs = data[2].slice(2);
+        const ayantDroitsMissingDocs = data[4].slice(2);
+
+        // Process contract data using missing documents numbers
+        const contractData = contractNames.map((contract, index) => {
+            const personnelMissing = parseInt(personnelMissingDocs[index].toString().replace(/[,\s]/g, '')) || 0;
+            const ayantDroitsMissing = parseInt(ayantDroitsMissingDocs[index].toString().replace(/[,\s]/g, '')) || 0;
+            return {
+                name: contract,
+                personnelMissing: personnelMissing,
+                ayantDroitsMissing: ayantDroitsMissing,
+                totalMissing: personnelMissing + ayantDroitsMissing
+            };
+        }).filter(item => item.totalMissing > 0);
+
+        // Sort by total missing documents (ascending - fewer missing is better)
+        contractData.sort((a, b) => a.totalMissing - b.totalMissing);
+
+        const colors = ['#28a745', '#007bff', '#ffc107', '#17a2b8', '#dc3545', '#6f42c1'];
+
+        return {
+            title: 'A. Documents Manquants par Type de Contrat',
+            description: 'Rapport des documents manquants par type de contrat (Personnel + Ayant Droits)',
+            charts: {
+                barChart: {
+                    title: 'Documents Manquants par Type de Contrat',
+                    data: contractData.slice(0, 6).map((item, index) => ({
+                        label: getContractLabel(item.name, index),
+                        value: item.totalMissing,
+                        color: colors[index % colors.length]
+                    }))
+                },
+                pieChart: {
+                    title: 'Répartition des Documents Manquants (Top 6)',
+                    data: (() => {
+                        const top6 = contractData.slice(0, 6);
+                        const total = top6.reduce((sum, item) => sum + item.totalMissing, 0);
+                        return top6.map((item, index) => ({
+                            label: getContractLabel(item.name, index),
+                            percentage: Math.round((item.totalMissing / total) * 100),
+                        color: colors[index % colors.length]
+                        }));
+                    })()
+                }
+            },
+            metrics: [
+                { label: 'Meilleur Contrat', value: contractData[0]?.totalMissing?.toLocaleString() + ' docs', color: 'success' },
+                { label: 'Moyenne Manquants', value: Math.round(contractData.reduce((sum, item) => sum + item.totalMissing, 0) / contractData.length).toLocaleString() + ' docs', color: 'primary' },
+                { label: 'Total Types', value: contractNames.length.toString(), color: 'info' },
+                { label: 'Total Manquants', value: contractData.reduce((sum, item) => sum + item.totalMissing, 0).toLocaleString() + ' docs', color: 'warning' }
+            ],
+            tableData: contractData.map(item => ({
+                contrat: item.name,
+                personnel: item.personnelMissing.toLocaleString() + ' docs',
+                ayantDroits: item.ayantDroitsMissing.toLocaleString() + ' docs',
+                total: item.totalMissing.toLocaleString() + ' docs',
+                statut: item.totalMissing < 1000 ? 'Excellent' : item.totalMissing < 3000 ? 'Bon' : 'À améliorer'
+            })),
+            tableHeaders: ['Type de Contrat', 'Personnel Manquants', 'Ayant Droits Manquants', 'Total Manquants', 'Statut']
+        };
+    }
+
+    function processDASData(data) {
+        // B.json structure: DAS names in first row, personnel percentages in second row, ayant droits percentages in third row
+        const dasNames = data[0].slice(2).filter(das => das && das.trim() !== '');
+        const personnelPercentages = data[1].slice(2);
+        const ayantDroitsPercentages = data[2].slice(2);
+
+        // Process DAS data using percentages (B.json doesn't have missing document numbers)
+        const dasData = dasNames.map((das, index) => {
+            const personnel = parseFloat(personnelPercentages[index]) || 0;
+            const ayantDroits = parseFloat(ayantDroitsPercentages[index]) || 0;
+            return {
+                name: das,
+                personnel: personnel,
+                ayantDroits: ayantDroits,
+                totalScore: personnel + ayantDroits // Combined score for ranking
+            };
+        }).filter(item => item.personnel > 0 || item.ayantDroits > 0);
+
+        // Sort by personnel percentage but keep all DAS
+        dasData.sort((a, b) => b.personnel - a.personnel);
+
+        const colors = ['#28a745', '#007bff', '#ffc107', '#17a2b8', '#dc3545', '#6f42c1'];
+
+        return {
+            title: 'B. Fiabilisation par DAS',
+            description: 'Rapport de fiabilisation des dossiers RH organisés par Direction/Service',
+            charts: {
+                barChart: {
+                    title: 'Comparaison Personnel vs Ayant Droits (Top 6 DAS)',
+                    data: dasData.slice(0, 6).map((item, index) => ({
+                        label: item.name,
+                        personnel: Math.round(item.personnel),
+                        ayantDroits: Math.round(item.ayantDroits),
+                        color: colors[index % colors.length]
+                    }))
+                },
+                pieChart: {
+                    title: 'Classement des DAS par Performance',
+                    data: (() => {
+                        const top3 = dasData.slice(0, 3);
+                        const bottom3 = dasData.slice(-3).reverse();
+                        return {
+                            top: top3.map((item, index) => ({
+                        label: item.name,
+                                value: Math.round(item.personnel),
+                                color: '#28a745'
+                            })),
+                            bottom: bottom3.map((item, index) => ({
+                                label: item.name,
+                                value: Math.round(item.personnel),
+                                color: '#dc3545'
+                            }))
+                        };
+                    })()
+                }
+            },
+            metrics: [
+                { label: 'Meilleur DAS', value: Math.round(dasData[0]?.personnel || 0) + '%', color: 'success' },
+                { label: 'Moyenne Personnel', value: Math.round(dasData.reduce((sum, item) => sum + item.personnel, 0) / dasData.length) + '%', color: 'primary' },
+                { label: 'Total DAS', value: dasNames.length.toString(), color: 'info' },
+                { label: 'Ayant Droits Moy', value: Math.round(dasData.reduce((sum, item) => sum + item.ayantDroits, 0) / dasData.length) + '%', color: 'warning' }
+            ],
+            tableData: dasData.map(item => ({
+                das: item.name,
+                personnel: Math.round(item.personnel) + '%',
+                ayantDroits: Math.round(item.ayantDroits) + '%',
+                difference: Math.round(item.personnel - item.ayantDroits) + '%',
+                statut: item.personnel > 70 ? 'Excellent' : item.personnel > 50 ? 'Bon' : 'À améliorer'
+            })),
+            tableHeaders: ['DAS', 'Personnel (%)', 'Ayant Droits (%)', 'Écart', 'Statut']
+        };
+    }
+
+    function processDASDetailsData(data) {
+        console.log('processDASDetailsData called with data:', data);
+        // C.json structure: 
+        // Row 0: Headers with document types
+        // Row 1: "DAS" separator row
+        // Row 2+: DAS data
+        // Columns: 0=DAS name, 2-13=document percentages, 14=% DOSSIER PERSONNEL, 16-20=ayant droits docs, 21=% AYANT DROITS
+        
+        if (!data || data.length < 3) {
+            console.error('Invalid data structure for DAS details');
+            throw new Error('Données invalides pour le KPI C');
+        }
+        
+        // Get DAS data starting from row 2 (skip header rows 0 and 1)
+        const dasData = data.slice(2).map((row, index) => {
+            const dasName = row[0];
+            if (!dasName || dasName.trim() === '' || dasName === 'DAS' || dasName === '|') {
+                console.log(`Row ${index + 2} skipped: ${dasName}`);
+                return null;
+            }
+            
+            // Get personnel percentage from column 14 (0-based index)
+            const personnelPercentageStr = row[14];
+            const personnelPercentage = personnelPercentageStr ? parseFloat(personnelPercentageStr.toString().replace('%', '')) : 0;
+            
+            // Get ayant droits percentage from column 21 (0-based index)
+            const ayantDroitsPercentageStr = row[21];
+            const ayantDroitsPercentage = ayantDroitsPercentageStr ? parseFloat(ayantDroitsPercentageStr.toString().replace('%', '')) : 0;
+            
+            // Count completed documents (non-empty values in document columns 2-13)
+            const documentColumns = row.slice(2, 14);
+            const completedDocs = documentColumns.filter(doc => {
+                if (!doc) return false;
+                const docStr = doc.toString().trim();
+                return docStr !== '' && docStr !== '|' && docStr !== '~';
+            }).length;
+            
+            const totalDocuments = 12; // There are 12 document types (CIN to EMPREINTE)
+            
+            console.log(`DAS ${dasName}: Personnel=${personnelPercentage}%, AyantDroits=${ayantDroitsPercentage}%, Docs=${completedDocs}/${totalDocuments}`);
+            
+            return {
+                name: dasName,
+                percentage: personnelPercentage,
+                ayantDroitsPercentage: ayantDroitsPercentage,
+                documentCount: completedDocs,
+                totalDocuments: totalDocuments,
+                missingDocs: totalDocuments - completedDocs
+            };
+        }).filter(item => item !== null);
+        
+        console.log(`Total DAS processed: ${dasData.length}`);
+
+        // Sort by percentage but keep all DAS
+        dasData.sort((a, b) => b.percentage - a.percentage);
+
+        const colors = ['#28a745', '#007bff', '#ffc107', '#17a2b8', '#dc3545', '#6f42c1'];
+
+        // Calculate most problematic documents (lowest average completion)
+        const documentTypes = data[0].slice(2, 14);
+        const documentStats = documentTypes.map((docType, docIndex) => {
+            const avgCompletion = dasData.reduce((sum, das) => {
+                const row = data.find(r => r[0] === das.name);
+                if (row) {
+                    const value = parseFloat(row[docIndex + 2]) || 0;
+                    return sum + value;
+                }
+                return sum;
+            }, 0) / dasData.length;
+            return {
+                name: docType,
+                completion: avgCompletion,
+                missing: 100 - avgCompletion
+            };
+        }).sort((a, b) => a.completion - b.completion);
+
+        return {
+            title: 'C. Détails par DAS',
+            description: 'Rapport détaillé des documents par Direction/Service avec pourcentages individuels',
+            charts: {
+                barChart: {
+                    title: 'Documents les Plus Problématiques (Moyenne)',
+                    data: documentStats.slice(0, 6).map((item, index) => ({
+                        label: item.name.substring(0, 15),
+                        value: Math.round(item.missing),
+                        color: colors[index % colors.length]
+                    }))
+                },
+                pieChart: {
+                    title: 'Comparaison Personnel vs Ayant Droits (Top 6 DAS)',
+                    data: dasData.slice(0, 6).map((item, index) => ({
+                        label: item.name,
+                        personnel: Math.round(item.percentage),
+                        ayantDroits: Math.round(item.ayantDroitsPercentage),
+                        color: colors[index % colors.length]
+                    }))
+                }
+            },
+            metrics: [
+                { label: 'Meilleur DAS', value: dasData[0]?.name + ' (' + dasData[0]?.percentage.toFixed(2) + '%)', color: 'success' },
+                { label: 'Moyenne Personnel', value: (dasData.reduce((sum, item) => sum + item.percentage, 0) / dasData.length).toFixed(2) + '%', color: 'primary' },
+                { label: 'Total DAS', value: dasData.length.toString(), color: 'info' }
+            ],
+            tableData: dasData.map(item => ({
+                das: item.name,
+                personnel: item.percentage.toFixed(2) + '%',
+                ayantDroits: item.ayantDroitsPercentage.toFixed(2) + '%',
+                documents: item.documentCount + '/' + item.totalDocuments,
+                manquants: item.missingDocs,
+                statut: item.percentage >= 70 ? 'Complet' : item.percentage >= 50 ? 'Partiel' : 'En cours'
+            })),
+            tableHeaders: ['DAS', '% Dossier Personnel', '% Ayant Droits', 'Documents Complétés', 'Docs Manquants', 'Statut']
+        };
+    }
+
+    function processContractDetailsData(data) {
+        // D.json structure: Same as C.json but with contract types instead of DAS
+        // Row 0: Headers with document types
+        // Row 1: "CONTRAT" separator row
+        // Row 2+: Contract data
+        // Columns: 0=Contract name, 2-13=document percentages, 14=% DOSSIER PERSONNEL, 16-20=ayant droits docs, 21=% AYANT DROITS
+        
+        // Get contract data starting from row 2 (skip header rows 0 and 1)
+        const contractData = data.slice(2).map(row => {
+            const contractName = row[0];
+            if (!contractName || contractName.trim() === '' || contractName === 'CONTRAT' || contractName === '|') return null;
+            
+            // Get personnel percentage from column 14 (0-based index)
+            const personnelPercentageStr = row[14];
+            const personnelPercentage = personnelPercentageStr ? parseFloat(personnelPercentageStr.toString().replace('%', '')) : 0;
+            
+            // Get ayant droits percentage from column 21 (0-based index)
+            const ayantDroitsPercentageStr = row[21];
+            const ayantDroitsPercentage = ayantDroitsPercentageStr ? parseFloat(ayantDroitsPercentageStr.toString().replace('%', '')) : 0;
+            
+            // Count completed documents (non-empty values in document columns 2-13)
+            const documentColumns = row.slice(2, 14);
+            const completedDocs = documentColumns.filter(doc => {
+                if (!doc) return false;
+                const docStr = doc.toString().trim();
+                return docStr !== '' && docStr !== '|' && docStr !== '~';
+            }).length;
+            
+            const totalDocuments = 12; // There are 12 document types (CIN to EMPREINTE)
+            
+            return {
+                name: contractName,
+                percentage: personnelPercentage,
+                ayantDroitsPercentage: ayantDroitsPercentage,
+                documentCount: completedDocs,
+                totalDocuments: totalDocuments,
+                missingDocs: totalDocuments - completedDocs
+            };
+        }).filter(item => item !== null);
+
+        // Sort by percentage but keep all contracts
+        contractData.sort((a, b) => b.percentage - a.percentage);
+
+        const colors = ['#28a745', '#007bff', '#ffc107', '#17a2b8', '#dc3545', '#6f42c1'];
+
+        // Calculate most problematic documents (lowest average completion)
+        const documentTypes = data[0].slice(2, 14);
+        const documentStats = documentTypes.map((docType, docIndex) => {
+            const avgCompletion = contractData.reduce((sum, contract) => {
+                const row = data.find(r => r[0] === contract.name);
+                if (row) {
+                    const value = parseFloat(row[docIndex + 2]) || 0;
+                    return sum + value;
+                }
+                return sum;
+            }, 0) / contractData.length;
+            return {
+                name: docType,
+                completion: avgCompletion,
+                missing: 100 - avgCompletion
+            };
+        }).sort((a, b) => a.completion - b.completion);
+
+        return {
+            title: 'D. Détails par Contrat',
+            description: 'Rapport détaillé des documents par type de contrat avec pourcentages individuels',
+            charts: {
+                barChart: {
+                    title: 'Documents les Plus Problématiques (Moyenne)',
+                    data: documentStats.slice(0, 6).map((item, index) => ({
+                        label: item.name.substring(0, 15),
+                        value: Math.round(item.missing),
+                        color: colors[index % colors.length]
+                    }))
+                },
+                pieChart: {
+                    title: 'Comparaison Personnel vs Ayant Droits (Top 6 Contrats)',
+                    data: contractData.slice(0, 6).map((item, index) => ({
+                        label: getContractLabel(item.name, index),
+                        personnel: Math.round(item.percentage),
+                        ayantDroits: Math.round(item.ayantDroitsPercentage),
+                        color: colors[index % colors.length]
+                    }))
+                }
+            },
+            metrics: [
+                { label: 'Meilleur Contrat', value: contractData[0]?.name + ' (' + contractData[0]?.percentage.toFixed(2) + '%)', color: 'success' },
+                { label: 'Moyenne Personnel', value: (contractData.reduce((sum, item) => sum + item.percentage, 0) / contractData.length).toFixed(2) + '%', color: 'primary' },
+                { label: 'Total Types', value: contractData.length.toString(), color: 'info' }
+            ],
+            tableData: contractData.map(item => ({
+                contrat: item.name,
+                personnel: item.percentage.toFixed(2) + '%',
+                ayantDroits: item.ayantDroitsPercentage.toFixed(2) + '%',
+                documents: item.documentCount + '/' + item.totalDocuments,
+                manquants: item.missingDocs,
+                statut: item.percentage >= 70 ? 'Complet' : item.percentage >= 50 ? 'Partiel' : 'En cours'
+            })),
+            tableHeaders: ['Type de Contrat', '% Dossier Personnel', '% Ayant Droits', 'Documents Complétés', 'Docs Manquants', 'Statut']
+        };
+    }
+
+    function processPersonnelMatrixData(data) {
+        // E.json structure: 
+        // Row 0: DAS names (DSOI, DENS, EPHR, etc.)
+        // Row 1+: Contract data with names in column 0 and percentages for each DAS
+        
+        const dasNames = data[0].slice(2); // DAS names from row 0, columns 2+
+        
+        // Get contract data starting from row 1
+        const contractData = data.slice(1).map(row => {
+            const contractName = row[0];
+            if (!contractName || contractName.trim() === '') return null;
+            
+            // Get percentages for all DAS (columns 2+)
+            const percentages = row.slice(2).map(p => {
+                if (!p) return 0;
+                const parsed = parseFloat(p.toString().replace('%', ''));
+                return isNaN(parsed) ? 0 : parsed;
+            });
+            
+            // Calculate average across all DAS
+            const average = percentages.length > 0 ? percentages.reduce((sum, p) => sum + p, 0) / percentages.length : 0;
+            
+            return {
+                name: contractName,
+                average: average,
+                percentages: percentages,
+                dasCount: percentages.filter(p => p > 0).length
+            };
+        }).filter(item => item && item.average > 0);
+
+        // Sort by average but keep all contracts
+        contractData.sort((a, b) => b.average - a.average);
+
+        const colors = ['#28a745', '#007bff', '#ffc107', '#17a2b8', '#dc3545', '#6f42c1'];
+
+        return {
+            title: 'E. Matrice Personnel',
+            description: 'Rapport croisé des documents "Personnel" par contrat et DAS',
+            charts: {
+                barChart: {
+                    title: 'Top 6 Contrats par Performance Moyenne',
+                    data: contractData.slice(0, 6).map((item, index) => ({
+                        label: getContractLabel(item.name, index),
+                        value: Math.round(item.average),
+                        color: colors[index % colors.length]
+                    }))
+                },
+                pieChart: {
+                    title: 'Couverture Géographique par Contrat',
+                    data: contractData.slice(0, 6).map((item, index) => ({
+                        label: getContractLabel(item.name, index),
+                        dasCount: item.dasCount,
+                        totalDas: dasNames.length,
+                        coverage: Math.round((item.dasCount / dasNames.length) * 100),
+                        color: colors[index % colors.length]
+                    }))
+                }
+            },
+            metrics: [
+                { label: 'Meilleur Contrat', value: contractData[0]?.name + ' (' + contractData[0]?.average.toFixed(2) + '%)', color: 'success' },
+                { label: 'Moyenne Générale', value: (contractData.reduce((sum, item) => sum + item.average, 0) / contractData.length).toFixed(2) + '%', color: 'primary' },
+                { label: 'Total Types', value: contractData.length.toString(), color: 'info' }
+            ],
+            tableData: contractData.map(item => ({
+                contrat: item.name,
+                moyenne: item.average.toFixed(2) + '%',
+                dasCouverts: item.dasCount + ' DAS',
+                meilleurePerformance: Math.max(...item.percentages).toFixed(1) + '%',
+                statut: item.average >= 70 ? 'Excellent' : item.average >= 50 ? 'Bon' : 'À améliorer'
+            })),
+            tableHeaders: ['Type de Contrat', 'Moyenne (%)', 'DAS Couverts', 'Meilleure Performance', 'Statut']
+        };
+    }
+
+    function processAyantDroitsMatrixData(data) {
+        // F.json structure: Same as E.json but for Ayant Droits
+        // Row 0: DAS names (DSOI, DENS, EPHR, etc.)
+        // Row 1+: Contract data with names in column 0 and percentages for each DAS
+        
+        const dasNames = data[0].slice(2); // DAS names from row 0, columns 2+
+        
+        // Get contract data starting from row 1
+        const contractData = data.slice(1).map(row => {
+            const contractName = row[0];
+            if (!contractName || contractName.trim() === '') return null;
+            
+            // Get percentages for all DAS (columns 2+)
+            const percentages = row.slice(2).map(p => {
+                if (!p) return 0;
+                const parsed = parseFloat(p.toString().replace('%', ''));
+                return isNaN(parsed) ? 0 : parsed;
+            });
+            
+            // Calculate average across all DAS
+            const average = percentages.length > 0 ? percentages.reduce((sum, p) => sum + p, 0) / percentages.length : 0;
+            
+            return {
+                name: contractName,
+                average: average,
+                percentages: percentages,
+                dasCount: percentages.filter(p => p > 0).length
+            };
+        }).filter(item => item && item.average > 0);
+
+        // Sort by average but keep all contracts
+        contractData.sort((a, b) => b.average - a.average);
+
+        const colors = ['#28a745', '#007bff', '#ffc107', '#17a2b8', '#dc3545', '#6f42c1'];
+
+        return {
+            title: 'F. Matrice Ayant Droits',
+            description: 'Rapport croisé des documents "Ayant Droits" par contrat et DAS',
+            charts: {
+                barChart: {
+                    title: 'Top 6 Contrats par Performance Moyenne',
+                    data: contractData.slice(0, 6).map((item, index) => ({
+                        label: getContractLabel(item.name, index),
+                        value: Math.round(item.average),
+                        color: colors[index % colors.length]
+                    }))
+                },
+                pieChart: {
+                    title: 'Couverture Géographique par Contrat',
+                    data: contractData.slice(0, 6).map((item, index) => ({
+                        label: getContractLabel(item.name, index),
+                        dasCount: item.dasCount,
+                        totalDas: dasNames.length,
+                        coverage: Math.round((item.dasCount / dasNames.length) * 100),
+                        color: colors[index % colors.length]
+                    }))
+                }
+            },
+            metrics: [
+                { label: 'Meilleur Contrat', value: contractData[0]?.name + ' (' + contractData[0]?.average.toFixed(2) + '%)', color: 'success' },
+                { label: 'Moyenne Générale', value: (contractData.reduce((sum, item) => sum + item.average, 0) / contractData.length).toFixed(2) + '%', color: 'primary' },
+                { label: 'Total Types', value: contractData.length.toString(), color: 'info' }
+            ],
+            tableData: contractData.map(item => ({
+                contrat: item.name,
+                moyenne: item.average.toFixed(2) + '%',
+                dasCouverts: item.dasCount + ' DAS',
+                meilleurePerformance: Math.max(...item.percentages).toFixed(1) + '%',
+                statut: item.average >= 70 ? 'Excellent' : item.average >= 50 ? 'Bon' : 'À améliorer'
+            })),
+            tableHeaders: ['Type de Contrat', 'Moyenne (%)', 'DAS Couverts', 'Meilleure Performance', 'Statut']
+        };
+    }
+
+    function getDefaultKPIContent(reportType) {
+        return {
+            title: 'Rapport KPI',
+            description: 'Données temporairement indisponibles',
+            charts: { barChart: { title: 'Aucune donnée', data: [] }, pieChart: { title: 'Aucune donnée', data: [] } },
+            metrics: [{ label: 'Erreur', value: 'N/A', color: 'danger' }],
+            tableData: [{ element: 'Erreur', statut: 'Erreur', percentage: '0%', observations: 'Données non disponibles' }]
+        };
+    }
+
+    function generatePieChart(data) {
+        const total = data.reduce((sum, item) => sum + item.percentage, 0);
+        let currentAngle = -90; // Start from top
+        let segments = '';
+        
+        data.forEach((item, index) => {
+            const percentage = item.percentage;
+            const angle = (percentage / total) * 360;
+            const endAngle = currentAngle + angle;
+            
+            // Calculate path for SVG arc
+            const radius = 50;
+            const centerX = 60;
+            const centerY = 60;
+            
+            const startAngleRad = (currentAngle * Math.PI) / 180;
+            const endAngleRad = (endAngle * Math.PI) / 180;
+            
+            const x1 = centerX + radius * Math.cos(startAngleRad);
+            const y1 = centerY + radius * Math.sin(startAngleRad);
+            const x2 = centerX + radius * Math.cos(endAngleRad);
+            const y2 = centerY + radius * Math.sin(endAngleRad);
+            
+            const largeArcFlag = angle > 180 ? 1 : 0;
+            
+            const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+            
+            segments += `<path d="${pathData}" fill="${item.color}" stroke="white" stroke-width="1"/>`;
+            
+            currentAngle = endAngle;
+        });
+        
+        return `
+            <svg width="120" height="120" viewBox="0 0 120 120" class="position-absolute">
+                ${segments}
+            </svg>
+        `;
+    }
+
+    function generateAdditionalCharts(kpiContent, reportType) {
+        let additionalCharts = '';
+
+        switch(reportType) {
+            case 'fiabilisation-contrat':
+                // Chart 1: Contract Performance Distribution
+                const performanceRanges = [
+                    { range: 'Excellent (≥85%)', count: 0, color: '#28a745' },
+                    { range: 'Bon (70-84%)', count: 0, color: '#17a2b8' },
+                    { range: 'Moyen (50-69%)', count: 0, color: '#ffc107' },
+                    { range: 'Faible (<50%)', count: 0, color: '#dc3545' }
+                ];
+                
+                kpiContent.tableData.forEach(item => {
+                    const percentage = parseInt(item.personnel) || 0;
+                    if (percentage >= 85) performanceRanges[0].count++;
+                    else if (percentage >= 70) performanceRanges[1].count++;
+                    else if (percentage >= 50) performanceRanges[2].count++;
+                    else performanceRanges[3].count++;
+                });
+
+                additionalCharts += `
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-chart-bar me-2"></i>Répartition des Performances
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        ${performanceRanges.map(range => `
+                                            <div class="col-3 text-center">
+                                                <div class="p-3">
+                                                    <div style="width: 60px; height: 60px; background-color: ${range.color}; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+                                                        <span class="text-white fw-bold">${range.count}</span>
+                                                    </div>
+                                                    <small class="text-muted">${range.range}</small>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                break;
+
+            case 'fiabilisation-das':
+                // Chart 1: DAS Performance Ranking
+
+                // Chart 2: Personnel vs Ayant Droits Gap Analysis
+                const gapData = kpiContent.tableData.map(item => ({
+                    das: item.das,
+                    gap: Math.abs(parseInt(item.personnel) - parseInt(item.ayantDroits))
+                })).sort((a, b) => b.gap - a.gap).slice(0, 6);
+
+                break;
+
+            case 'details-das':
+                // Chart 1: Document Completion Status
+                const docStatusCounts = kpiContent.tableData.reduce((acc, item) => {
+                    acc[item.statut] = (acc[item.statut] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                additionalCharts += `
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-pie-chart me-2"></i>Répartition des Statuts de Complétude
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex justify-content-around">
+                                                ${Object.entries(docStatusCounts).map(([status, count]) => {
+                                                    const colors = { 'Complet': '#28a745', 'Partiel': '#ffc107', 'En cours': '#dc3545' };
+                                                    const color = colors[status] || '#6c757d';
+                                                    const percentage = ((count / kpiContent.tableData.length) * 100).toFixed(1);
+                                                    return `
+                                                        <div class="text-center">
+                                                            <div style="width: 80px; height: 80px; background-color: ${color}; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+                                                                <span class="text-white fw-bold fs-4">${count}</span>
+                                                            </div>
+                                                            <div class="fw-bold">${status}</div>
+                                                            <small class="text-muted">${percentage}%</small>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center p-4">
+                                                <h2 class="text-primary mb-1">${kpiContent.tableData.length}</h2>
+                                                <p class="text-muted mb-0">Total DAS</p>
+                                                <hr>
+                                                <h4 class="text-success mb-1">${kpiContent.metrics.find(m => m.label.includes('Moyenne'))?.value || '0%'}</h4>
+                                                <p class="text-muted mb-0">Moyenne Générale</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                break;
+
+            case 'details-contrat':
+                // Chart 1: Contract Performance Comparison
+
+                // Chart 2: Document Completion Analysis
+                const docAnalysis = kpiContent.tableData.map(item => ({
+                    contrat: item.contrat,
+                    completed: parseInt(item.documents.split('/')[0]),
+                    total: parseInt(item.documents.split('/')[1]),
+                    percentage: parseFloat(item.personnel.replace('%', ''))
+                })).sort((a, b) => b.percentage - a.percentage).slice(0, 6);
+
+                break;
+
+            case 'matrice-personnel':
+
+                // Chart 2: Personnel Matrix Summary
+                additionalCharts += `
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-chart-pie me-2"></i>Résumé des Performances Personnel
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="d-flex justify-content-around">
+                                                ${kpiContent.tableData.slice(0, 6).map((item, index) => {
+                                                    const average = parseFloat(item.moyenne.replace('%', '') || '0') || 0;
+                                                    const colors = ['#28a745', '#17a2b8', '#ffc107', '#6f42c1', '#fd7e14', '#dc3545'];
+                                                    const color = colors[index % colors.length];
+                                                    const shortName = (item.contrat || '').split(' ').slice(-2).join(' ');
+                                                    
+                                                    return `
+                                                        <div class="text-center">
+                                                            <div style="width: 60px; height: 60px; background-color: ${color}; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+                                                                <span class="text-white fw-bold">${average.toFixed(0)}%</span>
+                                                            </div>
+                                                            <small class="text-muted">${shortName}</small>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center p-4">
+                                                <h2 class="text-primary mb-1">${kpiContent.tableData.length}</h2>
+                                                <p class="text-muted mb-0">Types de Contrats</p>
+                                                <hr>
+                                                <h4 class="text-success mb-1">${kpiContent.metrics.find(m => m.label.includes('Moyenne'))?.value || '0%'}</h4>
+                                                <p class="text-muted mb-0">Performance Moyenne</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                break;
+
+            case 'matrice-ayant-droits':
+
+                break;
+        }
+
+        return additionalCharts;
+    }
+
+       async function viewKPIReport(reportType) {
+           console.log('viewKPIReport called with:', reportType);
+           
+           const reportNames = {
+               'fiabilisation-contrat': 'A. Fiabilisation par Nature de Contrat',
+               'fiabilisation-das': 'B. Fiabilisation par DAS',
+               'details-das': 'C. Détails par DAS',
+               'details-contrat': 'D. Détails par Contrat',
+               'matrice-personnel': 'E. Matrice Personnel',
+               'matrice-ayant-droits': 'F. Matrice Ayant Droits'
+           };
+
+           const reportTitle = reportNames[reportType] || 'Rapport KPI';
+
+           // Get specific content for each KPI
+           console.log('Getting KPI content for:', reportType);
+           let kpiContent;
+           try {
+               kpiContent = await getKPIContent(reportType);
+               console.log('KPI content loaded:', kpiContent);
+           } catch (error) {
+               console.error('Error in viewKPIReport:', error);
+               alert('Erreur lors du chargement du rapport: ' + error.message);
+               return;
+           }
+        
+        // Create and show modal
+        const modalHtml = `
+            <div class="modal fade" id="kpiModal" tabindex="-1" aria-labelledby="kpiModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="kpiModalLabel">
+                                <i class="fas fa-chart-line me-2"></i>${reportTitle}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Report Content -->
+                            <div id="reportContent">
+                                <div class="report-header mb-4">
+                                    <h4 class="text-primary mb-2">
+                                        <i class="fas fa-chart-bar me-2"></i>Résumé du Rapport
+                                    </h4>
+                                    <p class="text-muted mb-0">Analyse détaillée des données RH - ${new Date().toLocaleDateString('fr-FR')}</p>
+                                </div>
+
+                                   <!-- Dynamic Charts Section -->
+                                   <div class="row mb-4">
+                                       <div class="col-12">
+                                           <div class="card border-0 shadow-sm">
+                                               <div class="card-header bg-light">
+                                                   <h6 class="mb-0">
+                                                       <i class="fas fa-chart-bar me-2"></i>Visualisation des Données
+                                                   </h6>
+                                               </div>
+                                               <div class="card-body">
+                                                   <div class="row">
+                               <!-- Dynamic Bar Chart -->
+                               <div class="col-md-6 mb-3">
+                                   <h6 class="chart-title">${kpiContent.charts.barChart.title}</h6>
+                                   <div class="chart-container">
+                        ${(() => {
+                            // Check if this is KPI B (comparison chart)
+                            const isKpiB = kpiContent.title.includes('B. Fiabilisation par DAS');
+                            
+                            if (isKpiB && kpiContent.charts.barChart.data[0]?.personnel !== undefined) {
+                                // Render comparison chart for KPI B
+                                return `
+                                    <div class="d-flex align-items-end justify-content-between" style="height: 120px;">
+                                        ${kpiContent.charts.barChart.data.map((item, index) => {
+                                            const personnelHeight = Math.min(item.personnel * 0.9, 90);
+                                            const ayantDroitsHeight = Math.min(item.ayantDroits * 3, 60);
+                                            return `
+                                                <div class="d-flex flex-column align-items-center" style="flex: 1; margin: 0 2px;">
+                                                    <div class="d-flex align-items-end" style="height: 100px; gap: 2px;">
+                                                        <div class="rounded-top" style="height: ${personnelHeight}px; width: 12px; background-color: ${item.color};" title="Personnel: ${item.personnel}%"></div>
+                                                        <div class="rounded-top" style="height: ${ayantDroitsHeight}px; width: 12px; background-color: ${item.color}; opacity: 0.5;" title="Ayant Droits: ${item.ayantDroits}%"></div>
+                                           </div>
+                                                    <small class="text-muted mt-1" style="font-size: 0.65rem; line-height: 1.0;">${item.label}</small>
+                                   </div>
+                                            `;
+                                        }).join('')}
+                               </div>
+                                    <div class="mt-2 text-center">
+                                        <small class="text-muted">
+                                            <span class="badge me-2" style="background-color: #007bff;"></span>Personnel
+                                            <span class="badge ms-2" style="background-color: #007bff; opacity: 0.5;"></span>Ayant Droits
+                                        </small>
+                                    </div>
+                                `;
+                            } else {
+                                // Standard bar chart for other KPIs
+                                const maxValue = Math.max(...kpiContent.charts.barChart.data.map(d => d.value || 0));
+                                const minValue = Math.min(...kpiContent.charts.barChart.data.map(d => d.value || 0));
+                                const range = maxValue - minValue;
+                                
+                                return `
+                                    <div class="d-flex align-items-end justify-content-between" style="height: 100px;">
+                                        ${kpiContent.charts.barChart.data.map((item, index) => {
+                                            let barHeight;
+                                            if (range < 20 && range > 0) {
+                                                barHeight = 30 + ((item.value - minValue) / range) * 50;
+                                            } else {
+                                                barHeight = Math.min((item.value / maxValue) * 80, 80);
+                                            }
+                                            
+                                            return `
+                                                <div class="d-flex flex-column align-items-center" style="flex: 1; margin: 0 2px;">
+                                                    <div class="rounded-top chart-bar" style="height: ${barHeight}px; width: 100%; background-color: ${item.color};"></div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2" style="height: 30px;">
+                                        ${kpiContent.charts.barChart.data.map((item, index) => {
+                                            const isKpiA = kpiContent.title.includes('Documents Manquants');
+                                            const valueDisplay = isKpiA ? 
+                                                item.value.toLocaleString() + ' docs' : 
+                                                item.value + '%';
+                                            return `
+                                                <div class="text-center" style="flex: 1; margin: 0 2px;">
+                                                    <div class="fw-bold text-primary" style="font-size: 0.8rem;">${valueDisplay}</div>
+                                                    <div class="small text-muted" style="font-size: 0.65rem; line-height: 1.0;">${item.label}</div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                `;
+                            }
+                        })()}
+                                   </div>
+                               </div>
+                                                       
+                                                       <!-- Dynamic Pie/Ranking Chart -->
+                                                       <div class="col-md-6 mb-3">
+                                                           <h6 class="chart-title">${kpiContent.charts.pieChart.title}</h6>
+                                                           ${(() => {
+                                                               const isKpiB = kpiContent.title.includes('B. Fiabilisation par DAS');
+                                                               const isKpiC = kpiContent.title.includes('C. Détails par DAS');
+                                                               const isKpiD = kpiContent.title.includes('D. Détails par Contrat');
+                                                               const isKpiE = kpiContent.title.includes('E. Matrice Personnel');
+                                                               const isKpiF = kpiContent.title.includes('F. Matrice Ayant Droits');
+                                                               
+                                                               if (isKpiB && kpiContent.charts.pieChart.data.top) {
+                                                                   // Render Top/Bottom ranking for KPI B
+                                                                   return `
+                                                                       <div class="chart-container" style="padding: 10px;">
+                                                                           <div class="mb-3">
+                                                                               <h6 class="text-success mb-2" style="font-size: 0.85rem;"><i class="fas fa-arrow-up me-1"></i>Top 3 DAS</h6>
+                                                                               ${kpiContent.charts.pieChart.data.top.map((item, index) => `
+                                                                                   <div class="d-flex align-items-center mb-2">
+                                                                                       <span class="badge bg-success me-2" style="width: 20px;">${index + 1}</span>
+                                                                                       <div class="flex-grow-1">
+                                                                                           <div class="d-flex justify-content-between align-items-center">
+                                                                                               <span style="font-size: 0.75rem;">${item.label}</span>
+                                                                                               <strong class="text-success" style="font-size: 0.8rem;">${item.value}%</strong>
+                                                                                           </div>
+                                                                                           <div class="progress" style="height: 4px;">
+                                                                                               <div class="progress-bar bg-success" style="width: ${item.value}%"></div>
+                                                                                           </div>
+                                                                                       </div>
+                                                                                   </div>
+                                                                               `).join('')}
+                                                                           </div>
+                                                                           <div>
+                                                                               <h6 class="text-danger mb-2" style="font-size: 0.85rem;"><i class="fas fa-arrow-down me-1"></i>Bottom 3 DAS</h6>
+                                                                               ${kpiContent.charts.pieChart.data.bottom.map((item, index) => `
+                                                                                   <div class="d-flex align-items-center mb-2">
+                                                                                       <span class="badge bg-danger me-2" style="width: 20px;">${index + 1}</span>
+                                                                                       <div class="flex-grow-1">
+                                                                                           <div class="d-flex justify-content-between align-items-center">
+                                                                                               <span style="font-size: 0.75rem;">${item.label}</span>
+                                                                                               <strong class="text-danger" style="font-size: 0.8rem;">${item.value}%</strong>
+                                                                                           </div>
+                                                                                           <div class="progress" style="height: 4px;">
+                                                                                               <div class="progress-bar bg-danger" style="width: ${item.value}%"></div>
+                                                                                           </div>
+                                                                                       </div>
+                                                                                   </div>
+                                                                               `).join('')}
+                                                                           </div>
+                                                                       </div>
+                                                                   `;
+                                                               } else if ((isKpiC || isKpiD) && kpiContent.charts.pieChart.data[0]?.personnel !== undefined) {
+                                                                   // Render comparison chart for KPI C
+                                                                   return `
+                                                                       <div class="chart-container" style="padding: 10px;">
+                                                                           ${kpiContent.charts.pieChart.data.map((item, index) => `
+                                                                               <div class="mb-2">
+                                                                                   <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                                       <small style="font-size: 0.75rem;">${item.label}</small>
+                                                                                   </div>
+                                                                                   <div class="d-flex gap-1">
+                                                                                       <div class="flex-grow-1">
+                                                                                           <div class="d-flex justify-content-between align-items-center">
+                                                                                               <small class="text-muted" style="font-size: 0.7rem;">Personnel</small>
+                                                                                               <strong style="font-size: 0.75rem;">${item.personnel}%</strong>
+                                                                                           </div>
+                                                                                           <div class="progress" style="height: 6px;">
+                                                                                               <div class="progress-bar" style="width: ${item.personnel}%; background-color: ${item.color};"></div>
+                                                                                           </div>
+                                                                                       </div>
+                                                                                       <div class="flex-grow-1">
+                                                                                           <div class="d-flex justify-content-between align-items-center">
+                                                                                               <small class="text-muted" style="font-size: 0.7rem;">Ayant Droits</small>
+                                                                                               <strong style="font-size: 0.75rem;">${item.ayantDroits}%</strong>
+                                                                                           </div>
+                                                                                           <div class="progress" style="height: 6px;">
+                                                                                               <div class="progress-bar" style="width: ${item.ayantDroits}%; background-color: ${item.color}; opacity: 0.6;"></div>
+                                                                                           </div>
+                                                                                       </div>
+                                                                                   </div>
+                                                                               </div>
+                                                                           `).join('')}
+                                                                       </div>
+                                                                   `;
+                                                               } else if ((isKpiE || isKpiF) && kpiContent.charts.pieChart.data[0]?.dasCount !== undefined) {
+                                                                   // Render coverage chart for KPI E and F
+                                                                   return `
+                                                                       <div class="chart-container" style="padding: 10px;">
+                                                                           ${kpiContent.charts.pieChart.data.map((item, index) => `
+                                                                               <div class="mb-3">
+                                                                                   <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                                       <small style="font-size: 0.75rem;">${item.label}</small>
+                                                                                       <span class="badge" style="background-color: ${item.color}; font-size: 0.7rem;">${item.dasCount}/${item.totalDas} DAS</span>
+                                                                                   </div>
+                                                                                   <div class="progress" style="height: 8px;">
+                                                                                       <div class="progress-bar" style="width: ${item.coverage}%; background-color: ${item.color};" title="${item.coverage}% de couverture"></div>
+                                                                                   </div>
+                                                                                   <div class="text-end mt-1">
+                                                                                       <small class="text-muted" style="font-size: 0.7rem;">${item.coverage}% de couverture</small>
+                                                                                   </div>
+                                                                               </div>
+                                                                           `).join('')}
+                                                                       </div>
+                                                                   `;
+                                                               } else {
+                                                                   // Standard pie chart for other KPIs
+                                                                   return `
+                                                                       <div class="chart-container d-flex align-items-center justify-content-center" style="height: 100px; padding-top: 10px;">
+                                                               <div class="position-relative chart-pie" style="width: 120px; height: 120px;">
+                                                                   ${generatePieChart(kpiContent.charts.pieChart.data)}
+                                                                   <div class="rounded-circle position-absolute bg-white d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; top: 20px; left: 20px;">
+                                                                                   ${(() => {
+                                                                                       const isKpiA = kpiContent.title.includes('Documents Manquants');
+                                                                                       if (isKpiA) {
+                                                                                           const totalDocs = kpiContent.charts.barChart.data.reduce((sum, item) => sum + item.value, 0);
+                                                                                           return `<strong class="text-primary" style="font-size: 0.8rem;">${totalDocs.toLocaleString()}</strong>`;
+                                                                                       } else {
+                                                                                           return `<strong class="text-primary">100%</strong>`;
+                                                                                       }
+                                                                                   })()}
+                                                                   </div>
+                                                               </div>
+                                                           </div>
+                                                           <div class="mt-2">
+                                                                           <div class="row g-1">
+                                                                               ${kpiContent.charts.pieChart.data.map((item, index) => {
+                                                                                   const isKpiA = kpiContent.title.includes('Documents Manquants');
+                                                                                   const valueDisplay = isKpiA ? 
+                                                                                       item.percentage + '%' : 
+                                                                                       item.percentage + '%';
+                                                                                   return `
+                                                                                       <div class="col-6">
+                                                                                           <div class="d-flex align-items-center py-1">
+                                                                                               <span class="badge me-2" style="background-color: ${item.color}; width: 10px; height: 10px; border-radius: 50%;"></span>
+                                                                                               <div class="flex-grow-1">
+                                                                                                   <div class="fw-bold" style="font-size: 0.75rem;">${item.label}</div>
+                                                                                                   <div class="text-muted" style="font-size: 0.7rem;">${valueDisplay}</div>
+                                                               </div>
+                                                           </div>
+                                                                                       </div>
+                                                                                   `;
+                                                                               }).join('')}
+                                                                           </div>
+                                                                       </div>
+                                                                   `;
+                                                               }
+                                                           })()}
+                                                       </div>
+                                                   </div>
+                                                   
+                                               </div>
+                                           </div>
+                                       </div>
+                                   </div>
+
+                                   <!-- Additional Value-Adding Graphs -->
+                                   ${generateAdditionalCharts(kpiContent, reportType)}
+
+                                   <!-- Dynamic Key Metrics -->
+                                   <div class="row mb-3">
+                                       ${kpiContent.metrics.map(metric => `
+                                           <div class="col-md-3">
+                                               <div class="card border-0 bg-light h-100">
+                                                   <div class="card-body text-center py-3">
+                                                       <h4 class="text-${metric.color} mb-1">${metric.value}</h4>
+                                                       <small class="text-muted">${metric.label}</small>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       `).join('')}
+                                   </div>
+                                
+                                <!-- Detailed Table -->
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-table me-2"></i>Détails du rapport
+                                        </h6>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        ${kpiContent.tableHeaders.map(header => `<th><i class="fas fa-list me-1"></i>${header}</th>`).join('')}
+                                                    </tr>
+                                                </thead>
+                                                   <tbody>
+                                                       ${kpiContent.tableData.map(row => `
+                                                           <tr>
+                                                               ${Object.values(row).map((value, index) => {
+                                                                   const header = kpiContent.tableHeaders[index];
+                                                                   if (header.includes('Statut')) {
+                                                                       const badgeClass = value === 'Excellent' || value === 'Complet' ? 'success' : 
+                                                                                         value === 'Bon' || value === 'Partiel' ? 'warning' : 'info';
+                                                                       return `<td><span class="badge bg-${badgeClass}">${value}</span></td>`;
+                                                                   } else if (header.includes('%')) {
+                                                                       const textClass = value.includes('85') || value.includes('90') || value.includes('95') ? 'success' : 
+                                                                                        value.includes('70') || value.includes('75') || value.includes('80') ? 'warning' : 'info';
+                                                                       return `<td><span class="fw-bold text-${textClass}">${value}</span></td>`;
+                                                                   } else if (index === 0) {
+                                                                       return `<td><strong>${value}</strong></td>`;
+                                                                   } else {
+                                                                       return `<td class="text-muted">${value}</td>`;
+                                                                   }
+                                                               }).join('')}
+                                                           </tr>
+                                                       `).join('')}
+                                                   </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Info - Compact -->
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="alert alert-light border-0">
+                                            <h6 class="mb-2">
+                                                <i class="fas fa-lightbulb me-1"></i>Recommandations
+                                            </h6>
+                                            <ul class="mb-0 small">
+                                                <li>Prioriser les documents Ayant Droits manquants</li>
+                                                <li>Finaliser les contrats CDD en cours</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Fermer
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="printKPIReport('${reportType}')">
+                                <i class="fas fa-print me-2"></i>Imprimer le Rapport
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing modal if any
+        const existingModal = document.getElementById('kpiModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Add modal to body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('kpiModal'), {
+            backdrop: true,
+            keyboard: true,
+            focus: true
+        });
+        
+        modal.show();
+
+        // Remove modal when hidden
+        document.getElementById('kpiModal').addEventListener('hidden.bs.modal', function () {
+            this.remove();
+        });
+    }
+
+    function printKPIReport(reportType) {
+        // Show loading state
+        const printBtn = event.target;
+        const originalText = printBtn.innerHTML;
+        printBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Génération PDF...';
+        printBtn.disabled = true;
+
+        // Simulate PDF generation
+        setTimeout(() => {
+            // Create a simple report for printing
+            const reportWindow = window.open('', '_blank');
+            const reportTitle = {
+                'fiabilisation-contrat': 'A. Fiabilisation par Nature de Contrat',
+                'fiabilisation-das': 'B. Fiabilisation par DAS',
+                'details-das': 'C. Détails par DAS',
+                'details-contrat': 'D. Détails par Contrat',
+                'matrice-personnel': 'E. Matrice Personnel',
+                'matrice-ayant-droits': 'F. Matrice Ayant Droits'
+            };
+
+            reportWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${reportTitle[reportType]} - ${new Date().toLocaleDateString('fr-FR')}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                        .report-title { font-size: 24px; font-weight: bold; color: #333; }
+                        .report-date { color: #666; margin-top: 10px; }
+                        .summary { margin: 20px 0; }
+                        .stats { display: flex; justify-content: space-around; margin: 20px 0; }
+                        .stat-item { text-align: center; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+                        .stat-number { font-size: 24px; font-weight: bold; color: #007bff; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="report-title">${reportTitle[reportType]}</div>
+                        <div class="report-date">Rapport généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</div>
+                    </div>
+                    
+                    <div class="summary">
+                        <h3>Résumé du Rapport</h3>
+                        <p>Ce rapport présente une analyse détaillée des données RH selon le type de rapport sélectionné.</p>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-number">85%</div>
+                            <div>Taux de Fiabilisation</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">125</div>
+                            <div>Total Dossiers</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">18</div>
+                            <div>En Attente</div>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Élément</th>
+                                <th>Statut</th>
+                                <th>Pourcentage</th>
+                                <th>Observations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Documents Personnel</td><td>Complet</td><td>95%</td><td>Tous les documents requis sont présents</td></tr>
+                            <tr><td>Documents Ayant Droits</td><td>Partiel</td><td>78%</td><td>Certains documents manquants</td></tr>
+                            <tr><td>Contrats CDI</td><td>Complet</td><td>92%</td><td>Conformité excellente</td></tr>
+                            <tr><td>Contrats CDD</td><td>En cours</td><td>65%</td><td>En cours de finalisation</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="footer">
+                        <p>Rapport généré automatiquement par le Système RH Professionnel</p>
+                        <p>© ${new Date().getFullYear()} - Tous droits réservés</p>
+                    </div>
+                </body>
+                </html>
+            `);
+
+            reportWindow.document.close();
+            reportWindow.print();
+
+            // Reset button
+            printBtn.innerHTML = originalText;
+            printBtn.disabled = false;
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('kpiModal'));
+            modal.hide();
+
+        }, 1500);
+    }
+</script>
+
+<style>
+    /* Dark Header Styles for Actions Rapides and Activité Récente */
+    .dark-header {
+        background: #0f172a !important;
+        border-bottom: 1px solid #334155 !important;
+        color: #f8fafc !important;
+    }
+
+    .dark-header h5 {
+        color: #f8fafc !important;
+    }
+
+    .dark-header i {
+        color: #f8fafc !important;
+    }
+
+    /* Dark mode specific styles */
+    [data-bs-theme="dark"] .dark-header {
+        background: #0f172a !important;
+        border-bottom: 1px solid #334155 !important;
+        color: #f8fafc !important;
+    }
+
+    [data-bs-theme="dark"] .dark-header h5 {
+        color: #f8fafc !important;
+    }
+
+    [data-bs-theme="dark"] .dark-header i {
+        color: #f8fafc !important;
+    }
+
+    /* Light mode - keep normal appearance */
+    [data-bs-theme="light"] .dark-header {
+        background: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    [data-bs-theme="light"] .dark-header h5 {
+        color: #1e293b !important;
+    }
+
+    [data-bs-theme="light"] .dark-header i {
+        color: #1e293b !important;
+    }
+
+    /* Modal Styles */
+    .report-modal .modal-dialog {
+        max-width: 95%;
+        width: 1200px;
+    }
+    
+    .report-modal .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    /* Chart Container - Responsive Heights */
+    .chart-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+        padding: 10px;
+    }
+    
+    /* Tablet */
+    @media (min-width: 768px) {
+        .chart-container {
+            height: 300px;
+        }
+    }
+    
+    /* Desktop */
+    @media (min-width: 1200px) {
+        .chart-container {
+            height: 350px;
+        }
+    }
+    
+    /* Table Responsive */
+    .report-table {
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+    
+    @media (min-width: 768px) {
+        .report-table {
+            max-height: 400px;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .report-table {
+            max-height: 500px;
+        }
+    }
+    
+    /* Sticky Table Header */
+    .report-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #212529 !important;
+        color: #ffffff !important;
+        border-color: #495057 !important;
+        font-weight: 600;
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    /* Ensure table header text is always visible */
+    .report-table .table-dark th {
+        color: #ffffff !important;
+        background-color: #212529 !important;
+    }
+    
+    /* Table header text styling */
+    .report-table thead th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+    
+    /* Modal Responsive */
+    .report-modal .modal-body {
+        padding: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .report-modal .modal-body {
+            padding: 1.5rem;
+        }
+    }
+    
+    /* Table Font Sizes */
+    .report-table table {
+        font-size: 0.75rem;
+    }
+    
+    @media (min-width: 768px) {
+        .report-table table {
+            font-size: 0.85rem;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .report-table table {
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Card Headers */
+    .card-header h6 {
+        font-size: 0.9rem;
+    }
+    
+    @media (min-width: 768px) {
+        .card-header h6 {
+            font-size: 1rem;
+        }
+    }
+    
+    /* Modal Title Responsive */
+    .modal-title {
+        font-size: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .modal-title {
+            font-size: 1.25rem;
+        }
+    }
+    
+    /* Badge Responsive */
+    .report-table .badge {
+        font-size: 0.7rem;
+        padding: 0.25em 0.5em;
+    }
+    
+    @media (min-width: 768px) {
+        .report-table .badge {
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+        }
+    }
+    
+    /* Smooth Scrolling */
+    .report-table {
+        scrollbar-width: thin;
+        scrollbar-color: #6c757d #f8f9fa;
+    }
+    
+    .report-table::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .report-table::-webkit-scrollbar-track {
+        background: #f8f9fa;
+    }
+    
+    .report-table::-webkit-scrollbar-thumb {
+        background: #6c757d;
+        border-radius: 4px;
+    }
+    
+    .report-table::-webkit-scrollbar-thumb:hover {
+        background: #495057;
+    }
+</style>
+
+<!-- Report Modal -->
+<div class="modal fade report-modal" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-lg-down modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="reportModalLabel">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    <span id="modalTitle">Rapport de Performance</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-gradient">
+                                <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i><span id="chart1Title">Graphique Principal</span></h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="pieChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-gradient">
+                                <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i><span id="chart2Title">Graphique Secondaire</span></h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="barChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3 g-3">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-gradient">
+                                <h6 class="mb-0"><i class="fas fa-table me-2"></i>Tableau Détaillé</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive report-table">
+                                    <table class="table table-bordered table-hover table-sm mb-0" id="reportTable">
+                                        <thead class="table-dark sticky-top">
+                                            <!-- Headers will be populated by JavaScript -->
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer flex-column flex-sm-row gap-2">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Fermer
+                </button>
+                <button type="button" class="btn btn-success w-100 w-sm-auto" onclick="exportReportToExcel()">
+                    <i class="fas fa-file-excel me-2"></i>Exporter Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// Report data from JSON files
+const reportData = {
+    'rapport-a': {
+        title: 'A. Performance par Nature de Contrat',
+        data: [
+            ["", "", "NATIONAL SALARIÉ PERMANENT CDI", "NATIONAL SALARIÉ PERMANENT CDD", "NATIONAL SALARIÉ CONTRACTUEL", "NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "NATIONAL AUTO-ENTREPRENEUR", "NATIONAL STAGIAIRE PROFESSIONNEL", "NATIONAL STAGIAIRE ETUDIANT", "ETRANGER ENSEIGNANT", "ETRANGER PRATICIEN"],
+            ["DOSSIER PERSONNEL", "Avancement", "84.83%", "73.10%", "74.01%", "39.88%", "43.56%", "37.08%", "35.96%", "34.48%", "6.72%", "18.10%", "14.99%", "35.14%", "35.74%", "2.45%", "0.00%"],
+            ["", "Nombre de documents manquants", " 2,264 ", " 2,963 ", " 315 ", " 202 ", " 745 ", " 151 ", " 2,951 ", " 2,178 ", " 347 ", " 285 ", " 3,356 ", " 3,168 ", " 694 ", " 199 ", " 180 "],
+            ["AYANT DROITS", "Avancement", "6.22%", "2.92%", "4.55%", "0.71%", "2.18%", "0.00%", "0.47%", "0.79%", "0.65%", "0.00%", "0.06%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["", "Nombre de documents manquants", " 5,833 ", " 4,456 ", " 482 ", " 139 ", " 538 ", " 100 ", " 1,911 ", " 1,374 ", " 154 ", " 145 ", " 1,644 ", " 2,035 ", " 450 ", " 85 ", " 75 "]
+        ]
+    },
+    'rapport-b': {
+        title: 'B. Performance par Organisation',
+        data: [
+            ["", "", "DSOI", "DENS", "EPHR", "DING", "DSPR", "DNUM", "DAPR", "DGST", "DSIG", "DRST", "DASO", "EING", "EPRD", "DEXP", "DPRD", "DPHR"],
+            ["DOSSIER PERSONNEL", "", "73.72%", "39.38%", "70.40%", "68.46%", "65.03%", "71.37%", "71.29%", "70.56%", "67.19%", "68.31%", "51.85%", "63.40%", "69.40%", "65.38%", "27.15%", "70.14%"],
+            ["AYANT DROITS", "", "3.40%", "1.06%", "5.37%", "7.53%", "8.79%", "1.29%", "4.35%", "1.30%", "1.25%", "10.34%", "3.33%", "4.59%", "4.26%", "2.05%", "0.24%", "8.33%"]
+        ]
+    },
+    'rapport-c': {
+        title: 'C. Performance Détaillée par Organisation',
+        data: [
+            ["", "", "CIN", "ACTE DE NAISSANCE", "FORMULAIRE", "CONTRAT", "DOSSIER MEDICAL", "BAC", "DIPLÔMES", "CV", "RIB", "FICHE ANTHRO", "PHOTO", "EMPREINTE", "% DOSSIER PERSONNEL", "", "ACTE DE MARIAGE", "CIN CONJOINT", "ACTES NAISS ENFANT", "CIN ENFANTS", "CIN PARENTS", "% AYANT DROITS"],
+            ["DAS", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "", "|", "|", "|", "|", "|", "|"],
+            ["DSOI", "", "90.42%", "69.44%", "78.59%", "41.30%", "69.62%", "51.61%", "77.87%", "83.87%", "86.78%", "74.95%", "84.11%", "76.11%", "73.72%", "", "9.58%", "3.58%", "3.58%", "0.24%", "0.24%", "3.44%"],
+            ["DENS", "", "86.76%", "17.55%", "41.73%", "16.55%", "2.01%", "9.21%", "52.66%", "51.08%", "70.07%", "24.75%", "48.06%", "52.09%", "39.38%", "", "1.87%", "2.30%", "0.72%", "0.43%", "0.86%", "1.24%"],
+            ["EPHR", "", "85.07%", "61.19%", "83.58%", "37.31%", "34.33%", "47.76%", "82.09%", "85.07%", "85.07%", "76.12%", "85.07%", "82.09%", "70.40%", "", "16.42%", "7.46%", "1.49%", "1.49%", "0.00%", "5.37%"],
+            ["DING", "", "91.40%", "54.84%", "90.32%", "44.09%", "9.68%", "21.51%", "86.02%", "90.32%", "91.40%", "75.27%", "90.32%", "76.34%", "68.46%", "", "9.68%", "20.43%", "6.45%", "1.08%", "2.15%", "7.96%"],
+            ["DSPR", "", "81.82%", "60.61%", "80.30%", "42.42%", "10.61%", "27.27%", "80.30%", "81.82%", "81.82%", "72.73%", "81.82%", "78.79%", "65.03%", "", "10.61%", "22.73%", "6.06%", "4.55%", "1.52%", "9.09%"],
+            ["DNUM", "", "87.10%", "62.90%", "87.10%", "45.16%", "6.45%", "61.29%", "82.26%", "87.10%", "87.10%", "80.65%", "87.10%", "82.26%", "71.37%", "", "1.61%", "4.84%", "0.00%", "0.00%", "11.29%", "3.55%"],
+            ["DAPR", "", "93.48%", "59.78%", "91.30%", "42.39%", "5.43%", "44.57%", "90.22%", "93.48%", "93.48%", "72.83%", "92.39%", "76.09%", "71.29%", "", "5.43%", "14.13%", "2.17%", "0.00%", "0.00%", "4.35%"],
+            ["DGST", "", "90.22%", "60.87%", "90.22%", "28.26%", "7.61%", "66.30%", "80.43%", "90.22%", "90.22%", "72.83%", "90.22%", "79.35%", "70.56%", "", "2.17%", "3.26%", "1.09%", "0.00%", "1.09%", "1.52%"],
+            ["DSIG", "", "87.50%", "51.56%", "85.94%", "48.44%", "14.06%", "51.56%", "73.44%", "87.50%", "87.50%", "56.25%", "85.94%", "76.56%", "67.19%", "", "3.13%", "3.13%", "0.00%", "0.00%", "4.69%", "2.19%"],
+            ["DRST", "", "88.44%", "58.50%", "87.07%", "44.90%", "3.40%", "19.05%", "87.07%", "88.44%", "88.44%", "80.27%", "88.44%", "85.71%", "68.31%", "", "14.97%", "27.89%", "7.48%", "1.36%", "2.04%", "10.75%"],
+            ["DASO", "", "88.89%", "31.48%", "85.19%", "20.37%", "12.96%", "11.11%", "37.04%", "87.04%", "87.04%", "35.19%", "87.04%", "38.89%", "51.85%", "", "5.56%", "1.85%", "3.70%", "5.56%", "0.00%", "3.33%"],
+            ["EING", "", "92.59%", "32.59%", "90.37%", "22.22%", "7.41%", "17.04%", "90.37%", "91.85%", "91.85%", "67.41%", "91.85%", "65.19%", "63.40%", "", "9.63%", "7.41%", "5.93%", "0.00%", "0.00%", "4.59%"],
+            ["EPRD", "", "93.44%", "42.62%", "86.89%", "31.15%", "49.18%", "31.15%", "81.97%", "91.80%", "93.44%", "65.57%", "91.80%", "73.77%", "69.40%", "", "8.20%", "8.20%", "4.92%", "0.00%", "1.64%", "4.59%"],
+            ["DEXP", "", "89.74%", "51.28%", "82.05%", "28.21%", "0.00%", "48.72%", "82.05%", "84.62%", "87.18%", "58.97%", "87.18%", "84.62%", "65.38%", "", "5.13%", "2.56%", "0.00%", "2.56%", "2.56%", "2.56%"],
+            ["DPRD", "", "54.17%", "2.98%", "52.83%", "6.55%", "0.74%", "0.74%", "4.17%", "53.13%", "53.87%", "4.32%", "53.87%", "38.39%", "27.15%", "", "0.15%", "0.89%", "0.00%", "0.15%", "0.00%", "0.24%"],
+            ["DPHR", "", "91.67%", "66.67%", "91.67%", "8.33%", "16.67%", "33.33%", "91.67%", "91.67%", "91.67%", "75.00%", "91.67%", "91.67%", "70.14%", "", "16.67%", "16.67%", "0.00%", "8.33%", "33.33%", "15.00%"]
+        ]
+    },
+    'rapport-d': {
+        title: 'D. Performance Détaillée par Nature de Contrat',
+        data: [
+            ["", "", "CIN", "ACTE DE NAISSANCE", "FORMULAIRE", "CONTRAT", "DOSSIER MEDICAL", "BAC", "DIPLÔMES", "CV", "RIB", "FICHE ANTHRO", "PHOTO", "EMPREINTE", "% DOSSIER PERSONNEL", "", "ACTE DE MARIAGE", "CIN CONJOINT", "ACTES NAISS ENFANT", "CIN ENFANTS", "CIN PARENTS", "% AYANT DROITS"],
+            ["NATURE", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "", "|", "|", "|", "|", "|", "|"],
+            ["NATIONAL SALARIÉ PERMANENT CDI", "", "99.12%", "74.68%", "98.47%", "48.79%", "66.16%", "54.98%", "95.34%", "99.04%", "99.12%", "89.79%", "99.04%", "93.49%", "84.83%", "", "14.79%", "9.32%", "5.95%", "1.05%", "1.21%", "6.46%"],
+            ["NATIONAL SALARIÉ PERMANENT CDD", "", "89.54%", "69.93%", "89.00%", "37.91%", "41.07%", "52.94%", "79.96%", "89.54%", "89.54%", "78.54%", "89.54%", "69.72%", "73.10%", "", "5.99%", "5.77%", "2.40%", "0.44%", "1.74%", "3.27%"],
+            ["NATIONAL SALARIÉ CONTRACTUEL", "", "99.01%", "48.51%", "96.04%", "36.63%", "49.50%", "34.65%", "78.22%", "99.01%", "99.01%", "59.41%", "99.01%", "89.11%", "74.01%", "", "9.90%", "5.94%", "4.95%", "1.98%", "1.98%", "4.95%"],
+            ["NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "", "75.00%", "25.00%", "28.57%", "21.43%", "7.14%", "14.29%", "50.00%", "50.00%", "71.43%", "35.71%", "50.00%", "50.00%", "39.88%", "", "3.57%", "0.00%", "0.00%", "0.00%", "0.00%", "0.71%"],
+            ["NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "", "86.36%", "27.27%", "30.00%", "25.45%", "7.27%", "5.45%", "70.91%", "53.64%", "63.64%", "34.55%", "51.82%", "66.36%", "43.56%", "", "0.91%", "10.00%", "0.00%", "0.00%", "0.00%", "2.18%"],
+            ["NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "", "85.00%", "30.00%", "15.00%", "20.00%", "0.00%", "5.00%", "45.00%", "45.00%", "65.00%", "35.00%", "40.00%", "60.00%", "37.08%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "", "94.53%", "16.41%", "21.35%", "19.53%", "2.60%", "4.69%", "61.46%", "36.20%", "66.93%", "19.01%", "31.25%", "57.55%", "35.96%", "", "0.78%", "1.56%", "0.00%", "0.00%", "0.00%", "0.47%"],
+            ["NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "", "66.79%", "23.47%", "24.19%", "17.69%", "4.69%", "8.30%", "44.40%", "42.96%", "54.15%", "30.69%", "44.77%", "51.62%", "34.48%", "", "0.72%", "2.53%", "0.36%", "0.36%", "0.00%", "0.79%"],
+            ["NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "", "16.13%", "3.23%", "0.00%", "3.23%", "0.00%", "3.23%", "12.90%", "6.45%", "16.13%", "0.00%", "6.45%", "12.90%", "6.72%", "", "0.00%", "3.23%", "0.00%", "0.00%", "0.00%", "0.65%"],
+            ["NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "", "62.07%", "3.45%", "10.34%", "10.34%", "0.00%", "0.00%", "27.59%", "13.79%", "34.48%", "3.45%", "10.34%", "41.38%", "18.10%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL AUTO-ENTREPRENEUR", "", "18.54%", "1.82%", "16.41%", "10.94%", "0.30%", "0.61%", "2.74%", "16.72%", "17.93%", "2.43%", "18.24%", "73.25%", "14.99%", "", "0.00%", "0.30%", "0.00%", "0.00%", "0.00%", "0.06%"],
+            ["NATIONAL STAGIAIRE PROFESSIONNEL", "", "83.78%", "0.98%", "82.31%", "0.49%", "0.25%", "0.49%", "0.98%", "82.80%", "83.78%", "1.47%", "82.80%", "1.47%", "35.14%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL STAGIAIRE ETUDIANT", "", "85.56%", "0.00%", "85.56%", "0.00%", "0.00%", "0.00%", "0.00%", "85.56%", "85.56%", "0.00%", "85.56%", "1.11%", "35.74%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["ETRANGER ENSEIGNANT", "", "5.88%", "0.00%", "5.88%", "0.00%", "0.00%", "0.00%", "0.00%", "5.88%", "5.88%", "0.00%", "5.88%", "0.00%", "2.45%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["ETRANGER PRATICIEN", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"]
+        ]
+    },
+    'rapport-e': {
+        title: 'E. Performance par Organisation et Nature de Contrat',
+        data: [
+            ["", "", "DSOI", "DENS", "EPHR", "DING", "DSPR", "DNUM", "DAPR", "DGST", "DSIG", "DRST", "DASO", "EING", "EPRD", "DEXP", "DPRD", "DPHR"],
+            ["NATIONAL SALARIÉ PERMANENT CDI", "", "89.67%", "72.74%", "82.46%", "76.75%", "80.90%", "81.25%", "77.16%", "79.32%", "74.17%", "74.63%", "76.75%", "74.55%", "76.52%", "73.33%", "87.50%", "76.19%"],
+            ["NATIONAL SALARIÉ PERMANENT CDD", "", "83.84%", "58.91%", "60.87%", "56.37%", "60.14%", "73.91%", "69.88%", "77.61%", "72.42%", "62.87%", "87.50%", "56.84%", "68.87%", "73.96%", "72.22%", "77.08%"],
+            ["NATIONAL SALARIÉ CONTRACTUEL", "", "82.00%", "71.08%", "70.83%", "0.00%", "62.50%", "0.00%", "76.67%", "50.00%", "48.96%", "0.00%", "0.00%", "0.00%", "69.44%", "68.06%", "0.00%", "0.00%"],
+            ["NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "", "40.97%", "0.00%", "41.67%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "41.67%", "0.00%", "8.33%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "", "43.56%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "", "0.00%", "37.22%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "36.67%", "0.00%", "0.00%"],
+            ["NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "", "0.00%", "35.96%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "", "34.48%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "", "0.00%", "6.72%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "", "0.00%", "22.22%", "0.00%", "33.33%", "0.00%", "0.00%", "66.67%", "0.00%", "0.00%", "0.00%", "0.00%", "12.50%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL AUTO-ENTREPRENEUR", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "14.99%", "0.00%"],
+            ["NATIONAL STAGIAIRE PROFESSIONNEL", "", "20.83%", "30.00%", "0.00%", "41.67%", "0.00%", "17.86%", "20.83%", "24.31%", "20.83%", "0.00%", "37.37%", "0.00%", "0.00%", "0.00%", "36.96%", "0.00%"],
+            ["NATIONAL STAGIAIRE ETUDIANT", "", "0.00%", "35.74%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["ETRANGER ENSEIGNANT", "", "0.00%", "2.45%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["ETRANGER PRATICIEN", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"]
+        ]
+    },
+    'rapport-f': {
+        title: 'F. Performance Détaillée par Organisation et Nature',
+        data: [
+            ["NATURE", "", "DSOI", "DENS", "EPHR", "DING", "DSPR", "DNUM", "DAPR", "DGST", "DSIG", "DRST", "DASO", "EING", "EPRD", "DEXP", "DPRD", "DPHR"],
+            ["NATIONAL SALARIÉ PERMANENT CDI", "", "5.33%", "4.86%", "7.89%", "9.47%", "20.83%", "4.38%", "5.93%", "2.22%", "0.00%", "13.24%", "9.47%", "6.55%", "8.18%", "0.00%", "30.00%", "22.86%"],
+            ["NATIONAL SALARIÉ PERMANENT CDD", "", "2.05%", "2.79%", "1.74%", "5.88%", "2.70%", "3.48%", "3.86%", "1.57%", "3.33%", "8.61%", "0.00%", "3.33%", "2.94%", "6.25%", "5.33%", "5.00%"],
+            ["NATIONAL SALARIÉ CONTRACTUEL", "", "5.20%", "11.76%", "10.00%", "0.00%", "0.00%", "0.00%", "4.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "", "0.83%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "", "2.18%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "", "0.00%", "0.47%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "", "0.79%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "", "0.00%", "0.65%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL AUTO-ENTREPRENEUR", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.06%", "0.00%"],
+            ["NATIONAL STAGIAIRE PROFESSIONNEL", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["NATIONAL STAGIAIRE ETUDIANT", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["ETRANGER ENSEIGNANT", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
+            ["ETRANGER PRATICIEN", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"]
+        ]
+    }
+};
+
+let currentReportType = '';
+let pieChart = null;
+let barChart = null;
+
+function openReportModal(reportType) {
+    currentReportType = reportType;
+    const report = reportData[reportType];
+    
+    if (!report) {
+        alert('Données du rapport non disponibles');
+        return;
+    }
+    
+    // Destroy existing charts if they exist
+    if (pieChart) {
+        pieChart.destroy();
+        pieChart = null;
+    }
+    if (barChart) {
+        barChart.destroy();
+        barChart = null;
+    }
+    
+    // Set modal title
+    document.getElementById('modalTitle').textContent = report.title;
+    
+    // Set chart titles based on report type
+    const chartTitles = {
+        'rapport-a': { chart1: 'Graphique Doughnut', chart2: 'Barres Horizontales' },
+        'rapport-b': { chart1: 'Graphique Polaire', chart2: 'Barres Colorées' },
+        'rapport-c': { chart1: 'Graphique Radar', chart2: 'Barres Groupées' },
+        'rapport-d': { chart1: 'Graphique Doughnut', chart2: 'Barres Horizontales Groupées' },
+        'rapport-e': { chart1: 'Répartition', chart2: 'Tendances (Ligne)' },
+        'rapport-f': { chart1: 'Graphique Polaire', chart2: 'Barres Comparatives' }
+    };
+    
+    const titles = chartTitles[reportType] || { chart1: 'Graphique Principal', chart2: 'Graphique Secondaire' };
+    document.getElementById('chart1Title').textContent = titles.chart1;
+    document.getElementById('chart2Title').textContent = titles.chart2;
+    
+    // Create charts
+    createPieChart(report.data);
+    createBarChart(report.data);
+    
+    // Create table
+    createReportTable(report.data);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+    modal.show();
+}
+
+function createPieChart(data) {
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    
+    // Determine the structure of the data
+    let labels = [];
+    let values = [];
+    let chartType = 'pie';
+    let chartTitle = 'Vue d\'ensemble';
+    
+    if (currentReportType === 'rapport-a') {
+        // Doughnut chart for contract types
+        chartType = 'doughnut';
+        chartTitle = 'Performance par Type de Contrat';
+        labels = data[0].slice(2).filter(h => h !== '');
+        values = data[1].slice(2).filter(v => v !== '');
+    } else if (currentReportType === 'rapport-b') {
+        // Polar area chart for organizations
+        chartType = 'polarArea';
+        chartTitle = 'Performance par Organisation';
+        labels = data[0].slice(2).filter(h => h !== '');
+        values = data[1].slice(2).filter(v => v !== '');
+    } else if (currentReportType === 'rapport-c') {
+        // Radar chart for detailed organization performance
+        chartType = 'radar';
+        chartTitle = 'Performance Détaillée par Organisation';
+        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        if (headerIndex !== -1) {
+            labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+            values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+        }
+    } else if (currentReportType === 'rapport-d') {
+        // Doughnut for contract nature details
+        chartType = 'doughnut';
+        chartTitle = 'Performance par Nature de Contrat';
+        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        if (headerIndex !== -1) {
+            labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+            values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+        }
+    } else if (currentReportType === 'rapport-e') {
+        // Pie chart for organization-nature matrix
+        chartType = 'pie';
+        chartTitle = 'Répartition Org./Nature';
+        labels = data[0].slice(2).filter(h => h !== '');
+        values = data[1].slice(2).filter(v => v !== '');
+    } else if (currentReportType === 'rapport-f') {
+        // Polar area for detailed org-nature
+        chartType = 'polarArea';
+        chartTitle = 'Performance Détaillée';
+        labels = data[0].slice(2).filter(h => h !== '');
+        values = data[1].slice(2).filter(v => v !== '');
+    }
+    
+    const chartData = {
+        labels: labels.map(h => h.length > 20 ? h.substring(0, 20) + '...' : h),
+        datasets: [{
+            label: chartTitle,
+            data: values.map(p => parseFloat(p.replace('%', ''))),
+            backgroundColor: [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#E7E9ED', '#C9CBCF', '#4BC0C0', '#FF6384',
+                '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                '#FF6384', '#C9CBCF', '#36A2EB', '#FFCE56'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    };
+    
+    pieChart = new Chart(ctx, {
+        type: chartType,
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: window.innerWidth < 768 ? 'bottom' : 'right',
+                    labels: {
+                        font: {
+                            size: window.innerWidth < 768 ? 8 : (window.innerWidth < 1200 ? 9 : 10)
+                        },
+                        padding: window.innerWidth < 768 ? 5 : 8,
+                        boxWidth: window.innerWidth < 768 ? 12 : 15
+                    }
+                },
+                title: {
+                    display: true,
+                    text: chartTitle,
+                    font: {
+                        size: window.innerWidth < 768 ? 12 : (window.innerWidth < 1200 ? 13 : 14),
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 5,
+                        bottom: 10
+                    }
+                }
+            },
+            scales: chartType === 'radar' ? {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20,
+                        font: {
+                            size: window.innerWidth < 768 ? 8 : 10
+                        }
+                    },
+                    pointLabels: {
+                        font: {
+                            size: window.innerWidth < 768 ? 8 : 10
+                        }
+                    }
+                }
+            } : {}
+        }
+    });
+}
+
+function createBarChart(data) {
+    const ctx = document.getElementById('barChart').getContext('2d');
+    
+    // Determine the structure of the data
+    let labels = [];
+    let datasets = [];
+    let chartType = 'bar';
+    let chartTitle = 'Analyse Comparative';
+    let isHorizontal = false;
+    
+    if (currentReportType === 'rapport-a') {
+        // Horizontal bar for contract types
+        chartType = 'bar';
+        isHorizontal = true;
+        chartTitle = 'Comparaison des Contrats';
+        labels = data[0].slice(2).filter(h => h !== '');
+        const values = data[1].slice(2).filter(v => v !== '');
+        datasets = [{
+            label: 'Dossier Personnel (%)',
+            data: values.map(p => parseFloat(p.replace('%', ''))),
+            backgroundColor: '#FF6384',
+            borderColor: '#FF6384',
+            borderWidth: 2
+        }];
+    } else if (currentReportType === 'rapport-b') {
+        // Vertical bar for organizations
+        chartType = 'bar';
+        chartTitle = 'Comparaison des Organisations';
+        labels = data[0].slice(2).filter(h => h !== '');
+        const values = data[1].slice(2).filter(v => v !== '');
+        datasets = [{
+            label: 'Performance (%)',
+            data: values.map(p => parseFloat(p.replace('%', ''))),
+            backgroundColor: values.map(v => {
+                const val = parseFloat(v.replace('%', ''));
+                return val >= 70 ? '#4BC0C0' : val >= 50 ? '#FFCE56' : '#FF6384';
+            }),
+            borderWidth: 2,
+            borderColor: '#fff'
+        }];
+    } else if (currentReportType === 'rapport-c') {
+        // Stacked bar for organizations showing Dossier Personnel vs Ayant Droits
+        chartType = 'bar';
+        chartTitle = 'Dossier Personnel vs Ayant Droits';
+        const dossierIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        const ayantIndex = data[0].indexOf('% AYANT DROITS');
+        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+        datasets = [
+            {
+                label: 'Dossier Personnel',
+                data: data.slice(2).map(row => parseFloat(row[dossierIndex].replace('%', ''))),
+                backgroundColor: '#36A2EB',
+                borderWidth: 1
+            },
+            {
+                label: 'Ayant Droits',
+                data: data.slice(2).map(row => parseFloat(row[ayantIndex].replace('%', ''))),
+                backgroundColor: '#FF9F40',
+                borderWidth: 1
+            }
+        ];
+    } else if (currentReportType === 'rapport-d') {
+        // Horizontal bar for contract nature
+        chartType = 'bar';
+        isHorizontal = true;
+        chartTitle = 'Nature de Contrat - Performance';
+        const dossierIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        const ayantIndex = data[0].indexOf('% AYANT DROITS');
+        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+        datasets = [
+            {
+                label: 'Dossier Personnel',
+                data: data.slice(2).map(row => parseFloat(row[dossierIndex].replace('%', ''))),
+                backgroundColor: '#9966FF',
+                borderWidth: 1
+            },
+            {
+                label: 'Ayant Droits',
+                data: data.slice(2).map(row => parseFloat(row[ayantIndex].replace('%', ''))),
+                backgroundColor: '#FFCE56',
+                borderWidth: 1
+            }
+        ];
+    } else if (currentReportType === 'rapport-e') {
+        // Line chart for trends
+        chartType = 'line';
+        chartTitle = 'Tendances par Organisation';
+        labels = data[0].slice(2).filter(h => h !== '');
+        const values = data[1].slice(2).filter(v => v !== '');
+        datasets = [{
+            label: 'Performance (%)',
+            data: values.map(p => parseFloat(p.replace('%', ''))),
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: '#36A2EB',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#36A2EB'
+        }];
+    } else if (currentReportType === 'rapport-f') {
+        // Mixed chart - bar + line
+        chartType = 'bar';
+        chartTitle = 'Performance Mixte';
+        labels = data[0].slice(2).filter(h => h !== '');
+        const values = data[1].slice(2).filter(v => v !== '');
+        datasets = [{
+            label: 'Performance (%)',
+            data: values.map(p => parseFloat(p.replace('%', ''))),
+            backgroundColor: '#4BC0C0',
+            borderColor: '#4BC0C0',
+            borderWidth: 2
+        }];
+    }
+    
+    const barData = {
+        labels: labels.map(h => h.length > 15 ? h.substring(0, 15) + '...' : h),
+        datasets: datasets
+    };
+    
+    barChart = new Chart(ctx, {
+        type: chartType,
+        data: barData,
+        options: {
+            indexAxis: isHorizontal ? 'y' : 'x',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: window.innerWidth < 768 ? 'bottom' : 'top',
+                    labels: {
+                        font: {
+                            size: window.innerWidth < 768 ? 9 : (window.innerWidth < 1200 ? 10 : 11)
+                        },
+                        padding: window.innerWidth < 768 ? 5 : 8,
+                        boxWidth: window.innerWidth < 768 ? 12 : 15
+                    }
+                },
+                title: {
+                    display: true,
+                    text: chartTitle,
+                    font: {
+                        size: window.innerWidth < 768 ? 12 : (window.innerWidth < 1200 ? 13 : 14),
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 5,
+                        bottom: 10
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: isHorizontal ? undefined : 100,
+                    ticks: {
+                        font: {
+                            size: window.innerWidth < 768 ? 8 : (window.innerWidth < 1200 ? 9 : 10)
+                        }
+                    }
+                },
+                x: {
+                    beginAtZero: true,
+                    max: isHorizontal ? 100 : undefined,
+                    ticks: {
+                        font: {
+                            size: window.innerWidth < 768 ? 8 : (window.innerWidth < 1200 ? 9 : 10)
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createReportTable(data) {
+    const table = document.getElementById('reportTable');
+    const thead = table.querySelector('thead');
+    const tbody = table.querySelector('tbody');
+    
+    // Clear existing content
+    thead.innerHTML = '';
+    tbody.innerHTML = '';
+    
+    // Create header
+    const headerRow = document.createElement('tr');
+    data[0].forEach(cell => {
+        const th = document.createElement('th');
+        th.textContent = cell;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    // Create data rows
+    data.slice(1).forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach((cell, index) => {
+            const td = document.createElement('td');
+            if (cell.includes('%')) {
+                const percentage = parseFloat(cell.replace('%', ''));
+                let badgeClass = 'bg-secondary';
+                if (percentage >= 70) badgeClass = 'bg-success';
+                else if (percentage >= 50) badgeClass = 'bg-warning';
+                else if (percentage > 0) badgeClass = 'bg-danger';
+                
+                td.innerHTML = `<span class="badge ${badgeClass}">${cell}</span>`;
+            } else {
+                td.textContent = cell;
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+function exportReportToExcel() {
+    const table = document.getElementById('reportTable');
+    const wb = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(wb, `${currentReportType}-rapport.xlsx`);
+}
+
+// Add event listener for modal close to clean up charts
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('reportModal');
+    modal.addEventListener('hidden.bs.modal', function() {
+        // Clean up charts when modal is closed
+        if (pieChart) {
+            pieChart.destroy();
+            pieChart = null;
+        }
+        if (barChart) {
+            barChart.destroy();
+            barChart = null;
+        }
+    });
+});
+</script>
+
+{% endblock %}

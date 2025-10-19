@@ -1,0 +1,297 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ dossier.nom }} - Documents{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <!-- Folder Header -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="mb-0">
+                        <i class="fas fa-folder me-2"></i>
+                        {{ dossier.nom }}
+                    </h1>
+                    <div>
+                        {% set requiredDocs = documentRequirements|filter(r => r.required) %}
+                        {% set uploadedRequiredDocs = requiredDocs|filter(r => r.uploaded) %}
+                        {% set completionRate = requiredDocs|length > 0 ? (uploadedRequiredDocs|length / requiredDocs|length * 100)|round : 100 %}
+                        
+                        {% if completionRate == 100 %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>Complété
+                            </span>
+                        {% elseif completionRate >= 50 %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-clock me-1"></i>En cours ({{ completionRate }}%)
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Incomplet ({{ completionRate }}%)
+                            </span>
+                        {% endif %}
+                        <small class="ms-2">{{ dossier.createdAt|date('d/m/Y H:i') }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if dossier.description %}
+                    <p class="mb-0">{{ dossier.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Document Requirements Section -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-file-alt me-2"></i>
+                    Documents Requis par Contrat
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if documentRequirements is empty %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun document requis trouvé pour vos contrats dans ce dossier.
+                    </div>
+                {% else %}
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        {% set requiredDocs = documentRequirements|filter(r => r.required) %}
+                        {% set uploadedRequiredDocs = requiredDocs|filter(r => r.uploaded) %}
+                        {% set realCompletionRate = requiredDocs|length > 0 ? (uploadedRequiredDocs|length / requiredDocs|length * 100)|round : 100 %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold">Progression des documents obligatoires</span>
+                            <span class="badge {% if realCompletionRate == 100 %}bg-success{% elseif realCompletionRate >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ uploadedRequiredDocs|length }}/{{ requiredDocs|length }} ({{ realCompletionRate }}%)
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar {% if realCompletionRate == 100 %}bg-success{% elseif realCompletionRate >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ realCompletionRate }}%" 
+                                 aria-valuenow="{{ realCompletionRate }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {{ realCompletionRate }}%
+                            </div>
+                        </div>
+                        
+                        <!-- Status Summary -->
+                        <div class="mt-3">
+                            {% if realCompletionRate == 100 %}
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Dossier complet !</strong> Tous les documents obligatoires ont été téléchargés par le Responsable RH.
+                                </div>
+                            {% elseif realCompletionRate >= 50 %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <strong>Dossier en cours de traitement.</strong> {{ requiredDocs|length - uploadedRequiredDocs|length }} document(s) obligatoire(s) manquant(s).
+                                </div>
+                            {% else %}
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Dossier incomplet.</strong> {{ requiredDocs|length - uploadedRequiredDocs|length }} document(s) obligatoire(s) manquant(s). Veuillez contacter le Responsable RH.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Documents List - Vertical Layout -->
+                    <div class="documents-list">
+                        <!-- Required Documents Section -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Documents Obligatoires
+                            </h5>
+                            {% set requiredDocs = documentRequirements|filter(r => r.required) %}
+                            {% if requiredDocs is empty %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Aucun document obligatoire requis.
+                                </div>
+                            {% else %}
+                                {% for requirement in requiredDocs %}
+                                    <div class="document-item mb-3 p-3 border rounded {% if requirement.uploaded %}border-success bg-light-success{% else %}border-warning bg-light-warning{% endif %}">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="fas fa-file-alt text-primary me-2"></i>
+                                                    <h6 class="mb-0 text-dark">{{ requirement.abbreviation|document_full_name }}</h6>
+                                                    <span class="badge bg-primary ms-2">{{ requirement.abbreviation }}</span>
+                                                </div>
+                                                
+                                                {% if requirement.uploaded and requirement.document %}
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-calendar me-1"></i>
+                                                            Téléchargé le: {{ requirement.document.uploadedAt|date('d/m/Y H:i') }}
+                                                        </small>
+                                                    </div>
+                                                    {% if requirement.document.uploadedBy %}
+                                                        <div class="mb-2">
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-user me-1"></i>
+                                                                Par: {{ requirement.document.uploadedBy }}
+                                                            </small>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="text-end">
+                                                {% if requirement.uploaded %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Consultable
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>Requis
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Optional Documents Section -->
+                        <div class="mb-4">
+                            <h5 class="text-info mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Documents Complémentaires
+                            </h5>
+                            {% set optionalDocs = documentRequirements|filter(r => not r.required) %}
+                            {% if optionalDocs is empty %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Aucun document complémentaire disponible.
+                                </div>
+                            {% else %}
+                                {% for requirement in optionalDocs %}
+                                    <div class="document-item mb-3 p-3 border rounded {% if requirement.uploaded %}border-success bg-light-success{% else %}border-info bg-light-info{% endif %}">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="fas fa-file-alt text-info me-2"></i>
+                                                    <h6 class="mb-0 text-dark">{{ requirement.abbreviation|document_full_name }}</h6>
+                                                    <span class="badge bg-info ms-2">{{ requirement.abbreviation }}</span>
+                                                </div>
+                                                
+                                                {% if requirement.uploaded and requirement.document %}
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-calendar me-1"></i>
+                                                            Téléchargé le: {{ requirement.document.uploadedAt|date('d/m/Y H:i') }}
+                                                        </small>
+                                                    </div>
+                                                    {% if requirement.document.uploadedBy %}
+                                                        <div class="mb-2">
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-user me-1"></i>
+                                                                Par: {{ requirement.document.uploadedBy }}
+                                                            </small>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="text-end">
+                                                {% if requirement.uploaded %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Consultable
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-info">
+                                                        <i class="fas fa-info-circle me-1"></i>Optionnel
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note :</strong> Vous pouvez consulter vos documents. Pour télécharger ou modifier des documents, veuillez contacter votre Responsable RH.
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ path('employee_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour au Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .documents-list {
+        max-width: 100%;
+    }
+    
+    .document-item {
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent !important;
+    }
+    
+    .document-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .document-item.border-success {
+        border-left-color: #28a745 !important;
+    }
+    
+    .document-item.border-warning {
+        border-left-color: #ffc107 !important;
+    }
+    
+    .document-item.border-info {
+        border-left-color: #17a2b8 !important;
+    }
+    
+    .bg-light-success {
+        background-color: rgba(40, 167, 69, 0.1) !important;
+    }
+    
+    .bg-light-warning {
+        background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+    
+    .bg-light-info {
+        background-color: rgba(23, 162, 184, 0.1) !important;
+    }
+    
+    @media (max-width: 767px) {
+        .document-item {
+            padding: 1rem !important;
+        }
+        
+        .document-item h6 {
+            font-size: 0.9rem !important;
+        }
+        
+        .badge {
+            font-size: 0.75rem !important;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+    }
+</style>
+{% endblock %}

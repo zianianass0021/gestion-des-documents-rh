@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Documents{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0">
+                    <i class="fas fa-file-alt me-2"></i>
+                    Mes Documents
+                </h1>
+            </div>
+            
+            <!-- Barre de recherche -->
+            <div class="card-header bg-light">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="search" 
+                                   value="{{ search }}" 
+                                   placeholder="Rechercher par nom document, type, usage, dossier...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i>Rechercher
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card-body">
+                {% if search %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-search me-2"></i>
+                        Recherche pour : "<strong>{{ search }}</strong>" 
+                        ({{ documents|length }} résultat{{ documents|length > 1 ? 's' : '' }})
+                        <a href="{{ path('employee_documents') }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="fas fa-times"></i> Effacer
+                        </a>
+                    </div>
+                {% endif %}
+                
+                {% if documents is empty %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun document trouvé.
+                    </div>
+                {% else %}
+                    <!-- Desktop Table View -->
+                    <div class="table-responsive desktop-view">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Nom du Fichier</th>
+                                    <th>Type</th>
+                                    <th>Dossier</th>
+                                    <th>Date d'Upload</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for document in documents %}
+                                <tr>
+                                    <td>{{ document.abbreviation }}</td>
+                                    <td>{{ document.libelleComplet }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ document.typeDocument }}</span>
+                                    </td>
+                                    <td>{{ document.usage }}</td>
+                                    <td>
+                                        {% if document.uploadedAt %}
+                                            {{ document.uploadedAt|date('d/m/Y H:i') }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-eye"></i> Consultable
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mobile Card View -->
+                    <div class="mobile-view">
+                        {% for document in documents %}
+                        <div class="document-card mb-3">
+                            <div class="document-card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ document.libelleComplet }}</h6>
+                                        <small class="text-muted">Réf: {{ document.abbreviation }}</small>
+                                    </div>
+                                    <span class="badge bg-secondary">{{ document.typeDocument }}</span>
+                                </div>
+                            </div>
+                            <div class="document-card-body">
+                                <div class="info-row">
+                                    <i class="fas fa-tag text-info"></i>
+                                    <span>{{ document.usage }}</span>
+                                </div>
+                            </div>
+                            <div class="document-card-actions">
+                                <span class="badge bg-success w-100 text-center">
+                                    <i class="fas fa-eye me-1"></i>Consultable
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="mt-3">
+                    <a href="{{ path('employee_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour au Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mobile-view { display: none; }
+    
+    .document-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .document-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .document-card-header h6 {
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .document-card-body {
+        padding: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+    }
+    
+    .info-row i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-row span {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    
+    .document-card-actions {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    @media (max-width: 767px) {
+        .desktop-view { display: none !important; }
+        .mobile-view { display: block !important; }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+    }
+</style>
+{% endblock %}

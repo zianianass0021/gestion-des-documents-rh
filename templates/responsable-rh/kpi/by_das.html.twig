@@ -1,0 +1,79 @@
+{% extends 'base_sidebar.html.twig' %}
+
+{% block title %}KPI - Fiabilisation par DAS{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ path('responsable_kpi_index') }}" class="btn btn-outline-secondary mb-3">
+                <i class="fas fa-arrow-left me-1"></i>
+                Retour aux KPI
+            </a>
+            <h1 class="mb-3">
+                <i class="fas fa-building me-2"></i>
+                B. Fiabilisation Dossier RH par DAS
+            </h1>
+            <p class="text-muted">Taux d'avancement des documents par division activités stratégiques</p>
+        </div>
+    </div>
+
+    <!-- KPI Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-table me-2"></i>
+                Tableau de Fiabilisation par DAS
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>DAS</th>
+                            <th class="text-center bg-info-subtle">Dossier Personnel</th>
+                            <th class="text-center bg-success-subtle">Ayant Droits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            <td class="fw-bold">{{ row.das }}</td>
+                            <td class="text-center">
+                                {% set personnel_pct = row.personnel_percentage %}
+                                <span class="badge 
+                                    {% if personnel_pct >= 80 %}bg-success
+                                    {% elseif personnel_pct >= 50 %}bg-warning
+                                    {% else %}bg-danger{% endif %} 
+                                    fs-6">
+                                    {{ personnel_pct|number_format(2) }}%
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                {% set ayant_pct = row.ayant_droits_percentage %}
+                                <span class="badge 
+                                    {% if ayant_pct >= 80 %}bg-success
+                                    {% elseif ayant_pct >= 50 %}bg-warning
+                                    {% else %}bg-danger{% endif %} 
+                                    fs-6">
+                                    {{ ayant_pct|number_format(2) }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                Aucune donnée disponible
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

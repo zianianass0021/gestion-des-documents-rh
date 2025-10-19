@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Réclamation{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0">
+                    <i class="fas fa-plus me-2"></i>
+                    Nouvelle Réclamation
+                </h1>
+            </div>
+            <div class="card-body">
+                {{ form_start(form) }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.employe) }}
+                            {{ form_widget(form.employe) }}
+                            {{ form_errors(form.employe) }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.typeReclamation) }}
+                            {{ form_widget(form.typeReclamation) }}
+                            {{ form_errors(form.typeReclamation) }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.commentaire) }}
+                        {{ form_widget(form.commentaire) }}
+                        {{ form_errors(form.commentaire) }}
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form_label(form.document) }}
+                        {{ form_widget(form.document) }}
+                        {{ form_errors(form.document) }}
+                        <small class="form-text text-muted">
+                            Formats acceptés: JPG, PNG, GIF, PDF, DOC, DOCX (max 5MB)
+                        </small>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ path('manager_reclamations') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Créer la Réclamation
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 767px) {
+        .col-md-8 {
+            padding: 0 0.5rem;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .d-grid {
+            flex-direction: column !important;
+        }
+        
+        .d-grid .btn {
+            width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .d-grid .btn:last-child {
+            margin-bottom: 0 !important;
+        }
+    }
+</style>
+{% endblock %}

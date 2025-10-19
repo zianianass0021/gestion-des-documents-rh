@@ -1,0 +1,304 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails Organisation - {{ organisation.dossierDesignation }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-sitemap me-2"></i>
+                {{ organisation.dossierDesignation }}
+            </h1>
+            <p class="text-muted mb-0">Détails de l'organisation</p>
+        </div>
+        <div>
+            <a href="{{ path('responsable_edit_organisation', {'id': organisation.id}) }}" class="btn btn-warning me-2">
+                <i class="fas fa-edit me-2"></i>Modifier
+            </a>
+            <a href="{{ path('responsable_manage_organisations') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Organisation Details -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informations Générales
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Code :</label>
+                                <p class="form-control-plaintext">
+                                    <span class="badge bg-primary">{{ organisation.code }}</span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">DAS :</label>
+                                <p class="form-control-plaintext">
+                                    <span class="badge bg-info">{{ organisation.das }}</span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Groupement :</label>
+                                <p class="form-control-plaintext">
+                                    <span class="badge bg-secondary">{{ organisation.groupement }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dossier :</label>
+                                <p class="form-control-plaintext">
+                                    <span class="badge bg-warning">{{ organisation.dossier }}</span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Division d'Activités Stratégiques :</label>
+                                <p class="form-control-plaintext">{{ organisation.divisionActivitesStrategiques }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Désignation :</label>
+                                <p class="form-control-plaintext">
+                                    <strong>{{ organisation.dossierDesignation }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Statistiques
+                    </h6>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-tie fa-3x text-primary mb-2"></i>
+                        <h4 class="text-primary">{{ organisation.organisationEmployeeContrats|length }}</h4>
+                        <p class="text-muted">Employé{{ organisation.organisationEmployeeContrats|length > 1 ? 's' : '' }} assigné{{ organisation.organisationEmployeeContrats|length > 1 ? 's' : '' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employees List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-users me-2"></i>
+                        Employés Assignés
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if organisation.organisationEmployeeContrats is empty %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucun employé assigné à cette organisation.
+                        </div>
+                    {% else %}
+                        <!-- Desktop Table View -->
+                        <div class="table-responsive desktop-view">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Email</th>
+                                        <th>Contrat</th>
+                                        <th>Date Début</th>
+                                        <th>Date Fin</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for orgContrat in organisation.organisationEmployeeContrats %}
+                                        {% set contrat = orgContrat.employeeContrat %}
+                                        {% set employe = contrat.employe %}
+                                        <tr>
+                                            <td>{{ employe.id }}</td>
+                                            <td>{{ employe.nom }}</td>
+                                            <td>{{ employe.prenom }}</td>
+                                            <td>{{ employe.email }}</td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ contrat.natureContrat }}</span>
+                                            </td>
+                                            <td>{{ contrat.dateDebut|date('d/m/Y') }}</td>
+                                            <td>
+                                                {% if contrat.dateFin %}
+                                                    {{ contrat.dateFin|date('d/m/Y') }}
+                                                {% else %}
+                                                    <span class="text-muted">En cours</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{ path('responsable_view_employe_details', {'id': employe.id}) }}" 
+                                                   class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye me-1"></i>Voir
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Mobile Card View -->
+                        <div class="mobile-view">
+                            {% for orgContrat in organisation.organisationEmployeeContrats %}
+                                {% set contrat = orgContrat.employeeContrat %}
+                                {% set employe = contrat.employe %}
+                                <div class="employee-card mb-3">
+                                    <div class="employee-card-header">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">{{ employe.prenom }} {{ employe.nom }}</h6>
+                                                <small class="text-muted">ID: {{ employe.id }}</small>
+                                            </div>
+                                            <span class="badge bg-primary">{{ contrat.natureContrat }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="employee-card-body">
+                                        <div class="info-row">
+                                            <i class="fas fa-envelope text-primary"></i>
+                                            <span>{{ employe.email }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <i class="fas fa-calendar-plus text-success"></i>
+                                            <span>Début: {{ contrat.dateDebut|date('d/m/Y') }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <i class="fas fa-calendar-minus text-warning"></i>
+                                            <span>
+                                                {% if contrat.dateFin %}
+                                                    Fin: {{ contrat.dateFin|date('d/m/Y') }}
+                                                {% else %}
+                                                    En cours
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="employee-card-actions">
+                                        <a href="{{ path('responsable_view_employe_details', {'id': employe.id}) }}" 
+                                           class="btn btn-sm btn-info w-100">
+                                            <i class="fas fa-eye me-1"></i>Voir Détails
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mobile-view { display: none; }
+    
+    .employee-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .employee-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .employee-card-header h6 {
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .employee-card-body {
+        padding: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-row span {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    
+    .employee-card-actions {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    @media (max-width: 767px) {
+        .desktop-view { display: none !important; }
+        .mobile-view { display: block !important; }
+        
+        .container-fluid {
+            padding: 0.5rem !important;
+        }
+        
+        h1.h3 {
+            font-size: 1.25rem !important;
+        }
+        
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            font-size: 0.85rem !important;
+        }
+        
+        .col-lg-8, .col-lg-4 {
+            margin-bottom: 1rem;
+        }
+        
+        .card-header h6 {
+            font-size: 0.95rem !important;
+        }
+        
+        .badge {
+            font-size: 0.75rem !important;
+        }
+    }
+</style>
+{% endblock %}

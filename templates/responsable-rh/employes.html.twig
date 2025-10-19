@@ -1,0 +1,356 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Employés{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        Gestion des Employés
+                    </h1>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('responsable_manage_employes', {'show_all': not showAll}) }}" 
+                           class="btn btn-{{ showAll ? 'primary' : 'outline-primary' }}">
+                            <i class="fas fa-{{ showAll ? 'eye' : 'eye-slash' }} me-2"></i>
+                            {{ showAll ? 'Voir seulement actifs' : 'Voir tous' }}
+                        </a>
+                        <a href="{{ path('responsable_rh_add_employe') }}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Ajouter un Employé
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Barre de recherche -->
+                <div class="mt-2 pt-2 border-top">
+                <form method="GET" class="row g-2">
+                    <div class="col-lg-7 col-md-6">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="search" 
+                                   value="{{ search }}" 
+                                   placeholder="Rechercher par nom, prénom, email...">
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3">
+                        <select name="show_all" class="form-select form-select-sm">
+                            <option value="0" {% if not showAll %}selected{% endif %}>Actifs seulement</option>
+                            <option value="1" {% if showAll %}selected{% endif %}>Tous</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-3">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-search me-1"></i>Rechercher
+                        </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                {% if search %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-search me-2"></i>
+                        Recherche pour : "<strong>{{ search }}</strong>" 
+                        ({{ employees|length }} résultat{{ employees|length > 1 ? 's' : '' }})
+                        <a href="{{ path('responsable_manage_employes') }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="fas fa-times"></i> Effacer
+                        </a>
+                    </div>
+                {% endif %}
+                
+                {% if employees is empty %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun employé trouvé. 
+                        <a href="{{ path('responsable_rh_add_employe') }}" class="alert-link">Ajouter le premier employé</a>
+                    </div>
+                {% else %}
+                    <!-- Desktop Table View -->
+                    <div class="table-responsive desktop-view">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">ID</th>
+                                    <th style="width: 120px;">Nom</th>
+                                    <th style="width: 120px;">Prénom</th>
+                                    <th style="width: 200px;">Email</th>
+                                    <th style="width: 250px;">Organisation</th>
+                                    <th style="width: 80px;">Statut</th>
+                                    <th style="width: 100px;">Contrat</th>
+                                    <th style="width: 100px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="animate-stagger">
+                                {% for employe in employees.items %}
+                                <tr class="{{ not employe.isActive ? 'table-secondary' : '' }} animate-fade-in-left" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                                    <td>{{ employe.id }}</td>
+                                    <td>{{ employe.nom }}</td>
+                                    <td>{{ employe.prenom }}</td>
+                                    <td>{{ employe.email }}</td>
+                                <td>
+                                    {% if employe.employeeContrats is not empty %}
+                                        {% set orgCount = 0 %}
+                                        {% for contrat in employe.employeeContrats %}
+                                            {% for orgContrat in contrat.organisationEmployeeContrats %}
+                                                {% if orgCount > 0 %}<br>{% endif %}
+                                                <span class="badge bg-{{ loop.parent.loop.first ? 'primary' : 'info' }} animate-scale-in small">
+                                                    {{ orgContrat.organisation.dossierDesignation|slice(0, 30) }}{% if orgContrat.organisation.dossierDesignation|length > 30 %}...{% endif %}
+                                                </span>
+                                                {% set orgCount = orgCount + 1 %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {% if orgCount == 0 %}
+                                            <span class="text-muted">Non assigné</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Non assigné</span>
+                                    {% endif %}
+                                </td>
+                                    <td>
+                                        {% if employe.isActive %}
+                                            <span class="badge bg-success small">
+                                                <i class="fas fa-check me-1"></i>Actif
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger small">
+                                                <i class="fas fa-times me-1"></i>Inactif
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if employe.employeeContrats|length > 0 %}
+                                            {% set dernierContrat = employe.employeeContrats|last %}
+                                            {% if dernierContrat.statut == 'actif' %}
+                                                <span class="badge bg-success small">Actif</span>
+                                            {% elseif dernierContrat.statut == 'expire' %}
+                                                <span class="badge bg-danger small">Expiré</span>
+                                            {% elseif dernierContrat.statut == 'suspendu' %}
+                                                <span class="badge bg-warning small">Suspendu</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary small">{{ dernierContrat.statut }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-secondary small">Aucun</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ path('responsable_view_employe_details', {'id': employe.id}) }}" class="btn btn-outline-info" title="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('responsable_toggle_employe_status', {'id': employe.id}) }}" 
+                                               class="btn btn-outline-{{ employe.isActive ? 'warning' : 'success' }}"
+                                               title="{{ employe.isActive ? 'Désactiver' : 'Activer' }} l'employé"
+                                               onclick="return confirm('Êtes-vous sûr de vouloir {{ employe.isActive ? 'désactiver' : 'activer' }} cet employé ?')">
+                                                <i class="fas fa-{{ employe.isActive ? 'pause' : 'play' }}"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mobile Card View -->
+                    <div class="mobile-view">
+                        {% for employe in employees %}
+                        <div class="employee-card mb-3 {{ not employe.isActive ? 'inactive-card' : '' }}">
+                            <div class="employee-card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-user me-2"></i>
+                                            {{ employe.nom }} {{ employe.prenom }}
+                                        </h6>
+                                        <small class="text-muted">ID: {{ employe.id }}</small>
+                                    </div>
+                                    <span class="badge {{ employe.isActive ? 'bg-success' : 'bg-secondary' }}">
+                                        {{ employe.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="employee-card-body">
+                                <div class="info-row">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                    <span>{{ employe.email }}</span>
+                                </div>
+                                
+                                {% if employe.employeeContrats is not empty %}
+                                    {% set orgCount = 0 %}
+                                    {% for contrat in employe.employeeContrats %}
+                                        {% if contrat.organisationEmployeeContrats is not empty %}
+                                            {% for orgContrat in contrat.organisationEmployeeContrats %}
+                                                {% if orgContrat.organisation %}
+                                                    {% set orgCount = orgCount + 1 %}
+                                                    {% if orgCount == 1 %}
+                                                        <div class="info-row">
+                                                            <i class="fas fa-sitemap text-info"></i>
+                                                            <span>{{ orgContrat.organisation.dossierDesignation }}</span>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if orgCount > 1 %}
+                                        <div class="info-row">
+                                            <i class="fas fa-plus-circle text-muted"></i>
+                                            <small class="text-muted">+{{ orgCount - 1 }} autre(s)</small>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                                
+                                {% if employe.employeeContrats is not empty %}
+                                    {% set firstContrat = employe.employeeContrats|first %}
+                                    <div class="info-row">
+                                        <i class="fas fa-file-contract text-success"></i>
+                                        <span>{{ firstContrat.natureContrat }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="employee-card-actions">
+                                <a href="{{ path('responsable_view_employe_details', {'id': employe.id}) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <a href="{{ path('responsable_toggle_employe_status', {'id': employe.id}) }}" 
+                                   class="btn btn-sm btn-outline-{{ employe.isActive ? 'warning' : 'success' }}"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir {{ employe.isActive ? 'désactiver' : 'activer' }} cet employé ?')">
+                                    <i class="fas fa-{{ employe.isActive ? 'pause' : 'play' }}"></i>
+                                    {{ employe.isActive ? 'Désactiver' : 'Activer' }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if employees is defined and employees.pageCount > 1 %}
+                {% include '_pagination.html.twig' with {'pagination': employees} %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Mobile Card Styles */
+    .mobile-view {
+        display: none;
+    }
+    
+    .employee-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .employee-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .employee-card.inactive-card {
+        opacity: 0.7;
+        background: #f8fafc;
+    }
+    
+    .employee-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .employee-card-header h6 {
+        margin: 0;
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .employee-card-body {
+        padding: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-row span {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    
+    .employee-card-actions {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 0.5rem;
+        justify-content: space-between;
+    }
+    
+    .employee-card-actions .btn {
+        flex: 1;
+    }
+    
+    /* Responsive Behavior */
+    @media (max-width: 767px) {
+        .desktop-view {
+            display: none !important;
+        }
+        
+        .mobile-view {
+            display: block !important;
+        }
+        
+        .card-header .d-flex {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .card-header .d-flex > div {
+            width: 100%;
+        }
+        
+        .card-header .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .card-header .btn i {
+            margin-right: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}

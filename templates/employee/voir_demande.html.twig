@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Demande/Réclamation{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>Détails de la Demande/Réclamation
+                    </h5>
+                    <span class="badge bg-{{ demande.statutCouleur }} fs-6">
+                        {{ demande.statutLibelle }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-tag me-2"></i>Titre</h6>
+                            <p class="text-muted">{{ demande.titre }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar me-2"></i>Date d'envoi</h6>
+                            <p class="text-muted">{{ demande.dateCreation|date('d/m/Y à H:i') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h6><i class="fas fa-file-text me-2"></i>Contenu de la demande/réclamation</h6>
+                            <div class="bg-light p-3 rounded">
+                                {{ demande.contenu|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if demande.reponse %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h6><i class="fas fa-reply me-2"></i>Réponse du Responsable RH</h6>
+                            <div class="alert alert-{{ demande.statut == 'acceptee' ? 'success' : 'warning' }}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>{{ demande.responsableRh.prenom }} {{ demande.responsableRh.nom }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ demande.dateReponse|date('d/m/Y à H:i') }}</small>
+                                    </div>
+                                    <span class="badge bg-{{ demande.statutCouleur }}">
+                                        {{ demande.statutLibelle }}
+                                    </span>
+                                </div>
+                                <hr>
+                                {{ demande.reponse|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-clock me-2"></i>
+                                Votre demande est en cours de traitement par votre responsable RH.
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('employee_demandes') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour à mes demandes et réclamations
+                        </a>
+                        {% if not demande.reponse %}
+                        <a href="{{ path('employee_nouvelle_demande') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nouvelle demande
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

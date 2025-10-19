@@ -1,0 +1,98 @@
+{% extends 'base_sidebar.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ path('responsable_rh_dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('performance_index') }}">Rapports</a></li>
+                        <li class="breadcrumb-item active">Rapport D</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">{{ title }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Performance Détaillée par Nature de Contrat</h5>
+                        <div>
+                            <button class="btn btn-success btn-sm" onclick="exportToExcel('rapport-d')">
+                                <i class="fas fa-file-excel me-1"></i>Exporter Excel
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="window.print()">
+                                <i class="fas fa-print me-1"></i>Imprimer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {% if data %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="rapport-d">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Nature de Contrat</th>
+                                        <th>Type</th>
+                                        {% for header in data[0] %}
+                                            {% if loop.index > 2 %}
+                                                <th class="text-center">{{ header }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in data %}
+                                        {% if loop.index > 1 %}
+                                            <tr>
+                                                {% for cell in row %}
+                                                    {% if loop.first %}
+                                                        <td><strong>{{ cell }}</strong></td>
+                                                    {% elseif loop.index == 2 %}
+                                                        <td>{{ cell }}</td>
+                                                    {% else %}
+                                                        <td class="text-center">
+                                                            {% if cell matches '/^[0-9.]+%$/' %}
+                                                                <span class="badge badge-{% if cell|replace({'%': ''})|number_format(2) >= 70 %}success{% elseif cell|replace({'%': ''})|number_format(2) >= 50 %}warning{% else %}danger{% endif %}">
+                                                                    {{ cell }}
+                                                                </span>
+                                                            {% else %}
+                                                                {{ cell }}
+                                                            {% endif %}
+                                                        </td>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Aucune donnée disponible pour ce rapport.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportToExcel(tableId) {
+    const table = document.getElementById(tableId);
+    const wb = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(wb, 'rapport-d-performance.xlsx');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,287 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Organisations{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-2">
+                <i class="fas fa-sitemap me-2"></i>
+                Gestion des Organisations
+            </h1>
+            <p class="text-muted mb-3">Structure organisationnelle de l'entreprise</p>
+            <a href="{{ path('responsable_assign_organisation') }}" class="btn btn-info mb-3">
+                <i class="fas fa-user-plus me-2"></i>Assigner Employé
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par nom, DAS, employé...">
+                <button class="btn btn-outline-secondary" onclick="clearSearch()">
+                    <i class="fas fa-times"></i> Effacer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-sitemap fa-2x text-primary mb-2"></i>
+                    <h4 class="text-primary">{{ organisations|length }}</h4>
+                    <p class="text-muted mb-0">Total Organisations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-layer-group fa-2x text-success mb-2"></i>
+                    <h4 class="text-success">
+                        {% set das_unique = [] %}
+                        {% for org in organisations %}
+                            {% if org.das not in das_unique %}
+                                {% set das_unique = das_unique|merge([org.das]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ das_unique|length }}
+                    </h4>
+                    <p class="text-muted mb-0">DAS Uniques</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x text-info mb-2"></i>
+                    <h4 class="text-info">
+                        {% set groupements_unique = [] %}
+                        {% for org in organisations %}
+                            {% if org.groupement not in groupements_unique %}
+                                {% set groupements_unique = groupements_unique|merge([org.groupement]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ groupements_unique|length }}
+                    </h4>
+                    <p class="text-muted mb-0">Groupements</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-user-tie fa-2x text-warning mb-2"></i>
+                    <h4 class="text-warning">
+                        {% set total_employees = 0 %}
+                        {% for org in organisations %}
+                            {% set total_employees = total_employees + org.organisationEmployeeContrats|length %}
+                        {% endfor %}
+                        {{ total_employees }}
+                    </h4>
+                    <p class="text-muted mb-0">Employés Assignés</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Organisations List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Liste des Organisations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if organisations is empty %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucune organisation trouvée.
+                        </div>
+                    {% else %}
+                        <!-- Desktop Table View -->
+                        <div class="table-responsive desktop-view">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>DAS</th>
+                                        <th>Division</th>
+                                        <th>Groupement</th>
+                                        <th>Dossier</th>
+                                        <th>Désignation</th>
+                                        <th class="text-center">Employés</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for organisation in organisations %}
+                                        <tr>
+                                            <td><span class="badge bg-primary">{{ organisation.code }}</span></td>
+                                            <td><span class="badge bg-info">{{ organisation.das }}</span></td>
+                                            <td><strong>{{ organisation.divisionActivitesStrategiques }}</strong></td>
+                                            <td><span class="badge bg-secondary">{{ organisation.groupement }}</span></td>
+                                            <td><span class="badge bg-warning">{{ organisation.dossier }}</span></td>
+                                            <td><strong>{{ organisation.dossierDesignation }}</strong></td>
+                                            <td class="text-center">
+                                                <span class="badge bg-success">{{ organisation.organisationEmployeeContrats|length }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{ path('responsable_view_organisation', {'id': organisation.id}) }}" 
+                                                   class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye me-1"></i>Voir
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Mobile Card View -->
+                        <div class="mobile-view">
+                            {% for organisation in organisations %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-building me-2"></i>
+                                        {{ organisation.dossierDesignation }}
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <strong>Code:</strong><br>
+                                            <span class="badge bg-primary">{{ organisation.code }}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>DAS:</strong><br>
+                                            <span class="badge bg-info">{{ organisation.das }}</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <strong>Division:</strong><br>
+                                            {{ organisation.divisionActivitesStrategiques }}
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <strong>Groupement:</strong><br>
+                                            <span class="badge bg-secondary">{{ organisation.groupement }}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>Employés:</strong><br>
+                                            <span class="badge bg-success">{{ organisation.organisationEmployeeContrats|length }}</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="text-center">
+                                        <a href="{{ path('responsable_view_organisation', {'id': organisation.id}) }}" 
+                                           class="btn btn-info">
+                                            <i class="fas fa-eye me-1"></i>Voir Détails
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const organizationCards = document.querySelectorAll('.mobile-view .card');
+    const tableRows = document.querySelectorAll('.desktop-view tbody tr');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        // Search in mobile cards
+        organizationCards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Search in desktop table
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    document.querySelectorAll('.mobile-view .card, .desktop-view tbody tr').forEach(element => {
+        element.style.display = '';
+    });
+}
+</script>
+
+<style>
+.mobile-view { display: none; }
+
+@media (max-width: 767px) {
+    .desktop-view { display: none !important; }
+    .mobile-view { display: block !important; }
+    
+    .container-fluid {
+        padding: 0.5rem;
+    }
+    
+    h1.h3 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .input-group {
+        margin-bottom: 1rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-header h6 {
+        font-size: 1rem;
+    }
+    
+    .badge {
+        font-size: 0.8rem;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Responsables RH{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">
+                    <i class="fas fa-user-friends me-2"></i>
+                    Gestion des Responsables RH
+                </h1>
+                <a href="{{ path('admin_add_responsable') }}" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>Ajouter un Responsable RH
+                </a>
+            </div>
+            <div class="card-body">
+                {% if responsables is empty %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun responsable RH trouvé. 
+                        <a href="{{ path('admin_add_responsable') }}" class="alert-link">Ajouter le premier responsable RH</a>
+                    </div>
+                {% else %}
+                    <!-- Desktop Table View -->
+                    <div class="table-responsive desktop-view">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>Rôles</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for responsable in responsables.items %}
+                                <tr>
+                                    <td>{{ responsable.id }}</td>
+                                    <td>{{ responsable.email }}</td>
+                                    <td>
+                                        {% for role in responsable.roles %}
+                                            <span class="badge bg-primary me-1">{{ role }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('admin_edit_responsable', {'id': responsable.id}) }}" class="btn btn-sm btn-warning me-2">
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </a>
+                                        <a href="{{ path('admin_delete_responsable', {'id': responsable.id}) }}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce responsable RH ?')">
+                                            <i class="fas fa-trash"></i> Supprimer
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mobile Card View -->
+                    <div class="mobile-view">
+                        {% for responsable in responsables %}
+                        <div class="responsable-card mb-3">
+                            <div class="responsable-card-header">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-user-tie me-2"></i>
+                                            Responsable RH
+                                        </h6>
+                                        <small class="text-muted">ID: {{ responsable.id }}</small>
+                                    </div>
+                                    <span class="badge bg-primary">RH</span>
+                                </div>
+                            </div>
+                            <div class="responsable-card-body">
+                                <div class="info-row">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                    <span>{{ responsable.email }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <i class="fas fa-shield-alt text-info"></i>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for role in responsable.roles %}
+                                            <span class="badge bg-secondary">{{ role }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="responsable-card-actions">
+                                <a href="{{ path('admin_edit_responsable', {'id': responsable.id}) }}" 
+                                   class="btn btn-sm btn-outline-warning flex-fill">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a href="{{ path('admin_delete_responsable', {'id': responsable.id}) }}" 
+                                   class="btn btn-sm btn-outline-danger flex-fill"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce responsable RH ?')">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mobile-view { display: none; }
+    
+    .responsable-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .responsable-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .responsable-card-header h6 {
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .responsable-card-body {
+        padding: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-row i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-row span {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    
+    .responsable-card-actions {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 767px) {
+        .desktop-view { display: none !important; }
+        .mobile-view { display: block !important; }
+        
+        .card-header {
+            flex-direction: column !important;
+            gap: 0.75rem;
+        }
+        
+        .card-header h1 {
+            font-size: 1.25rem !important;
+        }
+        
+        .card-header .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

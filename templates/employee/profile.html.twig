@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    Mon Profil
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Informations Personnelles</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Nom :</strong></td>
+                                        <td>{{ employee.nom }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Prénom :</strong></td>
+                                        <td>{{ employee.prenom }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Email :</strong></td>
+                                        <td>{{ employee.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Téléphone :</strong></td>
+                                        <td>{{ employee.telephone ?: 'Non renseigné' }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Informations Professionnelles</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Organisation :</strong></td>
+                                        <td>
+                                            {% if employee.employeeContrats is not empty %}
+                                                {% set currentContrat = employee.employeeContrats|first %}
+                                                {% if currentContrat.organisationEmployeeContrats is not empty %}
+                                                    {% set currentOrg = currentContrat.organisationEmployeeContrats|first.organisation %}
+                                                    {{ currentOrg.dossierDesignation }}
+                                                {% else %}
+                                                    Non assigné
+                                                {% endif %}
+                                            {% else %}
+                                                Non assigné
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ path('employee_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour au Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
