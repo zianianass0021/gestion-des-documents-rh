@@ -21,7 +21,7 @@ final class Version20251009154813 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE p_document ALTER abbreviation TYPE VARCHAR(20)');
-    }it
+    }
 
     public function down(Schema $schema): void
     {

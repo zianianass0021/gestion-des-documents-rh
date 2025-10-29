@@ -1,6 +1,9 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
+        # Optimize performance
+        types:
+            json: Doctrine\DBAL\Types\JsonType
 
     orm:
         auto_generate_proxy_classes: true

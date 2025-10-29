@@ -23,7 +23,7 @@
             
             .sidebar {
                 width: 250px;
-                background-color: #2c3e50;
+                background: #00a3db;
                 color: white;
                 position: fixed;
                 height: 100vh;
@@ -38,7 +38,8 @@
             
             .sidebar-header {
                 padding: 20px;
-                border-bottom: 1px solid #34495e;
+                background: #00a3db;
+                border-bottom: 1px solid #00a3db;
                 text-align: center;
             }
             
@@ -50,6 +51,17 @@
             
             .sidebar.collapsed .sidebar-header h4 {
                 display: none;
+            }
+            
+            .logo-img {
+                height: 150px;
+                width: auto;
+                max-width: 100%;
+                object-fit: contain;
+            }
+            
+            .sidebar.collapsed .logo-img {
+                height: 100px;
             }
             
             .sidebar-menu {
@@ -72,13 +84,16 @@
             }
             
             .sidebar-menu a:hover {
-                background-color: #34495e;
-                color: #3498db;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
             }
             
             .sidebar-menu a.active {
-                background-color: #3498db;
+                background: rgba(255, 255, 255, 0.3);
+                border-right: 4px solid #ffffff;
                 color: white;
+                font-weight: 600;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             }
             
             .sidebar-menu i {
@@ -303,7 +318,7 @@
             <!-- Sidebar -->
             <div class="sidebar" id="sidebar">
                 <div class="sidebar-header">
-                    <h4><i class="fas fa-users me-2"></i>Système RH</h4>
+                    <img src="{{ asset('logo.png') }}" alt="Système RH" class="logo-img">
                 </div>
                 <ul class="sidebar-menu">
                     {% if app.user %}

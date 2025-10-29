@@ -21,7 +21,24 @@
                         </li>
                     {% endif %}
 
-                    {% for page in 1..pagination.pageCount %}
+                    {# Calculer les pages à afficher autour de la page courante #}
+                    {% set startPage = max(1, pagination.current - 2) %}
+                    {% set endPage = min(pagination.pageCount, pagination.current + 2) %}
+                    
+                    {# Afficher la première page si elle n'est pas dans la plage #}
+                    {% if startPage > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ path(pagination.route, pagination.queryParams|merge({(pagination.pageParameterName): 1})) }}">1</a>
+                        </li>
+                        {% if startPage > 2 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Afficher les pages dans la plage calculée #}
+                    {% for page in startPage..endPage %}
                         {% if page == pagination.current %}
                             <li class="page-item active">
                                 <span class="page-link">{{ page }}</span>
@@ -34,6 +51,18 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+
+                    {# Afficher la dernière page si elle n'est pas dans la plage #}
+                    {% if endPage < pagination.pageCount %}
+                        {% if endPage < pagination.pageCount - 1 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ path(pagination.route, pagination.queryParams|merge({(pagination.pageParameterName): pagination.pageCount})) }}">{{ pagination.pageCount }}</a>
+                        </li>
+                    {% endif %}
 
                     {% if pagination.current < pagination.pageCount %}
                         <li class="page-item">

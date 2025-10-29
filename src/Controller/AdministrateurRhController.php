@@ -21,10 +21,15 @@ use App\Repository\EmployeeContratRepository;
 use App\Repository\DossierRepository;
 use App\Repository\PlacardRepository;
 use App\Repository\DocumentRepository;
+use App\Repository\NatureContratTypeDocumentRepository;
+use App\Entity\NatureContratTypeDocument;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Box\Spout\Writer\XLSX\Writer as XLSXWriter;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -274,25 +279,278 @@ class AdministrateurRhController extends AbstractController
     }
 
     #[Route('/download-excel', name: 'admin_download_module_excel')]
-    public function downloadModuleExcel(): Response
+    public function downloadModuleExcel(EmployeRepository $employeRepository, EntityManagerInterface $em, NatureContratTypeDocumentRepository $docRequirementRepo): Response
     {
-        $filePath = $this->getParameter('kernel.project_dir') . '/module.xlsx';
+        // Increase memory and execution time for large exports
+        set_time_limit(300); // 5 minutes
+        ini_set('memory_limit', '1024M');
         
-        if (!file_exists($filePath)) {
-            $this->addFlash('error', 'Le fichier Excel n\'existe pas.');
-            return $this->redirectToRoute('administrateur_rh_dashboard');
-        }
+        // Suppress any errors
+        @ini_set('display_errors', 0);
+        error_reporting(0);
         
-        // Lire le contenu du fichier
-        $content = file_get_contents($filePath);
-        
-        // Créer une réponse avec le contenu et le type MIME manuel
-        $response = new \Symfony\Component\HttpFoundation\Response($content);
+        try {
+            // Create a temporary file for the Excel export
+            $tempFile = tempnam(sys_get_temp_dir(), 'employees_export_');
+            
+            // Create writer instance
+            $writer = WriterEntityFactory::createXLSXWriter();
+            
+            // Open the temporary file for writing
+            $writer->openToFile($tempFile);
+            
+            // Pre-load all document requirements into memory for fast lookup
+            $allDocRequirements = $docRequirementRepo->findAll();
+            $docRequirementsLookup = [];
+            foreach ($allDocRequirements as $docReq) {
+                $contractType = $docReq->getContractType();
+                if (!isset($docRequirementsLookup[$contractType])) {
+                    $docRequirementsLookup[$contractType] = ['obligatoires' => [], 'complementaires' => []];
+                }
+                if ($docReq->isRequired()) {
+                    $docRequirementsLookup[$contractType]['obligatoires'][] = $docReq->getDocumentAbbreviation();
+                } else {
+                    $docRequirementsLookup[$contractType]['complementaires'][] = $docReq->getDocumentAbbreviation();
+                }
+            }
+            
+            // Also pre-load nature contrat codes for lookup
+            $allNatureContrats = $em->getRepository(\App\Entity\NatureContrat::class)->findAll();
+            $codeToDesignation = [];
+            $designationToCode = [];
+            foreach ($allNatureContrats as $nc) {
+                if ($nc->getCode()) {
+                    $codeToDesignation[$nc->getCode()] = $nc->getDesignation();
+                }
+                if ($nc->getDesignation()) {
+                    $designationToCode[$nc->getDesignation()] = $nc->getCode();
+                }
+            }
+            
+            // Define the header row
+            $headerRow = WriterEntityFactory::createRowFromArray([
+                'ID',
+                'Nom',
+                'Prénom',
+                'Email',
+                'Téléphone',
+                'Organisation',
+                'Groupement',
+                'Code',
+                'DAS',
+                'Type Contrat',
+                'Date Début',
+                'Date Fin',
+                'Statut Contrat',
+                'Placard',
+                'Emplacement',
+                'Statut Employé',
+                'Documents Requis'
+            ]);
+            $writer->addRow($headerRow);
+            
+            // Process employees in batches to avoid memory exhaustion
+            $batchSize = 200; // Increased batch size for faster processing
+            $offset = 0;
+            $totalProcessed = 0;
+            
+            while (true) {
+                // Get batch of employees using native SQL - ordered by last name then first name
+                $conn = $em->getConnection();
+                $sql = "SELECT id FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%' ORDER BY nom ASC, prenom ASC LIMIT :limit OFFSET :offset";
+                $stmt = $conn->prepare($sql);
+                $result = $stmt->executeQuery([
+                    'limit' => $batchSize,
+                    'offset' => $offset
+                ]);
+                $ids = $result->fetchFirstColumn();
+                
+                if (empty($ids)) {
+                    break;
+                }
+                
+                // Process each employee in the batch
+                foreach ($ids as $id) {
+                    try {
+                        $employe = $em->find(\App\Entity\Employe::class, $id);
+                        if (!$employe) {
+                            continue;
+                        }
+                        try {
+                            $contrats = $employe->getEmployeeContrats();
+                            
+                            // For each contract, create a separate row
+                            foreach ($contrats as $contrat) {
+                                try {
+                                    // Get organisations for this contract
+                                    $organisations = [];
+                                    $groupements = [];
+                                    $codes = [];
+                                    $dasValues = [];
+                                    
+                                    $orgContrats = $contrat->getOrganisationEmployeeContrats();
+                                    foreach ($orgContrats as $orgContrat) {
+                                        if ($orgContrat && $orgContrat->getOrganisation()) {
+                                            $org = $orgContrat->getOrganisation();
+                                            $organisations[] = $org->getDossierDesignation();
+                                            $groupements[] = $org->getGroupement() ?? '';
+                                            $codes[] = $org->getCode() ?? '';
+                                            $dasValues[] = $org->getDas() ?? '';
+                                        }
+                                    }
+                                    
+                                    $organisationsString = !empty($organisations) ? implode(', ', $organisations) : '';
+                                    $groupementString = !empty($groupements) ? implode(', ', array_unique($groupements)) : '';
+                                    $codeString = !empty($codes) ? implode(', ', array_unique($codes)) : '';
+                                    $dasString = !empty($dasValues) ? implode(', ', array_unique($dasValues)) : '';
+                                    
+                                    $natureContrat = $contrat->getNatureContrat();
+                                    $contractType = $natureContrat ? $natureContrat->getDesignation() : '';
+                                    
+                                    // Get placard and emplacement from employee's dossier (separated)
+                                    $placardName = '';
+                                    $emplacement = '';
+                                    if ($employe->getDossier()) {
+                                        $dossier = $employe->getDossier();
+                                        if ($dossier->getPlacard()) {
+                                            $placardName = $dossier->getPlacard()->getName() . ' (' . $dossier->getPlacard()->getLocation() . ')';
+                                        }
+                                        if ($dossier->getEmplacement()) {
+                                            $emplacement = $dossier->getEmplacement();
+                                        }
+                                    }
+                                    
+                                    // Get required documents for this contract using lookup
+                                    $documentsRequis = '';
+                                    if ($contractType && $natureContrat) {
+                                        $contractTypeDesignation = $natureContrat->getDesignation();
+                                        $contractTypeCode = $natureContrat->getCode();
+                                        
+                                        // Try to find documents by designation first
+                                        $docs = null;
+                                        if ($contractTypeDesignation && isset($docRequirementsLookup[$contractTypeDesignation])) {
+                                            $docs = $docRequirementsLookup[$contractTypeDesignation];
+                                        }
+                                        // If not found, try with code
+                                        elseif ($contractTypeCode && isset($docRequirementsLookup[$contractTypeCode])) {
+                                            $docs = $docRequirementsLookup[$contractTypeCode];
+                                        }
+                                        
+                                        if ($docs) {
+                                            $obligatoires = $docs['obligatoires'] ?? [];
+                                            $complementaires = $docs['complementaires'] ?? [];
+                                            
+                                            // Combine: obligatoires first, then complémentaires
+                                            $allDocs = array_merge($obligatoires, $complementaires);
+                                            $documentsRequis = implode(', ', $allDocs);
+                                        }
+                                    }
+                                    
+                                    $row = WriterEntityFactory::createRowFromArray([
+                                        $employe->getId(),
+                                        $employe->getNom(),
+                                        $employe->getPrenom(),
+                                        $employe->getEmail(),
+                                        $employe->getTelephone() ?? '',
+                                        $organisationsString,
+                                        $groupementString,
+                                        $codeString,
+                                        $dasString,
+                                        $contractType,
+                                        $contrat->getDateDebut() ? $contrat->getDateDebut()->format('Y-m-d') : '',
+                                        $contrat->getDateFin() ? $contrat->getDateFin()->format('Y-m-d') : '',
+                                        $contrat->getStatut() ?? '',
+                                        $placardName,
+                                        $emplacement,
+                                        $employe->isActive() ? 'Actif' : 'Inactif',
+                                        $documentsRequis
+                                    ]);
+                                    $writer->addRow($row);
+                                } catch (\Exception $e) {
+                                    // Skip this contract if there's an error
+                                    continue;
+                                }
+                            }
+                            
+                            // If employee has no contracts, still add them with empty contract fields
+                            if ($contrats->isEmpty()) {
+                                // Get placard and emplacement from employee's dossier (separated)
+                                $placardName = '';
+                                $emplacement = '';
+                                if ($employe->getDossier()) {
+                                    $dossier = $employe->getDossier();
+                                    if ($dossier->getPlacard()) {
+                                        $placardName = $dossier->getPlacard()->getName() . ' (' . $dossier->getPlacard()->getLocation() . ')';
+                                    }
+                                    if ($dossier->getEmplacement()) {
+                                        $emplacement = $dossier->getEmplacement();
+                                    }
+                                }
+                                
+                                $row = WriterEntityFactory::createRowFromArray([
+                                    $employe->getId(),
+                                    $employe->getNom(),
+                                    $employe->getPrenom(),
+                                    $employe->getEmail(),
+                                    $employe->getTelephone() ?? '',
+                                    '', // No organisation
+                                    '', // No groupement
+                                    '', // No code
+                                    '', // No DAS
+                                    '', // No contract type
+                                    '', // No start date
+                                    '', // No end date
+                                    '', // No contract status
+                                    $placardName,
+                                    $emplacement,
+                                    $employe->isActive() ? 'Actif' : 'Inactif',
+                                    '' // No documents required
+                                ]);
+                                $writer->addRow($row);
+                            }
+                        } catch (\Exception $e) {
+                            // Skip this employee if there's an error
+                            continue;
+                        }
+                    } catch (\Exception $e) {
+                        // Skip this employee if there's an error
+                        continue;
+                    }
+                }
+                
+                $offset += $batchSize;
+                $em->clear(); // Clear after each batch
+                
+                // Break if we got fewer results than requested (last batch)
+                if (count($ids) < $batchSize) {
+                    break;
+                }
+            }
+            
+            $writer->close();
+            
+            // Now read the file and return it as a response
+            if (!file_exists($tempFile)) {
+                throw new \Exception('Excel file could not be generated');
+            }
+            
+            $response = new Response();
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment; filename="module_employes_' . date('Y-m-d') . '.xlsx"');
-        $response->headers->set('Content-Length', strlen($content));
+            $response->headers->set('Content-Disposition', 'attachment; filename="employes_' . date('Y-m-d_His') . '.xlsx"');
+            $response->setContent(file_get_contents($tempFile));
+            
+            // Clean up
+            unlink($tempFile);
         
         return $response;
+            
+        } catch (\Exception $e) {
+            // If there's an error, output nothing to prevent file corruption
+            if (isset($tempFile) && file_exists($tempFile)) {
+                @unlink($tempFile);
+            }
+            throw $e;
+        }
     }
 
 }

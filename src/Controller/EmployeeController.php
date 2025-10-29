@@ -36,8 +36,11 @@ class EmployeeController extends AbstractController
         // Récupérer les informations de l'employé connecté
         $contrats = $contratRepository->findBy(['employe' => $employee]);
         $dossiers = $dossierRepository->findBy(['employe' => $employee]);
-        // Les documents ne sont plus liés aux dossiers, donc on récupère tous les documents
-        $documents = $documentRepository->findAll();
+        // Get only documents for this employee's dossier
+        $documents = [];
+        if ($employee->getDossier()) {
+            $documents = $employee->getDossier()->getDocuments()->toArray();
+        }
 
         // Calculer le statut réel de chaque dossier basé sur les documents requis
         $dossiersWithRealStatus = [];
@@ -176,8 +179,12 @@ class EmployeeController extends AbstractController
         if ($search) {
             $documents = $documentRepository->findBySearch($search);
         } else {
-            // Récupérer tous les documents disponibles pour l'employé
-            $documents = $documentRepository->findAll();
+            // Get only documents for this employee's dossier (not all documents)
+            if ($employee->getDossier()) {
+                $documents = $employee->getDossier()->getDocuments()->toArray();
+            } else {
+                $documents = [];
+            }
         }
 
         $response = $this->render('employee/documents.html.twig', [

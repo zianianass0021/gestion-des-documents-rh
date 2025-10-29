@@ -3,6 +3,21 @@
 {% block title %}Gestion des Placards{% endblock %}
 
 {% block body %}
+
+<!-- Statistiques en haut -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-warning d-flex align-items-center">
+            <i class="fas fa-archive me-3 fa-2x"></i>
+            <div>
+                <h5 class="mb-1">Total des Placards</h5>
+                <h3 class="mb-0 text-warning">{{ totalPlacards }}</h3>
+                <small class="text-muted">Placards d'archivage des dossiers</small>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -11,9 +26,11 @@
                     <i class="fas fa-archive me-2"></i>
                     Gestion des Placards
                 </h1>
-                <a href="{{ path('responsable_add_placard') }}" class="btn btn-success">
-                    <i class="fas fa-plus me-2"></i>Ajouter un Placard
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('responsable_add_placard') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Ajouter un Placard
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 {% if placards is empty %}
@@ -108,6 +125,13 @@
                             </div>
                         </div>
                         {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Pagination -->
+                {% if placards.pageCount > 1 %}
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ knp_pagination_render(placards) }}
                     </div>
                 {% endif %}
             </div>

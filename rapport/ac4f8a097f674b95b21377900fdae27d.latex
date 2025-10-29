@@ -1,0 +1,2489 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{multirow}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\usepackage[normalem]{ulem}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\includegraphics[width=2.38621in,height=1.69095in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image1.png}\includegraphics[width=1.32558in,height=1.32558in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image2.png}
+
+Rapport de Stage
+
+\begin{quote}
+\textbf{Développement d'un Système de Gestion Documentaire RH}
+
+\includegraphics[width=2.48837in,height=2.48837in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image3.png}
+
+\textbf{Réalisé par :}
+
+Anass ZIANI Anouar ESSADIQ Achraf TAMIRI
+
+\textbf{Encadrant :}
+
+M. BOUCHAL Anouar
+
+\textbf{Établissement :}
+
+Université Internationale Abulcasis des Sciences de la Santé École
+d'Ingénieur Abulcasis
+
+Promotion GISIBA-2
+
+Année Universitaire : 2025-2026
+\end{quote}
+
+\protect\hyperlink{remerciements}{Remerciements 7}
+
+\protect\hyperlink{duxe9dicace}{Dédicace 7}
+
+\protect\hyperlink{ruxe9sumuxe9-exuxe9cutif}{Résumé Exécutif 9}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+  \item
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \end{enumerate}
+  \item
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \end{enumerate}
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \end{enumerate}
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+  \item
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \item
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \tightlist
+    \item
+    \item
+    \item
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+\protect\hyperlink{introduction}{Introduction
+10}\protect\hyperlink{contexte-du-stage}{Contexte du stage
+10}\protect\hyperlink{contexte-organisationnel}{Contexte organisationnel
+10}\protect\hyperlink{enjeux-technologiques}{Enjeux technologiques
+10}\protect\hyperlink{impact-attendu}{Impact attendu
+10}\protect\hyperlink{probluxe9matique}{Problématique
+10}\protect\hyperlink{objectifs-du-projet}{Objectifs du projet
+11}\protect\hyperlink{analyse-des-besoins}{Analyse des besoins
+11}\protect\hyperlink{analyse-du-contexte-muxe9tier}{Analyse du contexte
+métier 11}\protect\hyperlink{analyse-des-acteurs}{Analyse des acteurs
+11}\protect\hyperlink{administrateur-rh}{Administrateur RH
+11}\protect\hyperlink{responsable-rh}{Responsable RH
+11}\protect\hyperlink{employuxe9}{Employé
+12}\protect\hyperlink{manager}{Manager
+12}\protect\hyperlink{exigences-fonctionnelles}{Exigences fonctionnelles
+13}\protect\hyperlink{_TOC_250064}{Performance
+14}\protect\hyperlink{_TOC_250063}{Sécurité
+14}\protect\hyperlink{_TOC_250062}{Disponibilité
+14}\protect\hyperlink{_TOC_250061}{Maintenabilité
+14}\protect\hyperlink{conception-du-systuxe8me}{Évolutivité
+15}\protect\hyperlink{conception-du-systuxe8me}{Conception du système
+15}\protect\hyperlink{architecture-guxe9nuxe9rale}{Architecture
+générale} 15\protect\hyperlink{principe-de-conception}{Principe de
+conception 15}\protect\hyperlink{patterns-architecturaux}{Patterns
+architecturaux
+15}\protect\hyperlink{moduxe9lisation-des-donnuxe9es}{Modélisation des
+données 15}\protect\hyperlink{_TOC_250054}{Entités principales
+15}\protect\hyperlink{contraintes-et-ruxe8gles-muxe9tier}{Contraintes et
+règles métier 17}\protect\hyperlink{choix-technologiques}{Choix
+technologiques
+17}\protect\hyperlink{duxe9veloppement-et-impluxe9mentation}{Développement
+et implémentation
+17}\protect\hyperlink{muxe9thodologie-de-duxe9veloppement}{Méthodologie
+de développement 17}\protect\hyperlink{approche-scrum}{Approche Scrum
+18}\protect\hyperlink{gestion-des-exigences}{Gestion des exigences
+18}\protect\hyperlink{contruxf4le-de-version}{Contrôle de version
+19}\protect\hyperlink{structure-du-projet}{Structure du projet
+19}\protect\hyperlink{fonctionnalituxe9s-duxe9veloppuxe9es}{Fonctionnalités
+développées
+19}\protect\hyperlink{interface-utilisateur-adaptative}{Interface
+utilisateur adaptative
+19}\protect\hyperlink{principe-dadaptation}{Principe d'adaptation
+19}\protect\hyperlink{dashboard-administrateur-rh}{Dashboard
+Administrateur RH
+20}\protect\hyperlink{dashboard-responsable-rh}{Dashboard Responsable RH
+20}\protect\hyperlink{dashboard-employuxe9}{Dashboard Employé
+20}\protect\hyperlink{gestion-des-documents}{Gestion des documents
+20}\protect\hyperlink{upload-suxe9curisuxe9}{Upload sécurisé
+20}\protect\hyperlink{classification-et-organisation}{Classification et
+organisation
+21}\protect\hyperlink{consultation-et-tuxe9luxe9chargement}{Consultation
+et téléchargement
+21}\protect\hyperlink{systuxe8me-de-rapports-et-kpis}{Système de
+rapports et KPIs
+21}\protect\hyperlink{guxe9nuxe9ration-automatique-de-rapports}{Génération
+automatique de rapports
+21}\protect\hyperlink{indicateurs-de-performance-cluxe9s}{Indicateurs de
+performance clés
+21}\protect\hyperlink{tableaux-de-bord-interactifs}{Tableaux de bord
+interactifs 21}\protect\hyperlink{tests-et-validation}{Tests et
+validation 22}\protect\hyperlink{stratuxe9gie-de-tests}{Stratégie de
+tests 22}\protect\hyperlink{pyramide-de-tests}{Pyramide de tests
+22}\protect\hyperlink{types-de-tests}{Types de tests
+22}\protect\hyperlink{_TOC_250027}{Outils de test
+22}\protect\hyperlink{validation-des-fonctionnalituxe9s}{Validation des
+fonctionnalités
+22}\protect\hyperlink{amuxe9liorations-et-optimisations}{Améliorations
+et optimisations
+23}\protect\hyperlink{refonte-de-linterface-utilisateur}{Refonte de
+l'interface utilisateur
+23}\protect\hyperlink{processus-damuxe9lioration}{Processus
+d'amélioration
+23}\protect\hyperlink{dashboard-employuxe9-optimisuxe9}{Dashboard
+employé optimisé
+23}\protect\hyperlink{amuxe9lioration-de-lexpuxe9rience-utilisateur}{Amélioration
+de l'expérience utilisateur
+23}\protect\hyperlink{architecture-technique-amuxe9lioruxe9e}{Architecture
+technique améliorée
+24}\protect\hyperlink{services-muxe9tier-optimisuxe9s}{Services métier
+optimisés
+24}\protect\hyperlink{extensions-twig-personnalisuxe9es}{Extensions Twig
+personnalisées
+24}\protect\hyperlink{optimisations-de-performance}{Optimisations de
+performance 24}\protect\hyperlink{base-de-donnuxe9es}{Base de données
+24}\protect\hyperlink{application}{Application
+24}\protect\hyperlink{ruxe9sultats-et-impact}{Résultats et impact
+24}\protect\hyperlink{buxe9nuxe9fices-obtenus}{Bénéfices obtenus
+24}\protect\hyperlink{buxe9nuxe9fices-quantifiuxe9s}{Bénéfices
+quantifiés 25}\protect\hyperlink{buxe9nuxe9fices-qualitatifs}{Bénéfices
+qualitatifs 25}\protect\hyperlink{conclusion-et-perspectives}{Conclusion
+et perspectives 25}\protect\hyperlink{bilan-du-projet}{Bilan du projet
+25}\protect\hyperlink{apports-personnels}{Apports personnels
+25}\protect\hyperlink{perspectives-duxe9volution}{Perspectives
+d'évolution 26}\protect\hyperlink{uxe9volutions-court-terme}{Évolutions
+court terme 26}\protect\hyperlink{uxe9volutions-moyen-terme}{Évolutions
+moyen terme 26}\protect\hyperlink{uxe9volutions-long-terme}{Évolutions
+long terme 27}\protect\hyperlink{recommandations}{Recommandations
+27}\protect\hyperlink{recommandations-opuxe9rationnelles}{Recommandations
+opérationnelles
+27}\protect\hyperlink{recommandations-stratuxe9giques}{Recommandations
+stratégiques
+27}\protect\hyperlink{recommandations-techniques}{Recommandations
+techniques 27}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{9}
+\item
+  \textbf{Validation et Test de Performance du Système
+  RH}.............................................................28
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \protect\hyperlink{bilan-du-projet}{Architecture et Fonctionnement
+    des Requêtes 28}
+
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \item
+      \protect\hyperlink{buxe9nuxe9fices-quantifiuxe9s}{Types de
+      Requêtes Testées 28}
+    \item
+      \protect\hyperlink{buxe9nuxe9fices-qualitatifs}{Optimisation des
+      Requêtes 29}
+    \end{enumerate}
+  \item
+    \protect\hyperlink{apports-personnels}{Résultats et Performance des
+    Requêtes 29}
+
+    \begin{enumerate}
+    \def\labelenumiii{\arabic{enumiii}.}
+    \item
+      \href{file:///C:/Users/ADL/OneDrive/Bureau/rapport\%20de\%20stage/rapport_de_stage.docx\#_TOC_250012}{Métriques
+      de Performance Exceptionnelles 29}
+    \item
+      \href{file:///C:/Users/ADL/OneDrive/Bureau/rapport\%20de\%20stage/rapport_de_stage.docx\#_TOC_250011}{Analyse
+      des Résultats 30}
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+10.3 \protect\hyperlink{perspectives-duxe9volution}{Utilisation et
+Exécution 30}
+
+10.4 \protect\hyperlink{perspectives-duxe9volution}{Conclusion 30}
+
+10.5 \protect\hyperlink{perspectives-duxe9volution}{Captures
+d\textquotesingle Écran d\textquotesingle Exécution 31}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{10}
+\item
+  \textbf{Démonstration
+  graphique}.........................................................................................................33
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \protect\hyperlink{bilan-du-projet}{l'administrateur RH 34}
+  \item
+    \protect\hyperlink{apports-personnels}{Le responsable RH 36}
+  \end{enumerate}
+\end{enumerate}
+
+11.3 \protect\hyperlink{perspectives-duxe9volution}{l'employé 43}
+
+11.4 \protect\hyperlink{perspectives-duxe9volution}{Le manager 46}
+
+11.4 \protect\hyperlink{perspectives-duxe9volution}{Quelque exemples
+illustratif du version mobile 48}
+
+\hypertarget{remerciements}{%
+\section{Remerciements}\label{remerciements}}
+
+Nous tenons à exprimer notre profonde gratitude à toutes les personnes
+qui ont contribué de près ou de loin à la réalisation de ce projet et à
+la réussite de notre stage.
+
+Nos sincères remerciements vont tout d'abord à notre encadrant, Monsieur
+Anouar BOUCHAL, pour son précieux soutien, ses conseils avisés, sa
+disponibilité constante et son expertise qui nous ont été d'une aide
+inestimable tout au long de ce travail. Sa guidance a été un pilier
+essentiel dans notre apprentissage et le développement de nos
+compétences.
+
+Nous remercions également l'École d'Ingénieur Abulcasis pour la qualité
+de la formation dispensée et pour nous avoir offert cette opportunité
+d'apprentissage pratique.
+
+Enfin, nous adressons nos remerciements à nos familles et à nos
+enseignants pour leur soutien indéfectible et leurs encouragements.
+
+\hypertarget{duxe9dicace}{%
+\section{Dédicace}\label{duxe9dicace}}
+
+Nous dédions ce travail :
+
+\begin{itemize}
+\item
+  À nos chers parents, pour leur amour inconditionnel, leurs sacrifices
+  et leur soutien constant qui ont toujours été notre source de
+  motivation.
+\item
+  À nos enseignants, pour leur dévouement et la transmission de leur
+  savoir.
+\item
+  À tous ceux qui ont cru en nous et nous ont apporté leur aide.
+\end{itemize}
+
+\hypertarget{ruxe9sumuxe9-exuxe9cutif}{%
+\section{Résumé Exécutif}\label{ruxe9sumuxe9-exuxe9cutif}}
+
+Ce rapport de stage présente le développement d'un système de gestion
+documentaire des ressources humaines (RH) au sein de la fondation CHEIKH
+ZAID. L'objectif principal était de moderniser et d'optimiser la gestion
+des documents des employés, en assurant une meilleure traçabilité, une
+sécurité renforcée et une accessibilité simplifiée. Le projet a été
+réalisé en utilisant le framework Symfony 7.3, avec une base de données
+PostgreSQL 16 et une architecture Dockerisée.
+
+Le système permet aux Responsables RH de gérer les dossiers des
+employés, d'uploader et de télécharger des documents, de suivre la
+conformité documentaire et de générer des rapports. Pour les employés,
+l'application offre une interface intuitive pour consulter leurs
+informations personnelles, leurs contrats et l'état de leurs documents,
+sans possibilité de modification ou d'upload. Une attention particulière
+a été portée à la refonte de l'interface utilisateur pour les employés,
+avec un dashboard dynamique et une navigation simplifiée, ainsi qu'à la
+mise en place de calculs en temps réel pour les indicateurs de
+performance clés (KPIs).
+
+Les améliorations récentes ont permis de renforcer la sécurité en
+appliquant le principe du moindre privilège, d'optimiser l'expérience
+utilisateur grâce à une navigation fluide et des retours visuels clairs,
+et d'améliorer la robustesse technique par l'optimisation des services
+métier et l'utilisation d'extensions Twig personnalisées. Le projet a
+été validé par des tests fonctionnels et des retours utilisateurs
+positifs, démontrant une réduction significative des délais de
+traitement des documents et une amélioration de la satisfaction des
+utilisateurs.
+
+En conclusion, ce stage a abouti à la création d'une solution RH
+complète, performante et sécurisée, prête pour un déploiement en
+production. Il a également permis d'acquérir une expérience précieuse en
+développement web professionnel et en gestion de projet agile.
+\textbf{Mots-clés :} Symfony, PHP, PostgreSQL, Docker, Gestion
+documentaire, RH, Digi-
+
+talisation.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item ~
+  \hypertarget{introduction}{%
+  \section{Introduction}\label{introduction}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{contexte-du-stage}{%
+    \subsection{Contexte du stage}\label{contexte-du-stage}}
+  \end{enumerate}
+\end{enumerate}
+
+Le stage s'est déroulé dans le contexte du développement d'un système de
+gestion doc- umentaire pour les ressources humaines, visant à
+digitaliser et automatiser les processus de gestion des documents
+employés. Cette digitalisation répond à un besoin croissant des
+organisations de moderniser leurs processus RH tout en garantissant la
+sécurité et la traçabilité des informations.
+
+Dans un environnement où la conformité réglementaire et la protection
+des données personnelles sont devenues des enjeux majeurs, le
+développement d'une solution tech- nologique adaptée s'impose comme une
+nécessité stratégique pour les organisations mod- ernes.
+
+\hypertarget{contexte-organisationnel}{%
+\subsubsection{Contexte
+organisationnel}\label{contexte-organisationnel}}
+
+L'organisation cible de ce projet est une entité de taille importante
+gérant plusieurs cen- taines d'employés répartis dans différentes
+divisions d'activités stratégiques (DAS). La complexité
+organisationnelle nécessite une approche structurée et modulaire pour
+répon- dre aux besoins spécifiques de chaque division tout en maintenant
+une cohérence globale. La digitalisation des processus RH s'inscrit dans
+une démarche plus large de transfor- mation numérique de l'organisation,
+visant à améliorer l'efficacité opérationnelle, réduire
+
+les coûts administratifs et améliorer l'expérience employé.
+
+\hypertarget{enjeux-technologiques}{%
+\subsubsection{Enjeux technologiques}\label{enjeux-technologiques}}
+
+Les défis technologiques principaux incluent la gestion de volumes
+importants de docu- ments, la sécurité des données sensibles,
+l'intégration avec les systèmes existants, et la scalabilité pour
+accompagner la croissance de l'organisation. Le choix des technologies
+s'est orienté vers des solutions robustes, éprouvées et évolutives.
+
+\hypertarget{impact-attendu}{%
+\subsubsection{Impact attendu}\label{impact-attendu}}
+
+Le projet vise à transformer radicalement la gestion documentaire RH en
+passant d'un sys- tème manuel et dispersé à une solution centralisée,
+automatisée et sécurisée. Les bénéfices attendus incluent une réduction
+significative des délais de traitement, une amélioration de la
+conformité réglementaire, et une meilleure satisfaction des
+utilisateurs.
+
+\hypertarget{probluxe9matique}{%
+\subsection{Problématique}\label{probluxe9matique}}
+
+Les organisations font face à des défis croissants dans la gestion
+documentaire RH :
+
+\begin{itemize}
+\item
+  \textbf{Processus manuels} : Gestion papier chronophage et sujette aux
+  erreurs
+\item
+  \textbf{Dispersion des informations} : Documents éparpillés dans
+  différents services
+\item
+  \textbf{Sécurité des données} : Risques de perte, vol ou accès non
+  autorisé
+\item
+  \textbf{Conformité réglementaire} : Difficulté à respecter les
+  obligations légales
+\item
+  \textbf{Traçabilité} : Manque de visibilité sur l'historique des
+  documents
+\item
+  \textbf{Accessibilité} : Accès limité aux informations pour les
+  employés
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{objectifs-du-projet}{%
+    \subsection{Objectifs du projet}\label{objectifs-du-projet}}
+  \end{enumerate}
+\end{itemize}
+
+Les objectifs principaux du projet étaient les suivants :
+
+\begin{itemize}
+\item
+  \textbf{Développer un système web} de gestion documentaire RH basé sur
+  Symfony
+\item
+  \textbf{Centraliser les documents} des employés dans une base de
+  données sécurisée
+\item
+  \textbf{Automatiser les processus} d'upload, de validation et de suivi
+  des documents
+\item
+  \textbf{Mettre en place des rôles} et permissions granulaires (Admin
+  RH, Responsable RH, Manager et Employé)
+\item
+  \textbf{Offrir une interface intuitive} et adaptative pour chaque type
+  d'utilisateur
+\item
+  \textbf{Générer des rapports} et des indicateurs de performance (KPIs)
+  pour le suivi RH
+\item
+  \textbf{Assurer la sécurité et la confidentialité} des données
+  sensibles
+\item
+  \textbf{Optimiser l'expérience utilisateur} pour les employés, en leur
+  offrant une vue claire de leur dossier
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item ~
+  \hypertarget{analyse-des-besoins}{%
+  \section{Analyse des besoins}\label{analyse-des-besoins}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{analyse-du-contexte-muxe9tier}{%
+    \subsection{Analyse du contexte
+    métier}\label{analyse-du-contexte-muxe9tier}}
+  \end{enumerate}
+\end{enumerate}
+
+Le service des Ressources Humaines gère un volume important de documents
+pour chaque employé (contrats, pièces d'identité, diplômes, certificats,
+etc.). La gestion manuelle de ces documents entraînait des retards, des
+erreurs de classement et des difficultés à garantir la conformité des
+dossiers. Le nouveau système vise à résoudre ces problèmes en offrant
+une solution centralisée et automatisée.
+
+\hypertarget{analyse-des-acteurs}{%
+\subsection{Analyse des acteurs}\label{analyse-des-acteurs}}
+
+Trois principaux rôles ont été identifiés :
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item ~
+  \hypertarget{administrateur-rh}{%
+  \subsubsection{Administrateur RH}\label{administrateur-rh}}
+
+  \begin{itemize}
+  \item
+    \textbf{Rôle :} Gestion globale des responsables RH.
+  \item
+    \textbf{Permissions :} Création et gestion des Responsables RH,
+    accès aux statistiques globales.
+  \item
+    \textbf{Besoin :} Vue d'ensemble de l'activité du système, outils de
+    configuration.
+  \end{itemize}
+\item ~
+  \hypertarget{responsable-rh}{%
+  \subsubsection{Responsable RH}\label{responsable-rh}}
+
+  \begin{itemize}
+  \item
+    \textbf{Rôle :} Gestion opérationnelle des employés et de leurs
+    documents.
+  \item
+    \textbf{Permissions :} Création, modification, suppression des
+    employés, gestion des con- trats, upload/download de documents,
+    traitement des demandes.
+  \item
+    \textbf{Besoin :} Interface complète de gestion, suivi détaillé des
+    dossiers, génération de rapports.
+  \end{itemize}
+\item ~
+  \hypertarget{employuxe9}{%
+  \subsubsection{Employé}\label{employuxe9}}
+
+  \begin{itemize}
+  \item
+    \textbf{Rôle :} Consultation de ses informations personnelles et de
+    l'état de son dossier documentaire.
+  \item
+    \textbf{Permissions :} Lecture seule de ses données, consultation de
+    ses contrats et docu- ments, soumission de demandes.
+  \item
+    \textbf{Besoin :} Dashboard personnel intuitif, suivi clair de la
+    progression de son dossier.
+  \end{itemize}
+\item ~
+  \hypertarget{manager}{%
+  \subsubsection{Manager}\label{manager}}
+
+  \begin{itemize}
+  \item
+    \textbf{Rôle :} Traitement et gestion des réclamations qui lui sont
+    soumises par les employés.
+  \item
+    \textbf{Permissions :} Consultation des réclamations,
+    validation/traitement et communication avec le Responsable RH si
+    nécessaire.
+  \item
+    \textbf{Besoin :} Interface pour suivre et résoudre les
+    réclamations, avec historique et statut de traitement.
+  \end{itemize}
+\end{enumerate}
+
+\includegraphics[width=5.3701in,height=4.9826in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image4.png}
+
+\begin{quote}
+Figure 1: Diagramme des cas d'utilisation du projet
+
+\textbf{Descriptions courtes des cas d'utilisation}
+\end{quote}
+
+\begin{itemize}
+\item
+  \textbf{consulter son profile, ses documents et ses contrats} --
+  Permet à l'employé de visualiser son profil, ses contrats et ses
+  documents personnels.
+\item
+  \textbf{soumettre une demande} -- Permet à l'employé d'envoyer une
+  demande (par ex- emple demande de document ou réclamation).
+\item
+  \textbf{gestion des employés} -- Permet au Responsable RH de créer,
+  modifier, consulter et supprimer des fiches employés.
+\item
+  \textbf{gestion des documents} -- Permet au Responsable RH d'uploader,
+  classer, consulter et télécharger des documents.
+\item
+  \textbf{gestion des contrats} -- Permet au Responsable RH d'associer,
+  suivre et gérer les contrats des employés.
+\item
+  \textbf{gestion des placards} -- Permet au Responsable RH d'organiser
+  le stockage/archivage des documents.
+\item
+  \textbf{gestion des demandes et validation des réclamations} -- Permet
+  au Responsable RH de traiter les demandes et valider les réclamations.
+\item
+  \textbf{gestion des réclamations} -- Permet au Manager de traiter et
+  suivre les réclamations qui lui sont soumises.
+\item
+  \textbf{gestion des responsables RH} -- Permet à l'Administrateur RH
+  de gérer les comptes et droits des Responsables RH.
+\end{itemize}
+
+\hypertarget{exigences-fonctionnelles}{%
+\subsection{Exigences fonctionnelles}\label{exigences-fonctionnelles}}
+
+Les exigences fonctionnelles clés incluent :
+
+\begin{itemize}
+\item
+  \textbf{Gestion des employés :} CRUD complet (Création, Consultation,
+  Modification, Suppression) des fiches employés.
+\item
+  \textbf{Gestion des contrats :} Association des contrats aux employés,
+  suivi des dates.
+\item
+  \textbf{Gestion des documents :} Upload sécurisé, classification par
+  type, association aux dossiers.
+\item
+  \textbf{Gestion des dossiers :} Création automatique, suivi de la
+  complétude des docu- ments requis.
+\item
+  \textbf{Gestion des organisations :} Création et gestion des
+  différentes entités de l'entreprise.
+\item
+  \textbf{Authentification et autorisation :} Système de connexion
+  sécurisé avec gestion des rôles.
+\item
+  \textbf{Tableaux de bord (Dashboards) :} Vues personnalisées pour
+  chaque rôle avec KPIs pertinents.
+\item
+  \textbf{Rapports et exports :} Génération de rapports PDF/Excel sur
+  les documents et employés.
+\item
+  \textbf{Gestion des demandes :} Système de soumission et de traitement
+  des demandes des employés.
+\item
+  \textbf{Configuration spécifique par organisation :} Gestion des
+  responsables RH par organisation, rapports et KPIs par organisation.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item ~
+  \hypertarget{conception-du-systuxe8me}{%
+  \section{Conception du système}\label{conception-du-systuxe8me}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{architecture-guxe9nuxe9rale}{%
+    \subsection{Architecture
+    générale}\label{architecture-guxe9nuxe9rale}}
+  \end{enumerate}
+\end{enumerate}
+
+Le système suit une architecture en couches (layered architecture) qui
+sépare clairement les responsabilités. Cette approche garantit une
+séparation claire des préoccupations, facilite la maintenance et permet
+une évolution progressive du système.
+
+\hypertarget{principe-de-conception}{%
+\subsubsection{Principe de conception}\label{principe-de-conception}}
+
+L'architecture adoptée respecte les principes SOLID (Single
+Responsibility, Open/Closed, Liskov Substitution, Interface Segregation,
+Dependency Inversion) pour garantir un code maintenable et extensible.
+Chaque couche a une responsabilité spécifique et communique avec les
+autres couches via des interfaces bien définies.
+
+\hypertarget{patterns-architecturaux}{%
+\subsubsection{Patterns architecturaux}\label{patterns-architecturaux}}
+
+Le système utilise plusieurs patterns architecturaux éprouvés :
+
+\begin{itemize}
+\item
+  \textbf{MVC (Model-View-Controller)} : Séparation de la logique
+  métier, de la présen- tation et du contrôle
+\item
+  \textbf{Repository Pattern} : Abstraction de l'accès aux données
+\item
+  \textbf{Service Layer} : Encapsulation de la logique métier complexe
+\item
+  \textbf{Dependency Injection} : Inversion de contrôle pour une
+  meilleure testabilité
+\item
+  \textbf{Observer Pattern} : Gestion des événements et notifications
+\end{itemize}
+
+\hypertarget{moduxe9lisation-des-donnuxe9es}{%
+\subsection{Modélisation des
+données}\label{moduxe9lisation-des-donnuxe9es}}
+
+Table 1: Architecture en couches du système
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2869}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7131}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\begin{quote}
+\textbf{Couche}
+\end{quote}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\begin{quote}
+\textbf{Responsabilités}
+\end{quote}
+\end{minipage} \\
+\midrule()
+\endhead
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Présentation
+\end{quote}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Interface utilisateur, templates Twig, gestion
+
+des formulaires
+\end{quote}
+\end{minipage} \\
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Contrôleur
+\end{quote}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Gestion des requêtes HTTP, orchestration
+
+des services
+\end{quote}
+\end{minipage} \\
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Service
+\end{quote}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Logique métier, validation, traitement des
+
+données
+\end{quote}
+\end{minipage} \\
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Repository
+\end{quote}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Accès aux données, requêtes optimisées
+\end{quote}
+\end{minipage} \\
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Entités
+\end{quote}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Modélisation des données, relations entre ob-
+\end{quote}
+
+jets
+\end{minipage} \\
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Base de données
+\end{quote}
+\end{minipage} & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{quote}
+Stockage persistant, intégrité des données
+\end{quote}
+\end{minipage} \\
+\bottomrule()
+\end{longtable}
+
+\includegraphics[width=5.66954in,height=5.20873in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image5.jpeg}
+
+Figure 2: Diagramme de séquence : création et modification des dossiers
+par le Responsable RH
+
+\begin{itemize}
+\item
+  \textbf{Document} : Fichiers et métadonnées associées (type, date,
+  utilisateur, statut)
+\item
+  \textbf{Dossier} : Dossier personnel de l'employé, regroupement
+  logique des documents
+\item
+  \textbf{Demande} : Demandes et réclamations des employés avec suivi de
+  traitement
+\item
+  \textbf{NatureContrat} : Types de contrats (CDI, CDD, stage, etc.)
+  avec règles spécifiques
+\item
+  \textbf{Placard} : Organisation physique des documents pour archivage
+\item
+  \textbf{Reclamation} : Système de réclamations avec workflow de
+  traitement
+\item
+  \textbf{OrganisationEmployeeContrat} : Liaison entre organisations et
+  contrats employés
+\item
+  \textbf{NatureContratTypeDocument} : Configuration des documents
+  requis par type de contrat
+\end{itemize}
+
+\includegraphics[width=5.66934in,height=3.11737in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image6.jpeg}
+
+Figure 3: Schéma de la base de données (modèle entités / relations)
+
+\hypertarget{contraintes-et-ruxe8gles-muxe9tier}{%
+\subsubsection{Contraintes et règles
+métier}\label{contraintes-et-ruxe8gles-muxe9tier}}
+
+Le modèle intègre plusieurs contraintes métier importantes :
+
+\begin{itemize}
+\item
+  \textbf{Unicité} : Un employé ne peut avoir qu'un seul dossier actif
+\item
+  \textbf{Intégrité référentielle} : Tous les documents doivent être
+  associés à un dossier valide
+\item
+  \textbf{Contrôle d'accès} : Les employés ne peuvent accéder qu'à leurs
+  propres données
+\item
+  \textbf{Audit trail} : Toutes les modifications sont tracées avec
+  horodatage et utilisateur
+\item
+  \textbf{Validation} : Les documents doivent respecter les types MIME
+  autorisés
+\end{itemize}
+
+\hypertarget{choix-technologiques}{%
+\subsection{Choix technologiques}\label{choix-technologiques}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\item ~
+  \hypertarget{duxe9veloppement-et-impluxe9mentation}{%
+  \section{Développement et
+  implémentation}\label{duxe9veloppement-et-impluxe9mentation}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{muxe9thodologie-de-duxe9veloppement}{%
+    \subsection{Méthodologie de
+    développement}\label{muxe9thodologie-de-duxe9veloppement}}
+  \end{enumerate}
+\end{enumerate}
+
+Le développement a suivi une approche agile avec les phases suivantes :
+
+Table 2: Stack technologique du projet
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2249}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2339}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5412}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Catégorie
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Technologie}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Raison du choix}
+\end{minipage} \\
+\midrule()
+\endhead
+Framework PHP & Symfony 7.3 & Robustesse, modularité, communauté \\
+Base de données & PostgreSQL 16 & Fiabilité, performance, intégrité des
+données \\
+ORM & Doctrine ORM & Mapping objet-relationnel, productivité \\
+Frontend & Twig, Bootstrap 5 & Flexibilité, rapidité de développement,
+responsive design \\
+Conteneurisation & Docker, Docker Compose & Environnement de
+développement isolé, déploiement simplifié \\
+Gestionnaire de paquets & Composer & Gestion des dépendances PHP \\
+Export de données & Python (OpenPyXL) & Flexibilité et puissance pour la
+manipulation Excel \\
+\bottomrule()
+\end{longtable}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Analyse et conception} : Définition des besoins, architecture
+  et modélisation des données
+\item
+  \textbf{Développement itératif} : Implémentation par sprints de 4
+  semaines avec livraisons incrémentales
+\item
+  \textbf{Tests continus} : Validation à chaque étape avec tests
+  unitaires et d'intégration
+\item
+  \textbf{Intégration} : Assemblage des composants et tests de
+  régression
+\item
+  \textbf{Déploiement} : Mise en production avec monitoring et suivi
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{approche-scrum}{%
+    \subsubsection{Approche Scrum}\label{approche-scrum}}
+  \end{enumerate}
+\end{enumerate}
+
+Le projet a adopté la méthodologie Scrum avec les éléments suivants :
+
+\begin{itemize}
+\item
+  \textbf{Sprints de 4 semaines} : Cycles de développement courts pour
+  une réactivité maximale
+\item
+  \textbf{Daily standups} : Points quotidiens pour synchroniser l'équipe
+  et identifier les blocages
+\item
+  \textbf{Sprint planning} : Planification détaillée des tâches pour
+  chaque sprint
+\item
+  \textbf{Sprint review} : Présentation des fonctionnalités développées
+  aux parties prenantes
+\item
+  \textbf{Retrospective} : Analyse des bonnes pratiques et axes
+  d'amélioration
+\end{itemize}
+
+\hypertarget{gestion-des-exigences}{%
+\subsubsection{Gestion des exigences}\label{gestion-des-exigences}}
+
+Les exigences ont été gérées selon une approche structurée :
+
+\begin{itemize}
+\item
+  \textbf{User Stories} : Description des fonctionnalités du point de
+  vue utilisateur
+\item
+  \textbf{Acceptance Criteria} : Critères d'acceptation clairs pour
+  chaque story
+\item
+  \textbf{Definition of Done} : Critères de finition pour valider une
+  story
+\item
+  \textbf{Prioritisation} : Classement des fonctionnalités selon leur
+  valeur métier
+\end{itemize}
+
+\hypertarget{contruxf4le-de-version}{%
+\subsubsection{Contrôle de version}\label{contruxf4le-de-version}}
+
+Le code source a été géré avec Git selon les bonnes pratiques :
+
+\begin{itemize}
+\item
+  \textbf{Branching strategy} : Utilisation de branches feature pour
+  chaque développement
+\item
+  \textbf{Code review} : Validation du code par les pairs avant
+  intégration
+\end{itemize}
+
+\hypertarget{structure-du-projet}{%
+\subsection{Structure du projet}\label{structure-du-projet}}
+
+Le projet Symfony suit la structure standard avec une organisation
+claire :
+
+\begin{itemize}
+\item
+  \textbf{src/} : Code source de l'application (entités, contrôleurs,
+  services)
+\item
+  \textbf{templates/} : Templates Twig pour l'interface utilisateur
+\item
+  \textbf{config/} : Configuration de l'application et des bundles
+\item
+  \textbf{public/} : Fichiers publics (CSS, JS, images, uploads)
+\item
+  \textbf{migrations/} : Migrations de base de données
+\item
+  \textbf{tests/} : Tests unitaires et fonctionnels
+\item
+  \textbf{vendor/} : Dépendances Composer
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\item ~
+  \hypertarget{fonctionnalituxe9s-duxe9veloppuxe9es}{%
+  \section{Fonctionnalités
+  développées}\label{fonctionnalituxe9s-duxe9veloppuxe9es}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{interface-utilisateur-adaptative}{%
+    \subsection{Interface utilisateur
+    adaptative}\label{interface-utilisateur-adaptative}}
+  \end{enumerate}
+\end{enumerate}
+
+Le système propose des interfaces adaptées selon le rôle de
+l'utilisateur. Cette approche garantit que chaque utilisateur accède
+uniquement aux fonctionnalités pertinentes pour son rôle, améliorant
+ainsi l'expérience utilisateur et la sécurité du système.
+
+\hypertarget{principe-dadaptation}{%
+\subsubsection{Principe d'adaptation}\label{principe-dadaptation}}
+
+L'interface s'adapte dynamiquement selon plusieurs critères :
+
+\begin{itemize}
+\item
+  \textbf{Rôle utilisateur} : Fonctionnalités disponibles selon les
+  permissions
+\item
+  \textbf{Contexte organisationnel} : Données affichées selon
+  l'organisation
+\item
+  \textbf{État des données} : Interface adaptée selon l'état des
+  documents
+\item
+  \textbf{Préférences utilisateur} : Personnalisation de l'affichage
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item ~
+  \hypertarget{dashboard-administrateur-rh}{%
+  \subsubsection{Dashboard Administrateur
+  RH}\label{dashboard-administrateur-rh}}
+
+  \begin{itemize}
+  \item
+    Vue d'ensemble globale du système avec métriques consolidées
+  \item
+    Statistiques multi-organisations avec comparaisons
+  \item
+    Gestion des utilisateurs et des permissions
+  \item
+    Configuration des paramètres système
+  \item
+    Rapports de performance et d'utilisation
+  \end{itemize}
+\item ~
+  \hypertarget{dashboard-responsable-rh}{%
+  \subsubsection{Dashboard Responsable
+  RH}\label{dashboard-responsable-rh}}
+
+  \begin{itemize}
+  \item
+    Suivi détaillé des dossiers employés avec indicateurs de progression
+  \item
+    Gestion des documents avec upload/download sécurisé
+  \item
+    Traitement des demandes et réclamations
+  \item
+    Génération de rapports personnalisés
+  \item
+    Configuration des types de documents requis
+  \end{itemize}
+\item ~
+  \hypertarget{dashboard-employuxe9}{%
+  \subsubsection{Dashboard Employé}\label{dashboard-employuxe9}}
+
+  \begin{itemize}
+  \item
+    Vue personnalisée de son profil et de ses informations
+  \item
+    Consultation de ses contrats et de leur historique
+  \item
+    Suivi de la progression de son dossier documentaire
+  \item
+    Soumission de demandes et réclamations
+  \item
+    Accès en lecture seule à ses documents
+  \end{itemize}
+\end{enumerate}
+
+\hypertarget{gestion-des-documents}{%
+\subsection{Gestion des documents}\label{gestion-des-documents}}
+
+Le cœur du système réside dans la gestion sécurisée des documents :
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item ~
+  \hypertarget{upload-suxe9curisuxe9}{%
+  \subsubsection{Upload sécurisé}\label{upload-suxe9curisuxe9}}
+
+  \begin{itemize}
+  \item
+    Validation stricte des types de fichiers autorisés
+  \item
+    Vérification de la taille et de l'intégrité des fichiers
+  \item
+    Stockage organisé avec structure de dossiers logique
+  \item
+    Métadonnées complètes (date, utilisateur, type, statut)
+  \item
+    Système de versioning pour les modifications
+  \end{itemize}
+\item ~
+  \hypertarget{classification-et-organisation}{%
+  \subsubsection{Classification et
+  organisation}\label{classification-et-organisation}}
+
+  \begin{itemize}
+  \item
+    Classification automatique par type de document
+  \item
+    Association aux dossiers employés correspondants
+  \item
+    Gestion des documents obligatoires vs complémentaire
+  \item
+    Système de tags et de recherche avancée
+  \item
+    Archivage automatique selon les règles métier
+  \end{itemize}
+\item ~
+  \hypertarget{consultation-et-tuxe9luxe9chargement}{%
+  \subsubsection{Consultation et
+  téléchargement}\label{consultation-et-tuxe9luxe9chargement}}
+
+  \begin{itemize}
+  \item
+    Accès contrôlé selon les rôles et permissions
+  \item
+    Prévisualisation des documents sans téléchargement
+  \item
+    Historique des consultations et modifications
+  \item
+    Notifications automatiques pour les nouveaux documents
+  \item
+    Interface responsive pour tous les appareils
+  \end{itemize}
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item ~
+  \hypertarget{systuxe8me-de-rapports-et-kpis}{%
+  \subsection{Système de rapports et
+  KPIs}\label{systuxe8me-de-rapports-et-kpis}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{guxe9nuxe9ration-automatique-de-rapports}{%
+    \subsubsection{Génération automatique de
+    rapports}\label{guxe9nuxe9ration-automatique-de-rapports}}
+
+    \begin{itemize}
+    \item
+      Rapports de conformité documentaire par employé
+    \item
+      Statistiques de progression par organisation
+    \item
+      Analyses de tendances et de performance
+    \item
+      Exports en formats PDF et Excel
+    \item
+      Planification automatique de rapports récurrents
+    \end{itemize}
+  \item ~
+    \hypertarget{indicateurs-de-performance-cluxe9s}{%
+    \subsubsection{Indicateurs de performance
+    clés}\label{indicateurs-de-performance-cluxe9s}}
+
+    \begin{itemize}
+    \item
+      Taux de complétude des dossiers par organisation
+    \item
+      Temps moyen de traitement des demandes
+    \item
+      Volume de documents uploadés par période
+    \item
+      Satisfaction utilisateur et retours d'expérience
+    \item
+      Métriques de performance système
+    \end{itemize}
+  \item ~
+    \hypertarget{tableaux-de-bord-interactifs}{%
+    \subsubsection{Tableaux de bord
+    interactifs}\label{tableaux-de-bord-interactifs}}
+
+    \begin{itemize}
+    \item
+      Graphiques dynamiques avec Chart.js
+    \item
+      Filtres temporels et organisationnels
+    \item
+      Drill-down pour analyses détaillées
+    \item
+      Alertes automatiques pour seuils critiques
+    \item
+      Personnalisation selon les préférences utilisateur
+    \end{itemize}
+  \end{enumerate}
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\item ~
+  \hypertarget{tests-et-validation}{%
+  \section{Tests et validation}\label{tests-et-validation}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{stratuxe9gie-de-tests}{%
+    \subsection{Stratégie de tests}\label{stratuxe9gie-de-tests}}
+  \end{enumerate}
+\end{enumerate}
+
+Le système a été testé selon une approche méthodique et exhaustive. La
+stratégie de tests suit la pyramide de tests avec une répartition
+optimale entre les différents niveaux de test.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item ~
+  \hypertarget{pyramide-de-tests}{%
+  \subsubsection{Pyramide de tests}\label{pyramide-de-tests}}
+
+  \begin{itemize}
+  \item
+    \textbf{Tests unitaires (70\%)} : Validation de chaque service
+    métier
+  \item
+    \textbf{Tests d'intégration (20\%)} : Vérification des interactions
+    entre composants
+  \item
+    \textbf{Tests end-to-end (10\%)} : Validation complète des parcours
+    utilisateur
+  \end{itemize}
+\item ~
+  \hypertarget{types-de-tests}{%
+  \subsubsection{Types de tests}\label{types-de-tests}}
+
+  \begin{itemize}
+  \item
+    \textbf{Tests unitaires} : Validation de chaque service métier
+  \item
+    \textbf{Tests d'intégration} : Vérification des interactions entre
+    composants
+  \item
+    \textbf{Tests fonctionnels} : Validation complète de l'interface
+    utilisateur
+  \item
+    \textbf{Tests de sécurité} : Vérification des permissions et
+    protection des données
+  \item
+    \textbf{Tests de performance} : Validation des temps de réponse et
+    charge
+  \item
+    \textbf{Tests d'acceptation} : Validation avec les utilisateurs
+    finaux
+  \item
+    \textbf{Tests de régression} : Vérification que les nouvelles
+    fonctionnalités n'impactent pas l'existant
+  \item
+    \textbf{Tests de compatibilité} : Validation sur différents
+    navigateurs et appareils
+  \end{itemize}
+\end{enumerate}
+
+\hypertarget{validation-des-fonctionnalituxe9s}{%
+\subsection{Validation des
+fonctionnalités}\label{validation-des-fonctionnalituxe9s}}
+
+\begin{quote}
+Toutes les fonctionnalités principales ont été validées avec succès :
+\end{quote}
+
+\begin{itemize}
+\item
+  \textbf{Authentification et autorisation} : Sécurité des accès et
+  gestion des rôles
+\item
+  \textbf{Gestion des documents} : Upload, stockage, consultation et
+  téléchargement
+\item
+  \textbf{Interface utilisateur} : Ergonomie et adaptabilité selon les
+  rôles
+\item
+  \textbf{Rapports et KPIs} : Génération et affichage des données
+\item
+  \textbf{Performance} : Temps de réponse et gestion de la charge
+\item
+  \textbf{Sécurité} : Protection des données
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\item ~
+  \hypertarget{amuxe9liorations-et-optimisations}{%
+  \section{Améliorations et
+  optimisations}\label{amuxe9liorations-et-optimisations}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{refonte-de-linterface-utilisateur}{%
+    \subsection{Refonte de l'interface
+    utilisateur}\label{refonte-de-linterface-utilisateur}}
+  \end{enumerate}
+\end{enumerate}
+
+\begin{quote}
+Au cours du développement, plusieurs améliorations significatives ont
+été apportées. Ces améliorations ont été guidées par les retours
+utilisateurs et les bonnes pratiques en matière d'expérience
+utilisateur.
+\end{quote}
+
+\hypertarget{processus-damuxe9lioration}{%
+\subsubsection{Processus
+d'amélioration}\label{processus-damuxe9lioration}}
+
+\begin{quote}
+L'amélioration de l'interface a suivi un processus structuré :
+\end{quote}
+
+\begin{itemize}
+\item
+  \textbf{Analyse des retours utilisateurs} : Collecte et analyse des
+  feedbacks
+\item
+  \textbf{Benchmarking} : Comparaison avec les meilleures pratiques du
+  marché
+\item
+  \textbf{Prototypage} : Création de maquettes pour valider les concepts
+\item
+  \textbf{Tests utilisateurs} : Validation des améliorations avec les
+  utilisateurs finaux
+\item
+  \textbf{Itération} : Amélioration continue basée sur les retours
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{dashboard-employuxe9-optimisuxe9}{%
+    \subsubsection{Dashboard employé
+    optimisé}\label{dashboard-employuxe9-optimisuxe9}}
+  \end{enumerate}
+\end{itemize}
+
+\begin{itemize}
+\item
+  \textbf{KPIs dynamiques} : Calculs en temps réel basés sur l'état des
+  documents
+\item
+  \textbf{Progression visuelle} : Barres de progression claires avec
+  indicateurs colorés
+\item
+  \textbf{Navigation simplifiée} : Accès direct aux fonctionnalités
+  principales
+\item
+  \textbf{États visuels} : Badges et icônes pour un feedback immédiat
+\item
+  \textbf{Responsive design} : Adaptation parfaite à tous les écrans
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{amuxe9lioration-de-lexpuxe9rience-utilisateur}{%
+    \subsubsection{Amélioration de l'expérience
+    utilisateur}\label{amuxe9lioration-de-lexpuxe9rience-utilisateur}}
+  \end{enumerate}
+\end{itemize}
+
+\begin{itemize}
+\item
+  \textbf{Feedback immédiat} : Messages de confirmation et d'erreur
+  clairs
+\item
+  \textbf{Chargement progressif} : Indicateurs de progression pour les
+  opérations longues
+\item
+  \textbf{Personnalisation} : Adaptation de l'interface selon les
+  préférences
+\item
+  \textbf{Performance} : Optimisation des temps de chargement
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{architecture-technique-amuxe9lioruxe9e}{%
+    \subsection{Architecture technique
+    améliorée}\label{architecture-technique-amuxe9lioruxe9e}}
+
+    \begin{enumerate}
+    \def\labelenumii{\arabic{enumii}.}
+    \item ~
+      \hypertarget{services-muxe9tier-optimisuxe9s}{%
+      \subsubsection{Services métier
+      optimisés}\label{services-muxe9tier-optimisuxe9s}}
+    \end{enumerate}
+  \end{enumerate}
+\end{itemize}
+
+\begin{itemize}
+\item
+  \textbf{DocumentRequirementService} : Gestion intelligente des
+  documents requis
+\item
+  \textbf{KpiService} : Calcul optimisé des indicateurs de performance
+\item
+  \textbf{CacheService} : Mise en cache intelligente des données
+  fréquentes
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{extensions-twig-personnalisuxe9es}{%
+    \subsubsection{Extensions Twig
+    personnalisées}\label{extensions-twig-personnalisuxe9es}}
+  \end{enumerate}
+\end{itemize}
+
+\begin{itemize}
+\item
+  \textbf{Filtres de formatage} : Affichage cohérent des données
+\item
+  \textbf{Fonctions utilitaires} : Calculs et transformations dans les
+  templates
+\item
+  \textbf{Composants réutilisables} : Éléments d'interface modulaires
+\item
+  \textbf{Optimisation des performances} : Réduction des requêtes de
+  base de données
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{optimisations-de-performance}{%
+    \subsection{Optimisations de
+    performance}\label{optimisations-de-performance}}
+
+    \begin{enumerate}
+    \def\labelenumii{\arabic{enumii}.}
+    \item ~
+      \hypertarget{base-de-donnuxe9es}{%
+      \subsubsection{Base de données}\label{base-de-donnuxe9es}}
+    \end{enumerate}
+  \end{enumerate}
+\end{itemize}
+
+\begin{itemize}
+\item
+  \textbf{Index optimisés} : Amélioration des temps de requête
+\item
+  \textbf{Requêtes optimisées} : Réduction du nombre de requêtes
+\item
+  \textbf{Partitioning} : Répartition des données pour de meilleures
+  performances
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{application}{%
+    \subsubsection{Application}\label{application}}
+  \end{enumerate}
+\end{itemize}
+
+\begin{itemize}
+\item
+  \textbf{Cache applicatif} : Mise en cache des données fréquemment
+  accédées
+\item
+  \textbf{Compression} : Optimisation automatique des images et
+  documents
+\item
+  \textbf{Pagination} : Gestion efficace des grandes listes de données
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{7}
+\item ~
+  \hypertarget{ruxe9sultats-et-impact}{%
+  \section{Résultats et impact}\label{ruxe9sultats-et-impact}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{buxe9nuxe9fices-obtenus}{%
+    \subsection{Bénéfices obtenus}\label{buxe9nuxe9fices-obtenus}}
+  \end{enumerate}
+\end{enumerate}
+
+\begin{quote}
+Le système développé apporte plusieurs bénéfices significatifs et
+mesurables. Ces bénéfices ont été quantifiés et validés par des
+métriques précises et des retours utilisateurs.
+\end{quote}
+
+\hypertarget{buxe9nuxe9fices-quantifiuxe9s}{%
+\subsubsection{Bénéfices
+quantifiés}\label{buxe9nuxe9fices-quantifiuxe9s}}
+
+\begin{itemize}
+\item
+  \textbf{Digitalisation complète} : Élimination totale des processus
+  papier
+\item
+  \textbf{Sécurité renforcée} : Protection avancée des données
+  personnelles
+\item
+  \textbf{Traçabilité} : Historique complet de toutes les actions
+\item
+  \textbf{Conformité} : Respect total des obligations légales (RGPD,
+  Code du travail)
+\item
+  \textbf{Scalabilité} : Adaptation facile aux besoins organisationnels
+  croissants
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{buxe9nuxe9fices-qualitatifs}{%
+    \subsubsection{Bénéfices
+    qualitatifs}\label{buxe9nuxe9fices-qualitatifs}}
+  \end{enumerate}
+\end{itemize}
+
+\begin{quote}
+Au-delà des métriques quantifiables, le système apporte des bénéfices
+qualitatifs im- portants :
+\end{quote}
+
+\begin{itemize}
+\item
+  \textbf{Amélioration de l'image} : Modernisation de l'image de
+  l'organisation
+\item
+  \textbf{Attractivité employeur} : Amélioration de l'expérience
+  candidat et employé
+\item
+  \textbf{Innovation} : Positionnement de l'organisation comme acteur
+  innovant
+\item
+  \textbf{Agilité} : Capacité d'adaptation rapide aux changements
+  réglementaires
+\item
+  \textbf{Transparence} : Amélioration de la transparence des processus
+  RH
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{8}
+\item ~
+  \hypertarget{conclusion-et-perspectives}{%
+  \section{Conclusion et
+  perspectives}\label{conclusion-et-perspectives}}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{bilan-du-projet}{%
+    \subsection{Bilan du projet}\label{bilan-du-projet}}
+  \end{enumerate}
+\end{enumerate}
+
+Ce projet de système de gestion documentaire RH a permis de développer
+une solution complète et professionnelle, alliant robustesse technique
+et ergonomie utilisateur. Les objectifs initiaux ont été non seulement
+atteints mais dépassés :
+
+\hypertarget{apports-personnels}{%
+\subsection{Apports personnels}\label{apports-personnels}}
+
+Ce stage a été particulièrement enrichissant sur plusieurs plans :
+
+\begin{itemize}
+\item
+  \textbf{Compétences techniques} : Maîtrise approfondie de Symfony,
+  Doctrine, PostgreSQL et Docker
+\item
+  \textbf{Méthodologie} : Approche agile, documentation technique
+\item
+  \textbf{Compréhension métier} : Enjeux RH, conformité réglementaire,
+  sécurité des don- nées
+\item
+  \textbf{Travail en équipe} : Collaboration efficace, communication,
+  gestion de projet
+\item
+  \textbf{Gestion de projet} : Planification, suivi, livraison dans les
+  délais
+\item
+  \textbf{Innovation} : Recherche de solutions créatives et optimisation
+  continue
+\end{itemize}
+
+\begin{quote}
+Table 3: Bilan des fonctionnalités développées
+\end{quote}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2327}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2558}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2558}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2558}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Fonctionnalités}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Technologies}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\begin{quote}
+\textbf{Statut}
+\end{quote}
+\end{minipage} \\
+\midrule()
+\endhead
+\multirow{3}{*}{Gestion Utilisateurs} & Authentification
+
+sécurisée & Symfony Security &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+& Gestion des rôles & Doctrine ORM &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+& Interface adaptative & Twig + Bootstrap &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+\multirow{3}{*}{Gestion Documents} & Upload sécurisé & Symfony Forms &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+& Validation des fichiers & Custom Validators &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+& Consultation par rôle & Twig Templates &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+\multirow{3}{*}{Rapports \& KPIs} & Génération automa-
+
+tique & PHP + Excel & \begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+& Graphiques interactifs & Chart.js &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+& Export Excel & PhpSpreadsheet &
+\begin{minipage}[t]{\linewidth}\raggedright
+\begin{itemize}
+\item
+  \begin{quote}
+  Complet
+  \end{quote}
+\end{itemize}
+\end{minipage} \\
+\bottomrule()
+\end{longtable}
+
+\begin{itemize}
+\item
+  \textbf{Résolution de problèmes} : Développement de l'aptitude à
+  analyser et résoudre des problèmes complexes
+\item
+  \textbf{Adaptabilité} : Flexibilité face aux changements et aux
+  nouveaux défis
+\item
+  \textbf{Leadership technique} : Capacité à guider et former d'autres
+  développeurs
+\item
+  \textbf{Communication} : Présentation et documentation technique pour
+  différents publics
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item ~
+    \hypertarget{perspectives-duxe9volution}{%
+    \subsection{Perspectives
+    d'évolution}\label{perspectives-duxe9volution}}
+  \end{enumerate}
+\end{itemize}
+
+Le système est conçu pour évoluer et s'adapter aux besoins futurs.
+L'architecture modulaire et les choix technologiques permettent une
+évolution progressive sans refonte complète.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item ~
+  \hypertarget{uxe9volutions-court-terme}{%
+  \subsubsection{Évolutions court
+  terme}\label{uxe9volutions-court-terme}}
+
+  \begin{itemize}
+  \item
+    \textbf{Intégrations} : Connexion avec d'autres systèmes RH (SIRH,
+    paie, formation)
+  \item
+    \textbf{Mobile} : Application mobile native pour les employés
+  \item
+    \textbf{Notifications} : Système de notifications push et email
+  \item
+    \textbf{Workflow} : Automatisation avancée des processus
+    d'approbation
+  \item
+    \textbf{API REST} : Ouverture du système pour intégrations tierces
+  \end{itemize}
+\item ~
+  \hypertarget{uxe9volutions-moyen-terme}{%
+  \subsubsection{Évolutions moyen
+  terme}\label{uxe9volutions-moyen-terme}}
+
+  \begin{itemize}
+  \item
+    \textbf{IA et Machine Learning} : Reconnaissance automatique de
+    documents, prédiction des besoins
+  \item
+    \textbf{Analytics} : Tableaux de bord avancés avec intelligence
+    décisionnelle
+  \item
+    \textbf{Signature électronique} : Intégration de solutions de
+    signature numérique
+  \item
+    \textbf{Multi-tenant} : Support de plusieurs organisations sur une
+    même instance
+  \end{itemize}
+\item ~
+  \hypertarget{uxe9volutions-long-terme}{%
+  \subsubsection{Évolutions long terme}\label{uxe9volutions-long-terme}}
+
+  \begin{itemize}
+  \item
+    \textbf{Blockchain} : Certification et traçabilité immuable des
+    documents
+  \item
+    \textbf{Reality augmentée} : Interface AR pour la consultation de
+    documents
+  \item
+    \textbf{Intelligence artificielle} : Assistant virtuel pour les
+    utilisateurs
+  \item
+    \textbf{Cloud native} : Migration complète vers le cloud avec
+    auto-scaling
+  \item
+    \textbf{Écosystème} : Plateforme ouverte avec marketplace
+    d'applications
+  \end{itemize}
+\end{enumerate}
+
+\hypertarget{recommandations}{%
+\subsection{Recommandations}\label{recommandations}}
+
+Pour assurer le succès du déploiement et de l'évolution du système :
+
+\hypertarget{recommandations-opuxe9rationnelles}{%
+\subsubsection{Recommandations
+opérationnelles}\label{recommandations-opuxe9rationnelles}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Formation utilisateurs} : Programme de formation adapté à
+  chaque profil
+\item
+  \textbf{Support technique} : Équipe dédiée pour l'assistance et la
+  maintenance
+\item
+  \textbf{Monitoring} : Surveillance continue des performances et de la
+  sécurité
+\item
+  \textbf{Évolutions} : Plan de développement sur 12 mois avec priorités
+  métier
+\item
+  \textbf{Documentation} : Mise à jour continue de la documentation
+  technique et utilisateur
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{recommandations-stratuxe9giques}{%
+    \subsubsection{Recommandations
+    stratégiques}\label{recommandations-stratuxe9giques}}
+  \end{enumerate}
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Gouvernance} : Mise en place d'un comité de pilotage pour les
+  évolutions
+\item
+  \textbf{ROI} : Mesure continue du retour sur investissement et des
+  bénéfices
+\item
+  \textbf{Innovation} : Veille technologique et expérimentation de
+  nouvelles solutions
+\item
+  \textbf{Partage} : Capitalisation des bonnes pratiques et retours
+  d'expérience
+\item
+  \textbf{Écosystème} : Développement d'un réseau de partenaires et
+  d'intégrateurs
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{recommandations-techniques}{%
+    \subsubsection{Recommandations
+    techniques}\label{recommandations-techniques}}
+  \end{enumerate}
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Architecture} : Maintien de la qualité architecturale lors des
+  évolutions
+\item
+  \textbf{Sécurité} : Audit de sécurité régulier et mise à jour des
+  mesures de protection
+\item
+  \textbf{Performance} : Monitoring proactif et optimisation continue
+\item
+  \textbf{Backup} : Stratégie de sauvegarde et de récupération robuste
+\item
+  \textbf{Compliance} : Veille réglementaire et adaptation aux nouvelles
+  obligations
+\end{enumerate}
+
+\textbf{10. Validation et Test de Performance du Système RH}
+
+Le script TestRhQueriesCommand.php est un outil de validation
+révolutionnaire qui démontre la capacité exceptionnelle du système de
+gestion documentaire RH à traiter plus de 10 000 employés avec des
+performances remarquables. Développé en PHP avec le framework Symfony,
+ce script utilise des concepts avancés de développement pour créer une
+solution de test automatisée et intelligente.
+
+L\textquotesingle architecture du script repose sur plusieurs piliers
+techniques fondamentaux : l\textquotesingle héritage de la classe
+Command de Symfony pour l\textquotesingle exécution en ligne de
+commande, l\textquotesingle utilisation du composant Stopwatch pour la
+mesure précise des performances, et l\textquotesingle exécution de
+requêtes SQL optimisées directement sur la base de données PostgreSQL.
+Le script implémente également un système de gestion
+d\textquotesingle erreurs robuste avec des mécanismes de capture
+d\textquotesingle exceptions, permettant d\textquotesingle identifier et
+de rapporter tout problème potentiel lors de l\textquotesingle exécution
+des tests.
+
+L\textquotesingle objectif principal est de valider que le système RH
+peut répondre aux besoins réels d\textquotesingle une entreprise
+moderne, en simulant les opérations quotidiennes d\textquotesingle un
+responsable RH avec des volumes de données massifs. Le script fonctionne
+en deux phases distinctes : une phase d\textquotesingle analyse des
+statistiques générales qui calcule les métriques globales du système,
+suivie d\textquotesingle une phase de tests de performance réalistes qui
+exécute sept types de requêtes RH critiques. Cette approche
+méthodologique garantit une évaluation complète et objective des
+performances, avec des résultats exceptionnels qui dépassent largement
+les attentes de performance.
+
+10.\textbf{1 Architecture et Fonctionnement des Requêtes}
+
+\textbf{11.1.1 Types de Requêtes Testées}
+
+\textbf{Le script exécute sept types de requêtes RH critiques utilisant
+des techniques SQL avancées pour optimiser les performances :}
+
+\textbf{• Dashboard RH - KPIs temps réel} : Utilise des sous-requêtes
+SELECT imbriquées avec COUNT() pour calculer simultanément les
+statistiques de toutes les tables principales (t\_employe, t\_dossier,
+t\_organisation\_employee\_contrat, p\_organisation, p\_placards,
+t\_demandes, t\_reclamation) en une seule exécution, exploitant les
+index de base de données pour des performances optimales.
+
+• \textbf{Recherche avancée d\textquotesingle employés} : Implémente des
+requêtes avec opérateurs ILIKE pour la recherche insensible à la casse,
+combinant plusieurs conditions WHERE avec OR pour rechercher dans les
+champs nom, prenom et email simultanément, optimisée par des index sur
+les colonnes de recherche.
+
+• \textbf{Rapport conformité documentaire} : Utilise des fonctions
+d\textquotesingle agrégation conditionnelles COUNT(CASE WHEN...) pour
+analyser la distribution des statuts de dossiers (actif, completed,
+pending, in\_progress) en une seule requête, permettant une analyse
+statistique complète sans multiple passages sur les données.
+
+\textbf{•} \textbf{Stats contrats par organisation} : Implémente des
+requêtes avec GROUP BY et fonctions d\textquotesingle agrégation (COUNT,
+AVG) sur des jointures complexes entre les tables t\_employee\_contrat,
+t\_organisation\_employee\_contrat et p\_organisation, optimisées par
+des index sur les clés étrangères.
+
+• \textbf{Optimisation placards} : Utilise des requêtes avec LEFT JOIN
+et GROUP BY pour calculer la distribution des dossiers par placard,
+permettant d\textquotesingle identifier les déséquilibres
+d\textquotesingle archivage et d\textquotesingle optimiser
+l\textquotesingle utilisation de l\textquotesingle espace de stockage.
+
+• \textbf{Gestion demandes RH} : Implémente des requêtes simples avec
+ORDER BY sur les colonnes de date pour un tri efficace, utilisant des
+index sur les colonnes temporelles pour des performances optimales sur
+les opérations de tri.
+
+\textbf{• Rapport performance global} : Utilise des requêtes UNION ALL
+pour combiner plusieurs métriques de performance en un seul résultat,
+chaque sous-requête étant optimisée individuellement avec des conditions
+WHERE spécifiques pour filtrer les données pertinentes.
+
+\textbf{10.1.2 Optimisation des Requêtes}
+
+Chaque requête utilise des requêtes SQL ultra-optimisées pour interroger
+directement la base de données PostgreSQL, évitant les surcharges liées
+aux couches d\textquotesingle abstraction. Cette approche garantit des
+mesures de performance précises et représentatives de la réalité
+opérationnelle, avec des temps de réponse exceptionnellement rapides.
+
+\textbf{10.2 Résultats et Performance des Requêtes}
+
+\textbf{10.2.1 Métriques de Performance Exceptionnelles}
+
+Le script mesure précisément les temps d\textquotesingle exécution de
+chaque requête en utilisant le composant Stopwatch de Symfony. Les
+résultats sont spectaculaires et dépassent toutes les attentes :
+
+• Dashboard RH : 3ms pour analyser 10,031 employés + 10,031 dossiers +
+12,642 contrats
+
+• Recherche avancée : 25ms pour trouver 3,049 employés dans 10,031+
+enregistrements
+
+• Conformité documentaire : 3ms pour analyser la conformité de 10,031
+dossiers
+
+• Stats contrats : 15ms pour analyser 12,642 contrats répartis sur 93
+organisations
+
+• Optimisation placards : 4ms pour optimiser 10,031 dossiers dans 25
+placards
+
+• Demandes RH : 1ms pour traiter 37 demandes en temps réel
+
+• Performance global : 5ms pour calculer 4 métriques de performance
+
+\textbf{10.2.2 Analyse des Résultats}
+
+Le temps moyen d\textquotesingle exécution des requêtes est de 8ms
+seulement, avec un taux de succès de 100\emph{\%.} \textbf{Ces
+performances exceptionnelles démontrent que le système peut gérer
+efficacement plus de 10,000 employés avec des temps de réponse
+ultra-rapides, prouvant la robustesse et l\textquotesingle efficacité de
+l\textquotesingle architecture mise en place}\emph{.}
+
+\textbf{10.3 Utilisation et Exécution}
+
+Le script s\textquotesingle exécute via la commande \textbf{\uline{php
+bin/console app:test-rh-queries}}. L\textquotesingle exécution génère un
+rapport complet affiché dans le terminal, incluant toutes les métriques
+de performance, les statistiques détaillées et les recommandations
+d\textquotesingle optimisation.
+
+\textbf{10.4 Conclusion}
+
+Le script de test de performance RH démontre de manière concluante la
+capacité exceptionnelle du système à gérer efficacement plus de 10,000
+employés avec des temps de réponse ultra-rapides (moyenne de 8ms). Ces
+performances remarquables prouvent la robustesse et
+l\textquotesingle efficacité de l\textquotesingle architecture mise en
+place, démontrant que le système peut répondre aux besoins réels
+d\textquotesingle une entreprise de grande envergure avec des
+performances exceptionnelles.
+
+\textbf{10.5 Captures d\textquotesingle Écran
+d\textquotesingle Exécution}
+
+Cette capture d\textquotesingle écran montre l\textquotesingle exécution
+complète du script de test, affichant les statistiques générales du
+système (10,031 employés, 10,031 dossiers, 12,642 contrats) et le résumé
+des performances avec un temps moyen de 8ms.
+
+\includegraphics[width=6.59861in,height=2.69167in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image7.png}
+
+\textbf{Figure 10.1 : Résultats de la commande de test de performance}
+
+\begin{itemize}
+\item
+  Cette figure présente le tableau détaillé des 7 requêtes RH testées,
+  montrant les temps d\textquotesingle exécution individuels (de 1ms à
+  25ms) et le nombre de résultats traités pour chaque requête.
+\end{itemize}
+
+\includegraphics[width=6.59861in,height=3.13681in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image8.png}
+
+\textbf{Figure 10.2 : Détail des métriques de performance}
+
+\begin{itemize}
+\item
+  \includegraphics[width=6.19583in,height=1.89653in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image9.png}Cette
+  capture d\textquotesingle écran illustre l\textquotesingle analyse de
+  distribution des dossiers dans les placards et des contrats dans les
+  organisations, démontrant l\textquotesingle équilibrage optimal des
+  données.
+\end{itemize}
+
+\textbf{Figure 10.3 : Analyse de distribution et équilibrage}
+
+\begin{itemize}
+\item
+  \includegraphics[width=6.59861in,height=3.01597in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image10.png}Cette
+  figure présente le résumé final avec les métriques clés (100\emph{\%
+  de succès, 8ms de moyenne) et les recommandations
+  d\textquotesingle optimisation du système.}
+\item
+  \textbf{Figure 10.4 : Résumé exécutif et recommandations}
+\end{itemize}
+
+\hypertarget{duxe9monstration-graphique}{%
+\section{11 Démonstration graphique}\label{duxe9monstration-graphique}}
+
+\hypertarget{section}{%
+\section{}\label{section}}
+
+\hypertarget{la-page-daccueil-du-gestionnaire-documentaire-rh}{%
+\section{\texorpdfstring{La page d'accueil du gestionnaire documentaire
+RH~:
+}{La page d'accueil du gestionnaire documentaire RH~: }}\label{la-page-daccueil-du-gestionnaire-documentaire-rh}}
+
+\hypertarget{section-1}{%
+\section{\texorpdfstring{\protect\includegraphics[width=6.59861in,height=3.11319in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image11.png}}{}}\label{section-1}}
+
+\hypertarget{section-2}{%
+\section{\texorpdfstring{\protect\includegraphics[width=6.58958in,height=3.10694in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image12.png}}{}}\label{section-2}}
+
+\hypertarget{section-3}{%
+\section{}\label{section-3}}
+
+\hypertarget{section-4}{%
+\section{}\label{section-4}}
+
+\hypertarget{section-5}{%
+\section{}\label{section-5}}
+
+\hypertarget{section-6}{%
+\section{}\label{section-6}}
+
+\hypertarget{section-7}{%
+\section{}\label{section-7}}
+
+\hypertarget{section-8}{%
+\section{}\label{section-8}}
+
+\hypertarget{section-9}{%
+\section{}\label{section-9}}
+
+\hypertarget{la-page-dauthentification}{%
+\section{La page d'authentification~:}\label{la-page-dauthentification}}
+
+\hypertarget{section-10}{%
+\section{}\label{section-10}}
+
+\hypertarget{section-11}{%
+\section{\texorpdfstring{\protect\includegraphics[width=6.59861in,height=3.1375in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image13.png}}{}}\label{section-11}}
+
+\hypertarget{section-12}{%
+\section{}\label{section-12}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{8}
+\item
+\item
+\item
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item ~
+    \hypertarget{ladministrateur-rh}{%
+    \subsection{L'administrateur Rh~:}\label{ladministrateur-rh}}
+  \end{enumerate}
+\end{enumerate}
+
+\hypertarget{section-13}{%
+\subsection{}\label{section-13}}
+
+\hypertarget{le-tableau-de-bord-de-ladministrateur-rh}{%
+\section[Le Tableau de Bord de l'administrateur
+RH~:]{\texorpdfstring{\protect\includegraphics[width=6.59861in,height=3.13264in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image14.png}Le
+Tableau de Bord de l'administrateur
+RH~:}{Le Tableau de Bord de l'administrateur RH~:}}\label{le-tableau-de-bord-de-ladministrateur-rh}}
+
+\hypertarget{section-14}{%
+\section{}\label{section-14}}
+
+\hypertarget{la-page-de-gestion-des-responsables-rh}{%
+\section{\texorpdfstring{L:a page de gestion des responsables RH~:
+}{L:a page de gestion des responsables RH~: }}\label{la-page-de-gestion-des-responsables-rh}}
+
+\includegraphics[width=6.59861in,height=2.37847in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image15.png}
+
+Les pages d'ajout et de modification d'un responsable RH~:
+
+\includegraphics[width=6.59861in,height=2.63958in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image16.png}\includegraphics[width=6.59861in,height=2.82778in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image17.png}
+
+\hypertarget{le-responsable-rh}{%
+\subsection{Le Responsable RH~:}\label{le-responsable-rh}}
+
+\hypertarget{section-15}{%
+\subsection{}\label{section-15}}
+
+\hypertarget{le-tableau-de-bord-de-responsable-rh}{%
+\section[Le Tableau de Bord de Responsable
+RH~:]{\texorpdfstring{\protect\includegraphics[width=7in,height=3.3125in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image18.png}\protect\includegraphics[width=6.99375in,height=3.31528in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image19.png}Le
+Tableau de Bord de Responsable
+RH~:}{Le Tableau de Bord de Responsable RH~:}}\label{le-tableau-de-bord-de-responsable-rh}}
+
+\hypertarget{section-16}{%
+\section{}\label{section-16}}
+
+Un exemple d'un indicateur de performance (KPI )~:
+
+\includegraphics[width=7.19683in,height=3.29167in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image20.png}\includegraphics[width=6.59861in,height=3.15278in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image21.png}La
+page de gestion des employés~:
+
+\includegraphics[width=6.59861in,height=3.04792in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image22.png}Les
+informations en détails d'un employé~:
+
+\includegraphics[width=6.59861in,height=3.0625in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image23.png}La
+page de gestions des contrats~:
+
+\includegraphics[width=6.59861in,height=3.13264in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image24.png}La
+page de gestion des dossiers~:
+
+Un exemple d'un dossier~:
+
+\includegraphics[width=5.91667in,height=3.10694in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image25.png}
+
+La modification d'un dossier~:
+
+\includegraphics[width=6.59861in,height=2.35625in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image26.png}
+
+\includegraphics[width=6.01667in,height=2.54722in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image27.png}La
+page d'assigner un employé à une organisation~:
+
+\includegraphics[width=6.59861in,height=3.14236in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image28.png}La
+page de gestion des Placards~:
+
+\includegraphics[width=5.87292in,height=2.30486in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image29.png}Un
+exemple d'un placard avec ses dossier~:
+
+La page de modification d'un placard~:
+
+\includegraphics[width=5.27273in,height=2.05139in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image30.png}
+
+La page de gestion des demandes~:
+
+\includegraphics[width=6.59861in,height=3.11042in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image31.png}
+
+\includegraphics[width=6.59861in,height=2.27153in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image32.png}Details
+d'une demande~:
+
+La page de gestion des réclamations~:
+
+\includegraphics[width=6.59861in,height=2.30556in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image33.png}
+
+\hypertarget{lemployuxe9}{%
+\subsection{L'employé :}\label{lemployuxe9}}
+
+\hypertarget{section-17}{%
+\subsection{}\label{section-17}}
+
+Le Tableau de Bord d'un employé :
+
+\includegraphics[width=6.59861in,height=2.91736in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image34.png}
+
+Le profil~:
+
+\includegraphics[width=6.59861in,height=2.06389in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image35.png}
+
+La page de consultation des contrats d'un employé~:
+
+\includegraphics[width=6.59861in,height=2.60556in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image36.png}
+
+La page de consultation du dossier d'un employé~:
+
+\includegraphics[width=6.59861in,height=3.10347in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image37.png}
+
+Les pages de consultation des demandes d'un employé et creation d'une
+nouvelle demande~:
+
+\includegraphics[width=6.59861in,height=1.91875in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image38.png}
+
+\includegraphics[width=6.59861in,height=2.53333in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image39.png}
+
+\hypertarget{le-manager}{%
+\subsection{Le Manager :}\label{le-manager}}
+
+\hypertarget{le-tableau-de-bord-du-manager}{%
+\subsection{\texorpdfstring{Le Tableau de Bord du manager~:
+}{Le Tableau de Bord du manager~: }}\label{le-tableau-de-bord-du-manager}}
+
+\hypertarget{section-18}{%
+\subsection{\texorpdfstring{\protect\includegraphics[width=6.59861in,height=2.85694in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image40.png}}{}}\label{section-18}}
+
+\includegraphics[width=6.59861in,height=1.86597in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image41.png}La
+page de gestion des réclamations~:
+
+La page de création d'une nouvelle réclamation~:
+
+\includegraphics[width=6.59861in,height=2.18958in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image42.png}
+
+Un exemple d'une réclamation~:
+
+\includegraphics[width=6.59861in,height=3.01875in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image43.png}
+
+\hypertarget{quelque-exemples-illustratif-du-version-mobile}{%
+\subsection{Quelque exemples illustratif du version mobile
+:}\label{quelque-exemples-illustratif-du-version-mobile}}
+
+\includegraphics[width=2.35833in,height=4.79097in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image44.png}
+
+\includegraphics[width=2.38472in,height=4.84375in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image45.png}
+
+\includegraphics[width=1.85183in,height=1.85183in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image46.png}
+
+\includegraphics[width=2.64375in,height=5.37083in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image47.png}
+
+\includegraphics[width=2.65972in,height=5.40208in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image48.png}
+
+\includegraphics[width=2.66597in,height=5.5875in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image49.png}\includegraphics[width=2.75556in,height=5.59722in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image50.png}
+
+\includegraphics[width=1.85139in,height=1.85139in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image46.png}
+
+Le système est maintenant prêt pour un déploiement en production et peut
+servir de base solide pour de futures évolutions. L'expérience acquise
+lors de ce stage a été particulièrement enrichissante, tant sur le plan
+technique que sur la compréhension des enjeux métier des systèmes RH
+modernes.
+
+\includegraphics[width=4.08621in,height=4.08621in]{vertopal_ac4f8a097f674b95b21377900fdae27d/media/image51.png}
+
+\end{document}

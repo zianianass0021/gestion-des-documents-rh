@@ -36,7 +36,7 @@
                     <div class="card-header text-center login-header animate-fade-in-down">
                         <div class="logo-container mb-3">
                             <div class="logo-circle animate-scale-in">
-                                <i class="fas fa-building fa-2x animate-float"></i>
+                                <img src="{{ asset('logo.png') }}" alt="Système RH" class="login-logo">
                             </div>
                         </div>
                         <h1 class="h3 fw-bold mb-2 animate-fade-in-up" style="animation-delay: 0.2s;">Connexion</h1>
@@ -225,21 +225,32 @@
     }
 
     .logo-circle {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        width: 120px;
+        height: 120px;
+        background: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
     }
 
     .logo-circle i {
         color: white !important;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-logo {
+        width: 85px;
+        height: 85px;
+        object-fit: contain;
+        object-position: center;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        display: block;
+        margin: 0 auto;
+        transform: translate(3px, 2px);
     }
 
     .login-header {

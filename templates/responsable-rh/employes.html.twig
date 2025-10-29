@@ -3,6 +3,21 @@
 {% block title %}Gestion des Employés{% endblock %}
 
 {% block body %}
+
+<!-- Statistiques en haut -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-primary d-flex align-items-center">
+            <i class="fas fa-users me-3 fa-2x"></i>
+            <div>
+                <h5 class="mb-1">Total des Employés</h5>
+                <h3 class="mb-0 text-primary">{{ totalEmployes }}</h3>
+                <small class="text-muted">Employés de l'entreprise</small>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -13,11 +28,6 @@
                         Gestion des Employés
                     </h1>
                     <div class="d-flex gap-2">
-                        <a href="{{ path('responsable_manage_employes', {'show_all': not showAll}) }}" 
-                           class="btn btn-{{ showAll ? 'primary' : 'outline-primary' }}">
-                            <i class="fas fa-{{ showAll ? 'eye' : 'eye-slash' }} me-2"></i>
-                            {{ showAll ? 'Voir seulement actifs' : 'Voir tous' }}
-                        </a>
                         <a href="{{ path('responsable_rh_add_employe') }}" class="btn btn-success">
                             <i class="fas fa-plus me-2"></i>Ajouter un Employé
                         </a>
@@ -39,13 +49,7 @@
                                    placeholder="Rechercher par nom, prénom, email...">
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-3">
-                        <select name="show_all" class="form-select form-select-sm">
-                            <option value="0" {% if not showAll %}selected{% endif %}>Actifs seulement</option>
-                            <option value="1" {% if showAll %}selected{% endif %}>Tous</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-3">
+                    <div class="col-lg-4 col-md-6">
                         <button type="submit" class="btn btn-primary btn-sm w-100">
                             <i class="fas fa-search me-1"></i>Rechercher
                         </button>
@@ -97,17 +101,24 @@
                                     <td>{{ employe.email }}</td>
                                 <td>
                                     {% if employe.employeeContrats is not empty %}
-                                        {% set orgCount = 0 %}
+                                        {% set uniqueOrgs = [] %}
                                         {% for contrat in employe.employeeContrats %}
                                             {% for orgContrat in contrat.organisationEmployeeContrats %}
-                                                {% if orgCount > 0 %}<br>{% endif %}
-                                                <span class="badge bg-{{ loop.parent.loop.first ? 'primary' : 'info' }} animate-scale-in small">
-                                                    {{ orgContrat.organisation.dossierDesignation|slice(0, 30) }}{% if orgContrat.organisation.dossierDesignation|length > 30 %}...{% endif %}
-                                                </span>
-                                                {% set orgCount = orgCount + 1 %}
+                                                {% set orgDesignation = orgContrat.organisation.dossierDesignation %}
+                                                {% if orgDesignation not in uniqueOrgs %}
+                                                    {% set uniqueOrgs = uniqueOrgs|merge([orgDesignation]) %}
+                                                {% endif %}
                                             {% endfor %}
                                         {% endfor %}
-                                        {% if orgCount == 0 %}
+                                        
+                                        {% if uniqueOrgs|length > 0 %}
+                                            {% for orgName in uniqueOrgs %}
+                                                {% if not loop.first %}<br>{% endif %}
+                                                <span class="badge bg-{{ loop.first ? 'primary' : 'info' }} animate-scale-in small">
+                                                    {{ orgName|slice(0, 30) }}{% if orgName|length > 30 %}...{% endif %}
+                                                </span>
+                                            {% endfor %}
+                                        {% else %}
                                             <span class="text-muted">Non assigné</span>
                                         {% endif %}
                                     {% else %}
@@ -185,27 +196,35 @@
                                 </div>
                                 
                                 {% if employe.employeeContrats is not empty %}
-                                    {% set orgCount = 0 %}
+                                    {% set uniqueOrgs = [] %}
                                     {% for contrat in employe.employeeContrats %}
                                         {% if contrat.organisationEmployeeContrats is not empty %}
                                             {% for orgContrat in contrat.organisationEmployeeContrats %}
                                                 {% if orgContrat.organisation %}
-                                                    {% set orgCount = orgCount + 1 %}
-                                                    {% if orgCount == 1 %}
-                                                        <div class="info-row">
-                                                            <i class="fas fa-sitemap text-info"></i>
-                                                            <span>{{ orgContrat.organisation.dossierDesignation }}</span>
-                                                        </div>
+                                                    {% set orgDesignation = orgContrat.organisation.dossierDesignation %}
+                                                    {% if orgDesignation not in uniqueOrgs %}
+                                                        {% set uniqueOrgs = uniqueOrgs|merge([orgDesignation]) %}
                                                     {% endif %}
                                                 {% endif %}
                                             {% endfor %}
                                         {% endif %}
                                     {% endfor %}
-                                    {% if orgCount > 1 %}
-                                        <div class="info-row">
-                                            <i class="fas fa-plus-circle text-muted"></i>
-                                            <small class="text-muted">+{{ orgCount - 1 }} autre(s)</small>
-                                        </div>
+                                    
+                                    {% if uniqueOrgs|length > 0 %}
+                                        {% for orgName in uniqueOrgs %}
+                                            {% if loop.index == 1 %}
+                                                <div class="info-row">
+                                                    <i class="fas fa-sitemap text-info"></i>
+                                                    <span>{{ orgName }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if uniqueOrgs|length > 1 %}
+                                            <div class="info-row">
+                                                <i class="fas fa-plus-circle text-muted"></i>
+                                                <small class="text-muted">+{{ uniqueOrgs|length - 1 }} autre(s)</small>
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
                                 
@@ -354,3 +373,4 @@
     }
 </style>
 {% endblock %}
+

@@ -11,3 +11,6 @@
 
 # Uploaded files
 /public/uploads/
+
+# Documentation files (personal/local)
+pagination_integration.tex

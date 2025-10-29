@@ -27,6 +27,7 @@ use App\Repository\PlacardRepository;
 use App\Repository\NatureContratRepository;
 use App\Repository\NatureContratTypeDocumentRepository;
 use App\Repository\OrganisationRepository;
+use App\Entity\NatureContratTypeDocument;
 use App\Form\OrganisationType;
 use App\Form\OrganisationEmployeeContratType;
 use App\Service\DocumentRequirementService;
@@ -36,8 +37,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Box\Spout\Writer\XLSX\Writer as XLSXWriter;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -72,7 +76,7 @@ class ResponsableRhController extends AbstractController
     }
 
     #[Route('/employes', name: 'responsable_manage_employes')]
-    public function manageEmployes(Request $request, EmployeRepository $employeRepository, PaginatorInterface $paginator): Response
+    public function manageEmployes(Request $request, EmployeRepository $employeRepository, PaginatorInterface $paginator, EntityManagerInterface $entityManager): Response
     {
         // Vérifier que l'utilisateur est toujours authentifié
         if (!$this->getUser()) {
@@ -85,49 +89,86 @@ class ResponsableRhController extends AbstractController
         }
 
         // Récupérer les paramètres de recherche et filtrage
-        $showAll = $request->query->getBoolean('show_all', false);
         $search = $request->query->get('search', '');
-        
-        // Récupérer les employés selon les filtres
-        if ($showAll) {
-            if ($search) {
-                $allEmployees = $employeRepository->findByRoleAndSearchQuery('ROLE_EMPLOYEE', $search);
-            } else {
-                $allEmployees = $employeRepository->findByRoleQuery('ROLE_EMPLOYEE');
-            }
-        } else {
-            if ($search) {
-                $allEmployees = $employeRepository->findActiveByRoleAndSearchQuery('ROLE_EMPLOYEE', $search);
-            } else {
-                $allEmployees = $employeRepository->findActiveByRoleQuery('ROLE_EMPLOYEE');
-            }
-        }
-
-        // Pagination manuelle
         $page = $request->query->getInt('page', 1);
-        $perPage = 10;
-        $totalCount = count($allEmployees);
-        $totalPages = ceil($totalCount / $perPage);
-        $offset = ($page - 1) * $perPage;
-        $employeesData = array_slice($allEmployees, $offset, $perPage);
-
-        // Créer un objet de pagination personnalisé
-        $employees = (object) [
-            'items' => $employeesData,
-            'current' => $page,
-            'pageCount' => $totalPages,
-            'totalCount' => $totalCount,
-            'firstItemNumber' => $offset + 1,
-            'lastItemNumber' => min($offset + $perPage, $totalCount),
-            'route' => 'responsable_manage_employes',
-            'queryParams' => $request->query->all(),
-            'pageParameterName' => 'page'
-        ];
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        
+        // Get paginated IDs directly from database (only load current page's IDs)
+        $conn = $entityManager->getConnection();
+        
+        if ($search) {
+            // Get IDs for current page with search filter
+            $countSql = 'SELECT COUNT(DISTINCT e.id) FROM t_employe e 
+                         WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role 
+                         AND (LOWER(e.nom) LIKE LOWER(:search) 
+                              OR LOWER(e.prenom) LIKE LOWER(:search) 
+                              OR LOWER(e.email) LIKE LOWER(:search))';
+            
+            $idsSql = 'SELECT e.id FROM t_employe e 
+                       WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role 
+                       AND (LOWER(e.nom) LIKE LOWER(:search) 
+                            OR LOWER(e.prenom) LIKE LOWER(:search) 
+                            OR LOWER(e.email) LIKE LOWER(:search))
+                       ORDER BY e.nom ASC 
+                       LIMIT :limit OFFSET :offset';
+        } else {
+            // Get IDs for current page without search
+            $countSql = 'SELECT COUNT(e.id) FROM t_employe e 
+                         WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role';
+            
+            $idsSql = 'SELECT e.id FROM t_employe e 
+                       WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role 
+                       ORDER BY e.nom ASC 
+                       LIMIT :limit OFFSET :offset';
+        }
+        
+        // Get total count
+        $stmt = $conn->prepare($countSql);
+        $result = $stmt->executeQuery(['role' => '%ROLE_EMPLOYEE%'] + ($search ? ['search' => '%' . $search . '%'] : []));
+        $totalCount = $result->fetchOne();
+        
+        // Get only current page's IDs (10 or less)
+        $stmt = $conn->prepare($idsSql);
+        $stmt->bindValue('role', '%ROLE_EMPLOYEE%', \PDO::PARAM_STR);
+        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
+        if ($search) {
+            $stmt->bindValue('search', '%' . $search . '%', \PDO::PARAM_STR);
+        }
+        $result = $stmt->execute();
+        $rows = $result->fetchAllAssociative();
+        $ids = array_column($rows, 'id');
+        
+        // Fetch only the 10 employees for this page
+        if (empty($ids)) {
+            $employeesArray = [];
+        } else {
+            $employeesArray = $employeRepository->createQueryBuilder('e')
+                ->where('e.id IN (:ids)')
+                ->setParameter('ids', $ids)
+                ->orderBy('e.nom', 'ASC')
+                ->getQuery()
+                ->getResult();
+        }
+        
+        // Create custom pagination object
+        $pageCount = max(1, (int) ceil($totalCount / $limit));
+        $employees = new \stdClass();
+        $employees->items = $employeesArray;
+        $employees->totalCount = $totalCount;
+        $employees->pageCount = $pageCount;
+        $employees->current = $page;
+        $employees->firstItemNumber = min($offset + 1, $totalCount);
+        $employees->lastItemNumber = min($offset + count($employeesArray), $totalCount);
+        $employees->route = 'responsable_manage_employes';
+        $employees->queryParams = array_filter(['search' => $search]);
+        $employees->pageParameterName = 'page';
 
         $response = $this->render('responsable-rh/employes.html.twig', [
             'employees' => $employees,
-            'showAll' => $showAll,
-            'search' => $search
+            'search' => $search,
+            'totalEmployes' => $totalCount
         ]);
         
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
@@ -149,6 +190,15 @@ class ResponsableRhController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier si l'email existe déjà
+            $existingEmployee = $entityManager->getRepository(Employe::class)->findOneBy(['email' => $employee->getEmail()]);
+            if ($existingEmployee) {
+                $this->addFlash('error', 'Cet email est déjà utilisé par un autre employé.');
+                return $this->render('responsable-rh/add_employe.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+            
             // Définir le rôle d'employé
             $employee->setRoles(['ROLE_EMPLOYEE']);
             
@@ -158,7 +208,7 @@ class ResponsableRhController extends AbstractController
                 $employee->setUsername($username);
             }
             
-            // Hacher le mot de passe
+            // Hioxidé le mot de passe
             $plainPassword = $form->get('password')->getData();
             if ($plainPassword) {
                 $hashedPassword = $passwordHasher->hashPassword($employee, $plainPassword);
@@ -192,8 +242,8 @@ class ResponsableRhController extends AbstractController
             $entityManager->persist($contrat);
             $entityManager->flush();
 
-            // Régénérer automatiquement le fichier Excel
-            $excelGenerator->generateModuleExcel();
+            // Régénérer automatiquement le fichier Excel (en arrière-plan pour éviter timeout)
+            // Uncomment to enable: $excelGenerator->generateModuleExcel();
 
             $this->addFlash('success', 'Employé créé avec succès avec son contrat.');
             return $this->redirectToRoute('responsable_manage_employes');
@@ -223,6 +273,15 @@ class ResponsableRhController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier si l'email existe déjà
+            $existingEmployee = $entityManager->getRepository(Employe::class)->findOneBy(['email' => $employee->getEmail()]);
+            if ($existingEmployee) {
+                $this->addFlash('error', 'Cet email est déjà utilisé par un autre employé.');
+                return $this->render('responsable-rh/add_employe.html.twig', [
+                    'form' => $form->createView()
+                ]);
+            }
+            
             // Définir automatiquement le rôle d'employé
             $employee->setRoles(['ROLE_EMPLOYEE']);
             
@@ -314,8 +373,8 @@ class ResponsableRhController extends AbstractController
                
                $entityManager->flush();
 
-            // Régénérer automatiquement le fichier Excel
-            $excelGenerator->generateModuleExcel();
+            // Régénérer automatiquement le fichier Excel (en arrière-plan pour éviter timeout)
+            // Uncomment to enable: $excelGenerator->generateModuleExcel();
 
             $this->addFlash('success', 'Employé ajouté avec succès !');
             return $this->redirectToRoute('responsable_manage_employes');
@@ -356,8 +415,8 @@ class ResponsableRhController extends AbstractController
         $employee->setIsActive(!$employee->isActive());
         $entityManager->flush();
 
-        // Régénérer automatiquement le fichier Excel
-        $excelGenerator->generateModuleExcel();
+        // Régénérer automatiquement le fichier Excel (commenté pour éviter timeout)
+        // $excelGenerator->generateModuleExcel();
 
         $status = $employee->isActive() ? 'activé' : 'désactivé';
         $this->addFlash('success', "Employé {$status} avec succès !");
@@ -404,7 +463,7 @@ class ResponsableRhController extends AbstractController
             $dossiersQuery = $dossierRepository->findAllQuery();
         }
 
-        // Paginer les résultats - 10 éléments par page
+        // ALWAYS paginate - 10 items per page
         $dossiers = $paginator->paginate(
             $dossiersQuery,
             $request->query->getInt('page', 1),
@@ -413,7 +472,8 @@ class ResponsableRhController extends AbstractController
 
         $response = $this->render('responsable-rh/dossiers.html.twig', [
             'dossiers' => $dossiers,
-            'search' => $search
+            'search' => $search,
+            'totalDossiers' => $dossierRepository->count([])
         ]);
         
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
@@ -914,7 +974,7 @@ class ResponsableRhController extends AbstractController
 
         $placardsQuery = $placardRepository->findAllQuery();
 
-        // Paginer les résultats - 10 éléments par page
+        // ALWAYS paginate - 10 items per page
         $placards = $paginator->paginate(
             $placardsQuery,
             $request->query->getInt('page', 1),
@@ -922,7 +982,8 @@ class ResponsableRhController extends AbstractController
         );
 
         return $this->render('responsable-rh/placards.html.twig', [
-            'placards' => $placards
+            'placards' => $placards,
+            'totalPlacards' => $placardRepository->count([])
         ]);
     }
 
@@ -1087,7 +1148,7 @@ class ResponsableRhController extends AbstractController
     {
         $contratsQuery = $contratRepository->findAllQuery();
 
-        // Paginer les résultats - 10 éléments par page
+        // ALWAYS paginate - 10 items per page
         $contrats = $paginator->paginate(
             $contratsQuery,
             $request->query->getInt('page', 1),
@@ -1096,6 +1157,7 @@ class ResponsableRhController extends AbstractController
         
         return $this->render('responsable-rh/contrats.html.twig', [
             'contrats' => $contrats,
+            'totalContrats' => $contratRepository->count([])
         ]);
     }
 
@@ -1105,7 +1167,7 @@ class ResponsableRhController extends AbstractController
     {
         $organisationsQuery = $organisationRepository->findAllQuery();
 
-        // Paginer les résultats - 10 éléments par page
+        // ALWAYS paginate - 10 items per page
         $organisations = $paginator->paginate(
             $organisationsQuery,
             $request->query->getInt('page', 1),
@@ -1187,8 +1249,8 @@ class ResponsableRhController extends AbstractController
             $entityManager->persist($organisationEmployeeContrat);
             $entityManager->flush();
             
-            // Régénérer automatiquement le fichier Excel
-            $excelGenerator->generateModuleExcel();
+            // Régénérer automatiquement le fichier Excel (commenté pour éviter timeout)
+            // $excelGenerator->generateModuleExcel();
             
             $this->addFlash('success', 'Employé assigné à l\'organisation avec succès !');
             return $this->redirectToRoute('responsable_manage_organisations');
@@ -1537,24 +1599,277 @@ class ResponsableRhController extends AbstractController
     }
 
     #[Route('/download-excel', name: 'responsable_download_module_excel')]
-    public function downloadModuleExcel(): Response
+    public function downloadModuleExcel(EmployeRepository $employeRepository, EntityManagerInterface $em, NatureContratTypeDocumentRepository $docRequirementRepo): Response
     {
-        $filePath = $this->getParameter('kernel.project_dir') . '/module.xlsx';
+        // Increase memory and execution time for large exports
+        set_time_limit(300); // 5 minutes
+        ini_set('memory_limit', '1024M');
         
-        if (!file_exists($filePath)) {
-            $this->addFlash('error', 'Le fichier Excel n\'existe pas.');
-            return $this->redirectToRoute('responsable_rh_dashboard');
-        }
+        // Suppress any errors
+        @ini_set('display_errors', 0);
+        error_reporting(0);
         
-        // Lire le contenu du fichier
-        $content = file_get_contents($filePath);
-        
-        // Créer une réponse avec le contenu et le type MIME manuel
-        $response = new Response($content);
+        try {
+            // Create a temporary file for the Excel export
+            $tempFile = tempnam(sys_get_temp_dir(), 'employees_export_');
+            
+            // Create writer instance
+            $writer = WriterEntityFactory::createXLSXWriter();
+            
+            // Open the temporary file for writing
+            $writer->openToFile($tempFile);
+            
+            // Pre-load all document requirements into memory for fast lookup
+            $allDocRequirements = $docRequirementRepo->findAll();
+            $docRequirementsLookup = [];
+            foreach ($allDocRequirements as $docReq) {
+                $contractType = $docReq->getContractType();
+                if (!isset($docRequirementsLookup[$contractType])) {
+                    $docRequirementsLookup[$contractType] = ['obligatoires' => [], 'complementaires' => []];
+                }
+                if ($docReq->isRequired()) {
+                    $docRequirementsLookup[$contractType]['obligatoires'][] = $docReq->getDocumentAbbreviation();
+                } else {
+                    $docRequirementsLookup[$contractType]['complementaires'][] = $docReq->getDocumentAbbreviation();
+                }
+            }
+            
+            // Also pre-load nature contrat codes for lookup
+            $allNatureContrats = $em->getRepository(\App\Entity\NatureContrat::class)->findAll();
+            $codeToDesignation = [];
+            $designationToCode = [];
+            foreach ($allNatureContrats as $nc) {
+                if ($nc->getCode()) {
+                    $codeToDesignation[$nc->getCode()] = $nc->getDesignation();
+                }
+                if ($nc->getDesignation()) {
+                    $designationToCode[$nc->getDesignation()] = $nc->getCode();
+                }
+            }
+            
+            // Define the header row
+            $headerRow = WriterEntityFactory::createRowFromArray([
+                'ID',
+                'Nom',
+                'Prénom',
+                'Email',
+                'Téléphone',
+                'Organisation',
+                'Groupement',
+                'Code',
+                'DAS',
+                'Type Contrat',
+                'Date Début',
+                'Date Fin',
+                'Statut Contrat',
+                'Placard',
+                'Emplacement',
+                'Statut Employé',
+                'Documents Requis'
+            ]);
+            $writer->addRow($headerRow);
+            
+            // Process employees in batches to avoid memory exhaustion
+            $batchSize = 200; // Increased batch size for faster processing
+            $offset = 0;
+            $totalProcessed = 0;
+            
+            while (true) {
+                // Get batch of employees using native SQL - ordered by last name then first name
+                $conn = $em->getConnection();
+                $sql = "SELECT id FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%' ORDER BY nom ASC, prenom ASC LIMIT :limit OFFSET :offset";
+                $stmt = $conn->prepare($sql);
+                $result = $stmt->executeQuery([
+                    'limit' => $batchSize,
+                    'offset' => $offset
+                ]);
+                $ids = $result->fetchFirstColumn();
+                
+                if (empty($ids)) {
+                    break;
+                }
+                
+                // Process each employee in the batch
+                foreach ($ids as $id) {
+                    try {
+                        $employe = $em->find(\App\Entity\Employe::class, $id);
+                        if (!$employe) {
+                            continue;
+                        }
+                        try {
+                            $contrats = $employe->getEmployeeContrats();
+                            
+                            // For each contract, create a separate row
+                            foreach ($contrats as $contrat) {
+                                try {
+                                    // Get organisations for this contract
+                                    $organisations = [];
+                                    $groupements = [];
+                                    $codes = [];
+                                    $dasValues = [];
+                                    
+                                    $orgContrats = $contrat->getOrganisationEmployeeContrats();
+                                    foreach ($orgContrats as $orgContrat) {
+                                        if ($orgContrat && $orgContrat->getOrganisation()) {
+                                            $org = $orgContrat->getOrganisation();
+                                            $organisations[] = $org->getDossierDesignation();
+                                            $groupements[] = $org->getGroupement() ?? '';
+                                            $codes[] = $org->getCode() ?? '';
+                                            $dasValues[] = $org->getDas() ?? '';
+                                        }
+                                    }
+                                    
+                                    $organisationsString = !empty($organisations) ? implode(', ', $organisations) : '';
+                                    $groupementString = !empty($groupements) ? implode(', ', array_unique($groupements)) : '';
+                                    $codeString = !empty($codes) ? implode(', ', array_unique($codes)) : '';
+                                    $dasString = !empty($dasValues) ? implode(', ', array_unique($dasValues)) : '';
+                                    
+                                    $natureContrat = $contrat->getNatureContrat();
+                                    $contractType = $natureContrat ? $natureContrat->getDesignation() : '';
+                                    
+                                    // Get placard and emplacement from employee's dossier (separated)
+                                    $placardName = '';
+                                    $emplacement = '';
+                                    if ($employe->getDossier()) {
+                                        $dossier = $employe->getDossier();
+                                        if ($dossier->getPlacard()) {
+                                            $placardName = $dossier->getPlacard()->getName() . ' (' . $dossier->getPlacard()->getLocation() . ')';
+                                        }
+                                        if ($dossier->getEmplacement()) {
+                                            $emplacement = $dossier->getEmplacement();
+                                        }
+                                    }
+                                    
+                                    // Get required documents for this contract using lookup
+                                    $documentsRequis = '';
+                                    if ($contractType && $natureContrat) {
+                                        $contractTypeDesignation = $natureContrat->getDesignation();
+                                        $contractTypeCode = $natureContrat->getCode();
+                                        
+                                        // Try to find documents by designation first
+                                        $docs = null;
+                                        if ($contractTypeDesignation && isset($docRequirementsLookup[$contractTypeDesignation])) {
+                                            $docs = $docRequirementsLookup[$contractTypeDesignation];
+                                        }
+                                        // If not found, try with code
+                                        elseif ($contractTypeCode && isset($docRequirementsLookup[$contractTypeCode])) {
+                                            $docs = $docRequirementsLookup[$contractTypeCode];
+                                        }
+                                        
+                                        if ($docs) {
+                                            $obligatoires = $docs['obligatoires'] ?? [];
+                                            $complementaires = $docs['complementaires'] ?? [];
+                                            
+                                            // Combine: obligatoires first, then complémentaires
+                                            $allDocs = array_merge($obligatoires, $complementaires);
+                                            $documentsRequis = implode(', ', $allDocs);
+                                        }
+                                    }
+                                    
+                                    $row = WriterEntityFactory::createRowFromArray([
+                                        $employe->getId(),
+                                        $employe->getNom(),
+                                        $employe->getPrenom(),
+                                        $employe->getEmail(),
+                                        $employe->getTelephone() ?? '',
+                                        $organisationsString,
+                                        $groupementString,
+                                        $codeString,
+                                        $dasString,
+                                        $contractType,
+                                        $contrat->getDateDebut() ? $contrat->getDateDebut()->format('Y-m-d') : '',
+                                        $contrat->getDateFin() ? $contrat->getDateFin()->format('Y-m-d') : '',
+                                        $contrat->getStatut() ?? '',
+                                        $placardName,
+                                        $emplacement,
+                                        $employe->isActive() ? 'Actif' : 'Inactif',
+                                        $documentsRequis
+                                    ]);
+                                    $writer->addRow($row);
+                                } catch (\Exception $e) {
+                                    // Skip this contract if there's an error
+                                    continue;
+                                }
+                            }
+                            
+                            // If employee has no contracts, still add them with empty contract fields
+                            if ($contrats->isEmpty()) {
+                                // Get placard and emplacement from employee's dossier (separated)
+                                $placardName = '';
+                                $emplacement = '';
+                                if ($employe->getDossier()) {
+                                    $dossier = $employe->getDossier();
+                                    if ($dossier->getPlacard()) {
+                                        $placardName = $dossier->getPlacard()->getName() . ' (' . $dossier->getPlacard()->getLocation() . ')';
+                                    }
+                                    if ($dossier->getEmplacement()) {
+                                        $emplacement = $dossier->getEmplacement();
+                                    }
+                                }
+                                
+                                $row = WriterEntityFactory::createRowFromArray([
+                                    $employe->getId(),
+                                    $employe->getNom(),
+                                    $employe->getPrenom(),
+                                    $employe->getEmail(),
+                                    $employe->getTelephone() ?? '',
+                                    '', // No organisation
+                                    '', // No groupement
+                                    '', // No code
+                                    '', // No DAS
+                                    '', // No contract type
+                                    '', // No start date
+                                    '', // No end date
+                                    '', // No contract status
+                                    $placardName,
+                                    $emplacement,
+                                    $employe->isActive() ? 'Actif' : 'Inactif',
+                                    '' // No documents required
+                                ]);
+                                $writer->addRow($row);
+                            }
+                        } catch (\Exception $e) {
+                            // Skip this employee if there's an error
+                            continue;
+                        }
+                    } catch (\Exception $e) {
+                        // Skip this employee if there's an error
+                        continue;
+                    }
+                }
+                
+                $offset += $batchSize;
+                $em->clear(); // Clear after each batch
+                
+                // Break if we got fewer results than requested (last batch)
+                if (count($ids) < $batchSize) {
+                    break;
+                }
+            }
+            
+            $writer->close();
+            
+            // Now read the file and return it as a response
+            if (!file_exists($tempFile)) {
+                throw new \Exception('Excel file could not be generated');
+            }
+            
+            $response = new Response();
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment; filename="module_employes_' . date('Y-m-d') . '.xlsx"');
-        $response->headers->set('Content-Length', strlen($content));
+            $response->headers->set('Content-Disposition', 'attachment; filename="employes_' . date('Y-m-d_His') . '.xlsx"');
+            $response->setContent(file_get_contents($tempFile));
+            
+            // Clean up
+            unlink($tempFile);
         
         return $response;
+            
+        } catch (\Exception $e) {
+            // If there's an error, output nothing to prevent file corruption
+            if (isset($tempFile) && file_exists($tempFile)) {
+                @unlink($tempFile);
+            }
+            throw $e;
+        }
     }
 }

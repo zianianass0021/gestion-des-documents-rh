@@ -12,9 +12,11 @@
                 Gestion des Organisations
             </h1>
             <p class="text-muted mb-3">Structure organisationnelle de l'entreprise</p>
-            <a href="{{ path('responsable_assign_organisation') }}" class="btn btn-info mb-3">
-                <i class="fas fa-user-plus me-2"></i>Assigner Employé
-            </a>
+            <div class="d-flex gap-2 mb-3">
+                <a href="{{ path('responsable_assign_organisation') }}" class="btn btn-info">
+                    <i class="fas fa-user-plus me-2"></i>Assigner Employé
+                </a>
+            </div>
         </div>
     </div>
 
@@ -39,7 +41,9 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-sitemap fa-2x text-primary mb-2"></i>
-                    <h4 class="text-primary">{{ organisations|length }}</h4>
+                    <h4 class="text-primary">
+                        {{ organisations.totalItemCount }}
+                    </h4>
                     <p class="text-muted mb-0">Total Organisations</p>
                 </div>
             </div>
@@ -200,6 +204,13 @@
                                 </div>
                             </div>
                             {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Pagination -->
+                    {% if not showAll and organisations.pageCount > 1 %}
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ knp_pagination_render(organisations) }}
                         </div>
                     {% endif %}
                 </div>

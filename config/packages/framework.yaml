@@ -9,6 +9,14 @@ framework:
     translator:
         default_path: '%kernel.project_dir%/translations'
         fallbacks: ['fr']
+    
+    # Assets configuration
+    assets: true
+    
+    # HTTP Cache configuration for performance
+    http_cache:
+        enabled: true
+        debug: '%kernel.debug%'
 
     #esi: true
     #fragments: true

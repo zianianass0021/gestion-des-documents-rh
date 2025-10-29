@@ -26,6 +26,52 @@
     
     <!-- Custom CSS -->
         {% block stylesheets %}
+        <script>
+        // Navigation optimization: Cache pages for instant transitions
+        (function() {
+            const cache = new Map();
+            const MAX_CACHE_SIZE = 5;
+            
+            // Prefetch links on hover
+            document.addEventListener('mouseover', function(e) {
+                let link = e.target.closest('a[href]');
+                if (link && link.href && !link.href.includes('#') && link.href.startsWith(window.location.origin)) {
+                    // Don't prefetch if already visited or cached
+                    if (!sessionStorage.getItem(link.href) && !link.hasAttribute('data-prefetched')) {
+                        link.setAttribute('data-prefetched', 'true');
+                        setTimeout(() => {
+                            fetch(link.href, {
+                                method: 'HEAD',
+                                cache: 'default'
+                            }).then(() => {
+                                sessionStorage.setItem(link.href, Date.now());
+                            }).catch(() => {});
+                        }, 200);
+                    }
+                }
+            });
+            
+            // Instant navigation with history API
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a[href]');
+                if (link && link.href && !link.href.includes('#') && link.href.startsWith(window.location.origin)) {
+                    // Don't intercept if ctrl/cmd click or external link
+                    if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                    if (link.target && link.target !== '_self') return;
+                    if (link.hasAttribute('data-no-spa')) return;
+                    
+                    const url = link.href;
+                    const cached = sessionStorage.getItem(url);
+                    
+                    // If cached recently (within 30 seconds), use it
+                    if (cached && (Date.now() - parseInt(cached)) < 30000) {
+                        e.preventDefault();
+                        window.location.href = url;
+                    }
+                }
+            });
+        })();
+        </script>
         <style>
             /* ===== PAGINATION STYLES ===== */
             .pagination {
@@ -340,7 +386,7 @@
                     left: 0;
                     width: 180px;
                     height: 100vh;
-                    background: var(--primary-900);
+                    background: #00a3db;
                     z-index: 1000;
                     transition: transform 0.3s ease;
         }
@@ -350,8 +396,8 @@
             }
             
             .sidebar-header {
-                background: var(--primary-800);
-                border-bottom: 1px solid var(--primary-700);
+                background: #00a3db;
+                border-bottom: 1px solid #00a3db;
                 padding: 0.75rem;
             }
             
@@ -359,6 +405,17 @@
             color: white;
                 font-size: 1rem;
                 font-weight: 600;
+            }
+            
+            .logo-img {
+                height: 150px;
+                width: auto;
+                max-width: 100%;
+                object-fit: contain;
+            }
+            
+            .sidebar.collapsed .logo-img {
+                height: 100px;
             }
             
             .sidebar-menu {
@@ -372,15 +429,16 @@
         }
 
             .sidebar-menu a:hover {
-                background: rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.2);
                 color: white;
             }
             
             .sidebar-menu a.active {
-                background: rgba(255, 255, 255, 0.2);
+                background: rgba(255, 255, 255, 0.3);
                 border-right: 4px solid #ffffff;
                 color: white;
                 font-weight: 600;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             }
             
             .sidebar-menu a.active i {
@@ -816,9 +874,8 @@
             <div class="sidebar" id="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-brand">
-                        <i class="fas fa-building me-2"></i>
-                        Système RH
-                </div>
+                        <img src="{{ asset('logo.png') }}" alt="Système RH" class="logo-img">
+                    </div>
                 </div>
                 <nav class="sidebar-menu">
                     {% if 'ROLE_ADMINISTRATEUR_RH' not in app.user.roles and 'ROLE_MANAGER' not in app.user.roles %}

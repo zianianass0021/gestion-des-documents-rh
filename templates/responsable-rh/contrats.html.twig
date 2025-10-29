@@ -3,6 +3,21 @@
 {% block title %}Gestion des Contrats{% endblock %}
 
 {% block body %}
+
+<!-- Statistiques en haut -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-success d-flex align-items-center">
+            <i class="fas fa-file-contract me-3 fa-2x"></i>
+            <div>
+                <h5 class="mb-1">Total des Contrats</h5>
+                <h3 class="mb-0 text-success">{{ totalContrats }}</h3>
+                <small class="text-muted">Contrats des employés</small>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -11,9 +26,11 @@
                     <i class="fas fa-file-contract me-2"></i>
                     Gestion des Contrats
                 </h1>
-                <a href="{{ path('responsable_add_employe') }}" class="btn btn-success">
-                    <i class="fas fa-plus me-2"></i>Ajouter un Employé avec Contrat
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('responsable_add_employe') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Ajouter un Employé avec Contrat
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <!-- Barre de recherche -->
@@ -70,16 +87,21 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ path('responsable_view_employe_details', {'id': contrat.employe.id}) }}" class="btn btn-sm btn-info me-2">
-                                            <i class="fas fa-eye"></i> Voir Employé
-                                        </a>
-                                        {% if contrat.statut == 'actif' %}
-                                            <a href="{{ path('responsable_toggle_employe_status', {'id': contrat.employe.id}) }}" 
-                                               class="btn btn-sm btn-warning"
-                                               onclick="return confirm('Êtes-vous sûr de vouloir changer le statut de cet employé ?')">
-                                                <i class="fas fa-toggle-on"></i> Changer Statut
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ path('responsable_view_employe_details', {'id': contrat.employe.id}) }}" 
+                                               class="btn btn-sm btn-info" 
+                                               title="Voir Employé">
+                                                <i class="fas fa-eye"></i>
                                             </a>
-                                        {% endif %}
+                                            {% if contrat.statut == 'actif' %}
+                                                <a href="{{ path('responsable_toggle_employe_status', {'id': contrat.employe.id}) }}" 
+                                                   class="btn btn-sm btn-warning"
+                                                   title="Changer Statut"
+                                                   onclick="return confirm('Êtes-vous sûr de vouloir changer le statut de cet employé ?')">
+                                                    <i class="fas fa-toggle-on"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -119,14 +141,16 @@
                                     <span>Fin: {{ contrat.dateFin ? contrat.dateFin|date('d/m/Y') : 'Non définie' }}</span>
                                 </div>
                             </div>
-                            <div class="contrat-card-actions">
+                            <div class="contrat-card-actions d-flex gap-2">
                                 <a href="{{ path('responsable_view_employe_details', {'id': contrat.employe.id}) }}" 
-                                   class="btn btn-sm btn-outline-primary">
+                                   class="btn btn-sm btn-outline-primary flex-fill"
+                                   title="Voir Employé">
                                     <i class="fas fa-eye"></i> Voir
                                 </a>
                                 {% if contrat.statut == 'actif' %}
                                 <a href="{{ path('responsable_toggle_employe_status', {'id': contrat.employe.id}) }}" 
-                                   class="btn btn-sm btn-outline-warning"
+                                   class="btn btn-sm btn-outline-warning flex-fill"
+                                   title="Changer Statut"
                                    onclick="return confirm('Êtes-vous sûr de vouloir changer le statut ?')">
                                     <i class="fas fa-toggle-on"></i> Statut
                                 </a>
@@ -134,6 +158,13 @@
                             </div>
                         </div>
                         {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Pagination -->
+                {% if contrats.pageCount > 1 %}
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ knp_pagination_render(contrats) }}
                     </div>
                 {% endif %}
             </div>

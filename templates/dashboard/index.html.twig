@@ -32,8 +32,8 @@
 </div>
 
 <!-- Quick Stats -->
-<div class="row g-3 mb-3 animate-stagger">
-    <div class="col-lg-3 col-md-6">
+<div class="row g-3 mb-3 animate-stagger justify-content-center">
+    <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up">
             <div class="card-body text-center py-3">
                 <div class="stat-icon bg-primary mb-2 animate-scale-in">
@@ -45,7 +45,7 @@
         </div>
     </div>
     
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.1s;">
             <div class="card-body text-center py-3">
                 <div class="stat-icon bg-success mb-2 animate-scale-in" style="animation-delay: 0.4s;">
@@ -57,7 +57,7 @@
         </div>
     </div>
     
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.2s;">
             <div class="card-body text-center py-3">
                 <div class="stat-icon bg-warning mb-2 animate-scale-in" style="animation-delay: 0.5s;">
@@ -69,14 +69,14 @@
         </div>
     </div>
     
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.3s;">
             <div class="card-body text-center py-3">
-                <div class="stat-icon bg-info mb-2 animate-scale-in" style="animation-delay: 0.6s;">
-                    <i class="fas fa-folder fa-lg text-white"></i>
+                <div class="stat-icon bg-danger mb-2 animate-scale-in" style="animation-delay: 0.6s;">
+                    <i class="fas fa-exclamation-triangle fa-lg text-white"></i>
                 </div>
-                <h4 class="stat-number text-info mb-1 animate-fade-in-up" style="animation-delay: 0.7s;">{{ kpis.total_documents }}</h4>
-                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.8s;">Documents</p>
+                <h4 class="stat-number text-danger mb-1 animate-fade-in-up" style="animation-delay: 0.7s;">{{ kpis.total_reclamations }}</h4>
+                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.8s;">Réclamations</p>
             </div>
         </div>
     </div>
@@ -2883,10 +2883,10 @@
                             <div class="card-body p-0">
                                 <div class="table-responsive report-table">
                                     <table class="table table-bordered table-hover table-sm mb-0" id="reportTable">
-                                        <thead class="table-dark sticky-top">
+                                        <thead class="table-dark sticky-top" id="reportTableHead">
                                             <!-- Headers will be populated by JavaScript -->
                                         </thead>
-                                        <tbody>
+                                        <tbody id="reportTableBody">
                                             <!-- Data will be populated by JavaScript -->
                                         </tbody>
                                     </table>
@@ -2912,114 +2912,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-// Report data from JSON files
-const reportData = {
-    'rapport-a': {
-        title: 'A. Performance par Nature de Contrat',
-        data: [
-            ["", "", "NATIONAL SALARIÉ PERMANENT CDI", "NATIONAL SALARIÉ PERMANENT CDD", "NATIONAL SALARIÉ CONTRACTUEL", "NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "NATIONAL AUTO-ENTREPRENEUR", "NATIONAL STAGIAIRE PROFESSIONNEL", "NATIONAL STAGIAIRE ETUDIANT", "ETRANGER ENSEIGNANT", "ETRANGER PRATICIEN"],
-            ["DOSSIER PERSONNEL", "Avancement", "84.83%", "73.10%", "74.01%", "39.88%", "43.56%", "37.08%", "35.96%", "34.48%", "6.72%", "18.10%", "14.99%", "35.14%", "35.74%", "2.45%", "0.00%"],
-            ["", "Nombre de documents manquants", " 2,264 ", " 2,963 ", " 315 ", " 202 ", " 745 ", " 151 ", " 2,951 ", " 2,178 ", " 347 ", " 285 ", " 3,356 ", " 3,168 ", " 694 ", " 199 ", " 180 "],
-            ["AYANT DROITS", "Avancement", "6.22%", "2.92%", "4.55%", "0.71%", "2.18%", "0.00%", "0.47%", "0.79%", "0.65%", "0.00%", "0.06%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["", "Nombre de documents manquants", " 5,833 ", " 4,456 ", " 482 ", " 139 ", " 538 ", " 100 ", " 1,911 ", " 1,374 ", " 154 ", " 145 ", " 1,644 ", " 2,035 ", " 450 ", " 85 ", " 75 "]
-        ]
-    },
-    'rapport-b': {
-        title: 'B. Performance par Organisation',
-        data: [
-            ["", "", "DSOI", "DENS", "EPHR", "DING", "DSPR", "DNUM", "DAPR", "DGST", "DSIG", "DRST", "DASO", "EING", "EPRD", "DEXP", "DPRD", "DPHR"],
-            ["DOSSIER PERSONNEL", "", "73.72%", "39.38%", "70.40%", "68.46%", "65.03%", "71.37%", "71.29%", "70.56%", "67.19%", "68.31%", "51.85%", "63.40%", "69.40%", "65.38%", "27.15%", "70.14%"],
-            ["AYANT DROITS", "", "3.40%", "1.06%", "5.37%", "7.53%", "8.79%", "1.29%", "4.35%", "1.30%", "1.25%", "10.34%", "3.33%", "4.59%", "4.26%", "2.05%", "0.24%", "8.33%"]
-        ]
-    },
-    'rapport-c': {
-        title: 'C. Performance Détaillée par Organisation',
-        data: [
-            ["", "", "CIN", "ACTE DE NAISSANCE", "FORMULAIRE", "CONTRAT", "DOSSIER MEDICAL", "BAC", "DIPLÔMES", "CV", "RIB", "FICHE ANTHRO", "PHOTO", "EMPREINTE", "% DOSSIER PERSONNEL", "", "ACTE DE MARIAGE", "CIN CONJOINT", "ACTES NAISS ENFANT", "CIN ENFANTS", "CIN PARENTS", "% AYANT DROITS"],
-            ["DAS", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "", "|", "|", "|", "|", "|", "|"],
-            ["DSOI", "", "90.42%", "69.44%", "78.59%", "41.30%", "69.62%", "51.61%", "77.87%", "83.87%", "86.78%", "74.95%", "84.11%", "76.11%", "73.72%", "", "9.58%", "3.58%", "3.58%", "0.24%", "0.24%", "3.44%"],
-            ["DENS", "", "86.76%", "17.55%", "41.73%", "16.55%", "2.01%", "9.21%", "52.66%", "51.08%", "70.07%", "24.75%", "48.06%", "52.09%", "39.38%", "", "1.87%", "2.30%", "0.72%", "0.43%", "0.86%", "1.24%"],
-            ["EPHR", "", "85.07%", "61.19%", "83.58%", "37.31%", "34.33%", "47.76%", "82.09%", "85.07%", "85.07%", "76.12%", "85.07%", "82.09%", "70.40%", "", "16.42%", "7.46%", "1.49%", "1.49%", "0.00%", "5.37%"],
-            ["DING", "", "91.40%", "54.84%", "90.32%", "44.09%", "9.68%", "21.51%", "86.02%", "90.32%", "91.40%", "75.27%", "90.32%", "76.34%", "68.46%", "", "9.68%", "20.43%", "6.45%", "1.08%", "2.15%", "7.96%"],
-            ["DSPR", "", "81.82%", "60.61%", "80.30%", "42.42%", "10.61%", "27.27%", "80.30%", "81.82%", "81.82%", "72.73%", "81.82%", "78.79%", "65.03%", "", "10.61%", "22.73%", "6.06%", "4.55%", "1.52%", "9.09%"],
-            ["DNUM", "", "87.10%", "62.90%", "87.10%", "45.16%", "6.45%", "61.29%", "82.26%", "87.10%", "87.10%", "80.65%", "87.10%", "82.26%", "71.37%", "", "1.61%", "4.84%", "0.00%", "0.00%", "11.29%", "3.55%"],
-            ["DAPR", "", "93.48%", "59.78%", "91.30%", "42.39%", "5.43%", "44.57%", "90.22%", "93.48%", "93.48%", "72.83%", "92.39%", "76.09%", "71.29%", "", "5.43%", "14.13%", "2.17%", "0.00%", "0.00%", "4.35%"],
-            ["DGST", "", "90.22%", "60.87%", "90.22%", "28.26%", "7.61%", "66.30%", "80.43%", "90.22%", "90.22%", "72.83%", "90.22%", "79.35%", "70.56%", "", "2.17%", "3.26%", "1.09%", "0.00%", "1.09%", "1.52%"],
-            ["DSIG", "", "87.50%", "51.56%", "85.94%", "48.44%", "14.06%", "51.56%", "73.44%", "87.50%", "87.50%", "56.25%", "85.94%", "76.56%", "67.19%", "", "3.13%", "3.13%", "0.00%", "0.00%", "4.69%", "2.19%"],
-            ["DRST", "", "88.44%", "58.50%", "87.07%", "44.90%", "3.40%", "19.05%", "87.07%", "88.44%", "88.44%", "80.27%", "88.44%", "85.71%", "68.31%", "", "14.97%", "27.89%", "7.48%", "1.36%", "2.04%", "10.75%"],
-            ["DASO", "", "88.89%", "31.48%", "85.19%", "20.37%", "12.96%", "11.11%", "37.04%", "87.04%", "87.04%", "35.19%", "87.04%", "38.89%", "51.85%", "", "5.56%", "1.85%", "3.70%", "5.56%", "0.00%", "3.33%"],
-            ["EING", "", "92.59%", "32.59%", "90.37%", "22.22%", "7.41%", "17.04%", "90.37%", "91.85%", "91.85%", "67.41%", "91.85%", "65.19%", "63.40%", "", "9.63%", "7.41%", "5.93%", "0.00%", "0.00%", "4.59%"],
-            ["EPRD", "", "93.44%", "42.62%", "86.89%", "31.15%", "49.18%", "31.15%", "81.97%", "91.80%", "93.44%", "65.57%", "91.80%", "73.77%", "69.40%", "", "8.20%", "8.20%", "4.92%", "0.00%", "1.64%", "4.59%"],
-            ["DEXP", "", "89.74%", "51.28%", "82.05%", "28.21%", "0.00%", "48.72%", "82.05%", "84.62%", "87.18%", "58.97%", "87.18%", "84.62%", "65.38%", "", "5.13%", "2.56%", "0.00%", "2.56%", "2.56%", "2.56%"],
-            ["DPRD", "", "54.17%", "2.98%", "52.83%", "6.55%", "0.74%", "0.74%", "4.17%", "53.13%", "53.87%", "4.32%", "53.87%", "38.39%", "27.15%", "", "0.15%", "0.89%", "0.00%", "0.15%", "0.00%", "0.24%"],
-            ["DPHR", "", "91.67%", "66.67%", "91.67%", "8.33%", "16.67%", "33.33%", "91.67%", "91.67%", "91.67%", "75.00%", "91.67%", "91.67%", "70.14%", "", "16.67%", "16.67%", "0.00%", "8.33%", "33.33%", "15.00%"]
-        ]
-    },
-    'rapport-d': {
-        title: 'D. Performance Détaillée par Nature de Contrat',
-        data: [
-            ["", "", "CIN", "ACTE DE NAISSANCE", "FORMULAIRE", "CONTRAT", "DOSSIER MEDICAL", "BAC", "DIPLÔMES", "CV", "RIB", "FICHE ANTHRO", "PHOTO", "EMPREINTE", "% DOSSIER PERSONNEL", "", "ACTE DE MARIAGE", "CIN CONJOINT", "ACTES NAISS ENFANT", "CIN ENFANTS", "CIN PARENTS", "% AYANT DROITS"],
-            ["NATURE", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "|", "", "|", "|", "|", "|", "|", "|"],
-            ["NATIONAL SALARIÉ PERMANENT CDI", "", "99.12%", "74.68%", "98.47%", "48.79%", "66.16%", "54.98%", "95.34%", "99.04%", "99.12%", "89.79%", "99.04%", "93.49%", "84.83%", "", "14.79%", "9.32%", "5.95%", "1.05%", "1.21%", "6.46%"],
-            ["NATIONAL SALARIÉ PERMANENT CDD", "", "89.54%", "69.93%", "89.00%", "37.91%", "41.07%", "52.94%", "79.96%", "89.54%", "89.54%", "78.54%", "89.54%", "69.72%", "73.10%", "", "5.99%", "5.77%", "2.40%", "0.44%", "1.74%", "3.27%"],
-            ["NATIONAL SALARIÉ CONTRACTUEL", "", "99.01%", "48.51%", "96.04%", "36.63%", "49.50%", "34.65%", "78.22%", "99.01%", "99.01%", "59.41%", "99.01%", "89.11%", "74.01%", "", "9.90%", "5.94%", "4.95%", "1.98%", "1.98%", "4.95%"],
-            ["NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "", "75.00%", "25.00%", "28.57%", "21.43%", "7.14%", "14.29%", "50.00%", "50.00%", "71.43%", "35.71%", "50.00%", "50.00%", "39.88%", "", "3.57%", "0.00%", "0.00%", "0.00%", "0.00%", "0.71%"],
-            ["NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "", "86.36%", "27.27%", "30.00%", "25.45%", "7.27%", "5.45%", "70.91%", "53.64%", "63.64%", "34.55%", "51.82%", "66.36%", "43.56%", "", "0.91%", "10.00%", "0.00%", "0.00%", "0.00%", "2.18%"],
-            ["NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "", "85.00%", "30.00%", "15.00%", "20.00%", "0.00%", "5.00%", "45.00%", "45.00%", "65.00%", "35.00%", "40.00%", "60.00%", "37.08%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "", "94.53%", "16.41%", "21.35%", "19.53%", "2.60%", "4.69%", "61.46%", "36.20%", "66.93%", "19.01%", "31.25%", "57.55%", "35.96%", "", "0.78%", "1.56%", "0.00%", "0.00%", "0.00%", "0.47%"],
-            ["NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "", "66.79%", "23.47%", "24.19%", "17.69%", "4.69%", "8.30%", "44.40%", "42.96%", "54.15%", "30.69%", "44.77%", "51.62%", "34.48%", "", "0.72%", "2.53%", "0.36%", "0.36%", "0.00%", "0.79%"],
-            ["NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "", "16.13%", "3.23%", "0.00%", "3.23%", "0.00%", "3.23%", "12.90%", "6.45%", "16.13%", "0.00%", "6.45%", "12.90%", "6.72%", "", "0.00%", "3.23%", "0.00%", "0.00%", "0.00%", "0.65%"],
-            ["NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "", "62.07%", "3.45%", "10.34%", "10.34%", "0.00%", "0.00%", "27.59%", "13.79%", "34.48%", "3.45%", "10.34%", "41.38%", "18.10%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL AUTO-ENTREPRENEUR", "", "18.54%", "1.82%", "16.41%", "10.94%", "0.30%", "0.61%", "2.74%", "16.72%", "17.93%", "2.43%", "18.24%", "73.25%", "14.99%", "", "0.00%", "0.30%", "0.00%", "0.00%", "0.00%", "0.06%"],
-            ["NATIONAL STAGIAIRE PROFESSIONNEL", "", "83.78%", "0.98%", "82.31%", "0.49%", "0.25%", "0.49%", "0.98%", "82.80%", "83.78%", "1.47%", "82.80%", "1.47%", "35.14%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL STAGIAIRE ETUDIANT", "", "85.56%", "0.00%", "85.56%", "0.00%", "0.00%", "0.00%", "0.00%", "85.56%", "85.56%", "0.00%", "85.56%", "1.11%", "35.74%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["ETRANGER ENSEIGNANT", "", "5.88%", "0.00%", "5.88%", "0.00%", "0.00%", "0.00%", "0.00%", "5.88%", "5.88%", "0.00%", "5.88%", "0.00%", "2.45%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["ETRANGER PRATICIEN", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"]
-        ]
-    },
-    'rapport-e': {
-        title: 'E. Performance par Organisation et Nature de Contrat',
-        data: [
-            ["", "", "DSOI", "DENS", "EPHR", "DING", "DSPR", "DNUM", "DAPR", "DGST", "DSIG", "DRST", "DASO", "EING", "EPRD", "DEXP", "DPRD", "DPHR"],
-            ["NATIONAL SALARIÉ PERMANENT CDI", "", "89.67%", "72.74%", "82.46%", "76.75%", "80.90%", "81.25%", "77.16%", "79.32%", "74.17%", "74.63%", "76.75%", "74.55%", "76.52%", "73.33%", "87.50%", "76.19%"],
-            ["NATIONAL SALARIÉ PERMANENT CDD", "", "83.84%", "58.91%", "60.87%", "56.37%", "60.14%", "73.91%", "69.88%", "77.61%", "72.42%", "62.87%", "87.50%", "56.84%", "68.87%", "73.96%", "72.22%", "77.08%"],
-            ["NATIONAL SALARIÉ CONTRACTUEL", "", "82.00%", "71.08%", "70.83%", "0.00%", "62.50%", "0.00%", "76.67%", "50.00%", "48.96%", "0.00%", "0.00%", "0.00%", "69.44%", "68.06%", "0.00%", "0.00%"],
-            ["NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "", "40.97%", "0.00%", "41.67%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "41.67%", "0.00%", "8.33%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "", "43.56%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "", "0.00%", "37.22%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "36.67%", "0.00%", "0.00%"],
-            ["NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "", "0.00%", "35.96%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "", "34.48%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "", "0.00%", "6.72%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "", "0.00%", "22.22%", "0.00%", "33.33%", "0.00%", "0.00%", "66.67%", "0.00%", "0.00%", "0.00%", "0.00%", "12.50%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL AUTO-ENTREPRENEUR", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "14.99%", "0.00%"],
-            ["NATIONAL STAGIAIRE PROFESSIONNEL", "", "20.83%", "30.00%", "0.00%", "41.67%", "0.00%", "17.86%", "20.83%", "24.31%", "20.83%", "0.00%", "37.37%", "0.00%", "0.00%", "0.00%", "36.96%", "0.00%"],
-            ["NATIONAL STAGIAIRE ETUDIANT", "", "0.00%", "35.74%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["ETRANGER ENSEIGNANT", "", "0.00%", "2.45%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["ETRANGER PRATICIEN", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"]
-        ]
-    },
-    'rapport-f': {
-        title: 'F. Performance Détaillée par Organisation et Nature',
-        data: [
-            ["NATURE", "", "DSOI", "DENS", "EPHR", "DING", "DSPR", "DNUM", "DAPR", "DGST", "DSIG", "DRST", "DASO", "EING", "EPRD", "DEXP", "DPRD", "DPHR"],
-            ["NATIONAL SALARIÉ PERMANENT CDI", "", "5.33%", "4.86%", "7.89%", "9.47%", "20.83%", "4.38%", "5.93%", "2.22%", "0.00%", "13.24%", "9.47%", "6.55%", "8.18%", "0.00%", "30.00%", "22.86%"],
-            ["NATIONAL SALARIÉ PERMANENT CDD", "", "2.05%", "2.79%", "1.74%", "5.88%", "2.70%", "3.48%", "3.86%", "1.57%", "3.33%", "8.61%", "0.00%", "3.33%", "2.94%", "6.25%", "5.33%", "5.00%"],
-            ["NATIONAL SALARIÉ CONTRACTUEL", "", "5.20%", "11.76%", "10.00%", "0.00%", "0.00%", "0.00%", "4.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL PRATICIEN PERMANENT CONTRACTUEL", "", "0.83%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL PRATICIEN PERMANENT À L'HONORAIRE VARIABLE", "", "2.18%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL ENSEIGNANT PERMANENT CONTRACTUEL", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL ENSEIGNANT PERMANENT À L'HONORAIRE FORFAITAIRE", "", "0.00%", "0.47%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL PRATICIEN VACATAIRE À L'HONORAIRE VARIABLE", "", "0.79%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL ENSEIGNANT VACATAIRE À L'HONORAIRE VARIABLE", "", "0.00%", "0.65%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL AUTRE AUX ÉMOLUMENTS PRESTATIONS", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL AUTO-ENTREPRENEUR", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.06%", "0.00%"],
-            ["NATIONAL STAGIAIRE PROFESSIONNEL", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["NATIONAL STAGIAIRE ETUDIANT", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["ETRANGER ENSEIGNANT", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"],
-            ["ETRANGER PRATICIEN", "", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%", "0.00%"]
-        ]
-    }
-};
+// Report data from PHP backend (real statistics)
+const reportData = {{ performanceData|json_encode|raw }};
+
+console.log('Report Data:', reportData);
 
 let currentReportType = '';
 let pieChart = null;
@@ -3029,8 +2925,10 @@ function openReportModal(reportType) {
     currentReportType = reportType;
     const report = reportData[reportType];
     
-    if (!report) {
-        alert('Données du rapport non disponibles');
+    console.log('Opening report:', reportType, report);
+    
+    if (!report || !report.data || report.data.length === 0) {
+        alert('Données du rapport non disponibles. Les données sont vide ou en cours de calcul.');
         return;
     }
     
@@ -3087,13 +2985,13 @@ function createPieChart(data) {
         chartType = 'doughnut';
         chartTitle = 'Performance par Type de Contrat';
         labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '');
+        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
     } else if (currentReportType === 'rapport-b') {
-        // Polar area chart for organizations
-        chartType = 'polarArea';
+        // Pie chart not used for rapport-b (hidden, only bar chart shown)
+        chartType = 'doughnut';
         chartTitle = 'Performance par Organisation';
         labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '');
+        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
     } else if (currentReportType === 'rapport-c') {
         // Radar chart for detailed organization performance
         chartType = 'radar';
@@ -3113,82 +3011,68 @@ function createPieChart(data) {
             values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
         }
     } else if (currentReportType === 'rapport-e') {
-        // Pie chart for organization-nature matrix
+        // Pie chart for personnel matrix
         chartType = 'pie';
-        chartTitle = 'Répartition Org./Nature';
-        labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '');
+        chartTitle = 'Performance Personnel par Contrat';
+        if (data && data.length > 1) {
+            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
+            values = data[1].slice(2).filter(v => v !== '' && v !== '|');
+        }
     } else if (currentReportType === 'rapport-f') {
-        // Polar area for detailed org-nature
-        chartType = 'polarArea';
-        chartTitle = 'Performance Détaillée';
-        labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '');
+        // Pie chart for ayant droits matrix
+        chartType = 'pie';
+        chartTitle = 'Performance Ayant Droits par Contrat';
+        if (data && data.length > 2) {
+            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
+            values = data[2].slice(2).filter(v => v !== '' && v !== '|');
+        }
     }
     
-    const chartData = {
-        labels: labels.map(h => h.length > 20 ? h.substring(0, 20) + '...' : h),
-        datasets: [{
-            label: chartTitle,
-            data: values.map(p => parseFloat(p.replace('%', ''))),
-            backgroundColor: [
-                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                '#FF9F40', '#E7E9ED', '#C9CBCF', '#4BC0C0', '#FF6384',
-                '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
-                '#FF6384', '#C9CBCF', '#36A2EB', '#FFCE56'
-            ],
-            borderWidth: 2,
-            borderColor: '#fff'
-        }]
-    };
+    // Clear canvas
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     
+    // Check if we have data
+    if (!labels || labels.length === 0 || !values || values.length === 0) {
+        console.log('No data to display in chart. Labels:', labels, 'Values:', values);
+        return;
+    }
+    
+    // Create chart
     pieChart = new Chart(ctx, {
         type: chartType,
-        data: chartData,
+        data: {
+            labels: labels,
+        datasets: [{
+            label: chartTitle,
+                data: values.map(v => {
+                    if (typeof v === 'string' && v.includes('%')) {
+                        return parseFloat(v.replace('%', ''));
+                    }
+                    return parseFloat(v) || 0;
+                }),
+            backgroundColor: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(255, 205, 86, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)'
+                ],
+                borderWidth: 2
+            }]
+        },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             plugins: {
-                legend: {
-                    position: window.innerWidth < 768 ? 'bottom' : 'right',
-                    labels: {
-                        font: {
-                            size: window.innerWidth < 768 ? 8 : (window.innerWidth < 1200 ? 9 : 10)
-                        },
-                        padding: window.innerWidth < 768 ? 5 : 8,
-                        boxWidth: window.innerWidth < 768 ? 12 : 15
-                    }
-                },
                 title: {
                     display: true,
-                    text: chartTitle,
-                    font: {
-                        size: window.innerWidth < 768 ? 12 : (window.innerWidth < 1200 ? 13 : 14),
-                        weight: 'bold'
-                    },
-                    padding: {
-                        top: 5,
-                        bottom: 10
-                    }
+                    text: chartTitle
+                },
+                legend: {
+                    position: 'bottom'
                 }
-            },
-            scales: chartType === 'radar' ? {
-                r: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        stepSize: 20,
-                        font: {
-                            size: window.innerWidth < 768 ? 8 : 10
-                        }
-                    },
-                    pointLabels: {
-                        font: {
-                            size: window.innerWidth < 768 ? 8 : 10
-                        }
-                    }
-                }
-            } : {}
+            }
         }
     });
 }
@@ -3196,11 +3080,16 @@ function createPieChart(data) {
 function createBarChart(data) {
     const ctx = document.getElementById('barChart').getContext('2d');
     
+    // Destroy existing chart
+    if (barChart) {
+        barChart.destroy();
+    }
+    
     // Determine the structure of the data
     let labels = [];
-    let datasets = [];
+    let values = [];
     let chartType = 'bar';
-    let chartTitle = 'Analyse Comparative';
+    let chartTitle = 'Comparaison';
     let isHorizontal = false;
     
     if (currentReportType === 'rapport-a') {
@@ -3209,160 +3098,97 @@ function createBarChart(data) {
         isHorizontal = true;
         chartTitle = 'Comparaison des Contrats';
         labels = data[0].slice(2).filter(h => h !== '');
-        const values = data[1].slice(2).filter(v => v !== '');
-        datasets = [{
-            label: 'Dossier Personnel (%)',
-            data: values.map(p => parseFloat(p.replace('%', ''))),
-            backgroundColor: '#FF6384',
-            borderColor: '#FF6384',
-            borderWidth: 2
-        }];
+        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
     } else if (currentReportType === 'rapport-b') {
-        // Vertical bar for organizations
-        chartType = 'bar';
-        chartTitle = 'Comparaison des Organisations';
-        labels = data[0].slice(2).filter(h => h !== '');
-        const values = data[1].slice(2).filter(v => v !== '');
-        datasets = [{
-            label: 'Performance (%)',
-            data: values.map(p => parseFloat(p.replace('%', ''))),
-            backgroundColor: values.map(v => {
-                const val = parseFloat(v.replace('%', ''));
-                return val >= 70 ? '#4BC0C0' : val >= 50 ? '#FFCE56' : '#FF6384';
-            }),
-            borderWidth: 2,
-            borderColor: '#fff'
-        }];
-    } else if (currentReportType === 'rapport-c') {
-        // Stacked bar for organizations showing Dossier Personnel vs Ayant Droits
-        chartType = 'bar';
-        chartTitle = 'Dossier Personnel vs Ayant Droits';
-        const dossierIndex = data[0].indexOf('% DOSSIER PERSONNEL');
-        const ayantIndex = data[0].indexOf('% AYANT DROITS');
-        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
-        datasets = [
-            {
-                label: 'Dossier Personnel',
-                data: data.slice(2).map(row => parseFloat(row[dossierIndex].replace('%', ''))),
-                backgroundColor: '#36A2EB',
-                borderWidth: 1
-            },
-            {
-                label: 'Ayant Droits',
-                data: data.slice(2).map(row => parseFloat(row[ayantIndex].replace('%', ''))),
-                backgroundColor: '#FF9F40',
-                borderWidth: 1
-            }
-        ];
-    } else if (currentReportType === 'rapport-d') {
-        // Horizontal bar for contract nature
+        // Horizontal bar chart for organizations
         chartType = 'bar';
         isHorizontal = true;
-        chartTitle = 'Nature de Contrat - Performance';
-        const dossierIndex = data[0].indexOf('% DOSSIER PERSONNEL');
-        const ayantIndex = data[0].indexOf('% AYANT DROITS');
-        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
-        datasets = [
-            {
-                label: 'Dossier Personnel',
-                data: data.slice(2).map(row => parseFloat(row[dossierIndex].replace('%', ''))),
-                backgroundColor: '#9966FF',
-                borderWidth: 1
-            },
-            {
-                label: 'Ayant Droits',
-                data: data.slice(2).map(row => parseFloat(row[ayantIndex].replace('%', ''))),
-                backgroundColor: '#FFCE56',
-                borderWidth: 1
-            }
-        ];
-    } else if (currentReportType === 'rapport-e') {
-        // Line chart for trends
-        chartType = 'line';
-        chartTitle = 'Tendances par Organisation';
+        chartTitle = 'Comparaison par Organisation';
         labels = data[0].slice(2).filter(h => h !== '');
-        const values = data[1].slice(2).filter(v => v !== '');
-        datasets = [{
-            label: 'Performance (%)',
-            data: values.map(p => parseFloat(p.replace('%', ''))),
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: '#36A2EB',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 5,
-            pointBackgroundColor: '#36A2EB'
-        }];
-    } else if (currentReportType === 'rapport-f') {
-        // Mixed chart - bar + line
+        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
+    } else if (currentReportType === 'rapport-c') {
+        // Grouped bar chart for detailed organization
         chartType = 'bar';
-        chartTitle = 'Performance Mixte';
-        labels = data[0].slice(2).filter(h => h !== '');
-        const values = data[1].slice(2).filter(v => v !== '');
-        datasets = [{
-            label: 'Performance (%)',
-            data: values.map(p => parseFloat(p.replace('%', ''))),
-            backgroundColor: '#4BC0C0',
-            borderColor: '#4BC0C0',
-            borderWidth: 2
-        }];
+        isHorizontal = false;
+        chartTitle = 'Documents par Organisation';
+        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        if (headerIndex !== -1) {
+        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+            values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+        }
+    } else if (currentReportType === 'rapport-d') {
+        // Grouped bar for contract nature details
+        chartType = 'bar';
+        isHorizontal = false;
+        chartTitle = 'Documents par Nature de Contrat';
+        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        if (headerIndex !== -1) {
+        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+            values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+        }
+    } else if (currentReportType === 'rapport-e') {
+        // Grouped bar for personnel matrix
+        chartType = 'bar';
+        isHorizontal = false;
+        chartTitle = 'Performance Personnel';
+        if (data && data.length > 1) {
+            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
+            values = data[1].slice(2).filter(v => v !== '' && v !== '|');
+        }
+    } else if (currentReportType === 'rapport-f') {
+        // Grouped bar for ayant droits matrix
+        chartType = 'bar';
+        isHorizontal = false;
+        chartTitle = 'Performance Ayant Droits';
+        if (data && data.length > 2) {
+            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
+            values = data[2].slice(2).filter(v => v !== '' && v !== '|');
+        }
     }
     
-    const barData = {
-        labels: labels.map(h => h.length > 15 ? h.substring(0, 15) + '...' : h),
-        datasets: datasets
-    };
+    // Check if we have data
+    if (!labels || labels.length === 0 || !values || values.length === 0) {
+        console.log('Bar Chart - No data to display. Labels:', labels, 'Values:', values);
+        return;
+    }
     
+    // Create chart
     barChart = new Chart(ctx, {
         type: chartType,
-        data: barData,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: chartTitle,
+                data: values.map(v => {
+                    if (typeof v === 'string' && v.includes('%')) {
+                        return parseFloat(v.replace('%', ''));
+                    }
+                    return parseFloat(v) || 0;
+                }),
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2
+            }]
+        },
         options: {
             indexAxis: isHorizontal ? 'y' : 'x',
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             plugins: {
-                legend: {
-                    display: true,
-                    position: window.innerWidth < 768 ? 'bottom' : 'top',
-                    labels: {
-                        font: {
-                            size: window.innerWidth < 768 ? 9 : (window.innerWidth < 1200 ? 10 : 11)
-                        },
-                        padding: window.innerWidth < 768 ? 5 : 8,
-                        boxWidth: window.innerWidth < 768 ? 12 : 15
-                    }
-                },
                 title: {
                     display: true,
-                    text: chartTitle,
-                    font: {
-                        size: window.innerWidth < 768 ? 12 : (window.innerWidth < 1200 ? 13 : 14),
-                        weight: 'bold'
-                    },
-                    padding: {
-                        top: 5,
-                        bottom: 10
-                    }
+                    text: chartTitle
+                },
+                legend: {
+                    display: false
                 }
             },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    max: isHorizontal ? undefined : 100,
-                    ticks: {
-                        font: {
-                            size: window.innerWidth < 768 ? 8 : (window.innerWidth < 1200 ? 9 : 10)
-                        }
-                    }
-                },
                 x: {
-                    beginAtZero: true,
-                    max: isHorizontal ? 100 : undefined,
-                    ticks: {
-                        font: {
-                            size: window.innerWidth < 768 ? 8 : (window.innerWidth < 1200 ? 9 : 10)
-                        }
-                    }
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
                 }
             }
         }
@@ -3370,43 +3196,72 @@ function createBarChart(data) {
 }
 
 function createReportTable(data) {
-    const table = document.getElementById('reportTable');
-    const thead = table.querySelector('thead');
-    const tbody = table.querySelector('tbody');
+    const tbody = document.getElementById('reportTableBody');
+    const thead = document.getElementById('reportTableHead');
     
-    // Clear existing content
-    thead.innerHTML = '';
+    if (!tbody) {
+        console.error('Element reportTableBody not found');
+        return;
+    }
+    
     tbody.innerHTML = '';
+    if (thead) thead.innerHTML = '';
     
-    // Create header
+    if (!data || data.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="100%" class="text-center text-muted">Aucune donnée disponible</td>';
+        tbody.appendChild(row);
+        return;
+    }
+    
+    // Create header row if data exists
+    if (data.length > 0 && thead) {
     const headerRow = document.createElement('tr');
-    data[0].forEach(cell => {
+        data[0].forEach(header => {
         const th = document.createElement('th');
-        th.textContent = cell;
+            th.textContent = header;
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
+    }
     
     // Create data rows
-    data.slice(1).forEach(row => {
+    data.slice(1).forEach((row, rowIndex) => {
         const tr = document.createElement('tr');
-        row.forEach((cell, index) => {
+        
+        row.forEach(cell => {
             const td = document.createElement('td');
+            
+            // Style cells based on content
             if (cell.includes('%')) {
                 const percentage = parseFloat(cell.replace('%', ''));
-                let badgeClass = 'bg-secondary';
-                if (percentage >= 70) badgeClass = 'bg-success';
-                else if (percentage >= 50) badgeClass = 'bg-warning';
-                else if (percentage > 0) badgeClass = 'bg-danger';
-                
-                td.innerHTML = `<span class="badge ${badgeClass}">${cell}</span>`;
+                td.textContent = cell;
+                if (percentage >= 70) {
+                    td.className = 'text-success fw-bold';
+                } else if (percentage >= 50) {
+                    td.className = 'text-warning fw-bold';
+                } else {
+                    td.className = 'text-danger fw-bold';
+                }
+            } else if (cell.includes('|')) {
+                td.textContent = '';
+                td.style.borderRight = '2px solid #dee2e6';
+            } else if (cell.trim() === '') {
+                td.textContent = '';
             } else {
                 td.textContent = cell;
             }
+            
             tr.appendChild(td);
         });
+        
         tbody.appendChild(tr);
     });
+}
+
+function generateAdditionalCharts(kpiContent, reportType) {
+    // Generate additional charts based on report type
+    return '';
 }
 
 function exportReportToExcel() {
@@ -3430,6 +3285,143 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+async function openReportModal(reportType) {
+    console.log('Opening report:', reportType, reportData);
+    currentReportType = reportType;
+    let report = reportData[reportType];
+    
+    // Destroy existing charts if they exist
+    if (pieChart) {
+        pieChart.destroy();
+        pieChart = null;
+    }
+    if (barChart) {
+        barChart.destroy();
+        barChart = null;
+    }
+    
+    // Show modal immediately
+    const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+    modal.show();
+    
+    // Set modal title
+    document.getElementById('modalTitle').textContent = report ? report.title : 'Chargement...';
+    
+    // Check if data needs to be loaded
+    if (!report || !report.data || report.loaded === false) {
+        // Show loading indicator
+        const modalBody = document.querySelector('#reportModal .modal-body');
+        modalBody.innerHTML = '<div class="text-center p-5"><div class="spinner-border" role="status"><span class="visually-hidden">Chargement...</span></div><p class="mt-3">Chargement des données en cours...</p></div>';
+        
+        // Load data via AJAX
+        try {
+            const response = await fetch(`/api/report/${reportType}`);
+            const data = await response.json();
+            
+            // Update report data
+            reportData[reportType] = { ...data, loaded: true };
+            report = reportData[reportType];
+            
+            // Restore modal body
+            modalBody.innerHTML = '<div class="row g-3"><div class="col-12 col-lg-6"><div class="card h-100 shadow-sm"><div class="card-header bg-gradient"><h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i><span id="chart1Title">Graphique Principal</span></h6></div><div class="card-body"><div class="chart-container"><canvas id="pieChart"></canvas></div></div></div></div><div class="col-12 col-lg-6"><div class="card h-100 shadow-sm"><div class="card-header bg-gradient"><h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i><span id="chart2Title">Graphique Secondaire</span></h6></div><div class="card-body"><div class="chart-container"><canvas id="barChart"></canvas></div></div></div></div></div><div class="row mt-3 g-3"><div class="col-12"><div class="card shadow-sm"><div class="card-header bg-gradient"><h6 class="mb-0"><i class="fas fa-table me-2"></i>Tableau Détaillé</h6></div><div class="card-body p-0"><div class="table-responsive report-table"><table class="table table-bordered table-hover table-sm mb-0" id="reportTable"><thead class="table-dark sticky-top" id="reportTableHead"></thead><tbody id="reportTableBody"></tbody></table></div></div></div></div></div>';
+            
+            // Render charts
+            renderReportCharts(reportType, report);
+        } catch (error) {
+            console.error('Error loading report:', error);
+            modalBody.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement des données. Veuillez réessayer.</div>';
+            return;
+        }
+    }
+    
+    if (!report || !report.data || report.data.length === 0) {
+        document.querySelector('#reportModal .modal-body').innerHTML = '<div class="alert alert-info">Aucune donnée disponible pour ce rapport.</div>';
+        return;
+    }
+    
+    // Render charts after modal is shown
+    renderReportCharts(reportType, report);
+}
+
+function renderReportCharts(reportType, report) {
+    // Set chart titles based on report type
+    const chartTitles = {
+        'rapport-a': { chart1: '', chart2: 'Performance par Type de Contrat' },
+        'rapport-b': { chart1: '', chart2: 'Performance par Organisation' },
+        'rapport-c': { chart1: 'Graphique Radar', chart2: 'Barres Groupées' },
+        'rapport-d': { chart1: 'Graphique Doughnut', chart2: 'Barres Horizontales Groupées' },
+        'rapport-e': { chart1: 'Répartition', chart2: 'Tendances (Ligne)' },
+        'rapport-f': { chart1: 'Graphique Polaire', chart2: 'Barres Comparatives' }
+    };
+    
+    const titles = chartTitles[reportType] || { chart1: 'Graphique Principal', chart2: 'Graphique Secondaire' };
+    if (document.getElementById('chart1Title')) {
+        document.getElementById('chart1Title').textContent = titles.chart1;
+        document.getElementById('chart2Title').textContent = titles.chart2;
+    }
+    
+    // Wait for modal to be fully shown before creating charts
+    const modalElement = document.getElementById('reportModal');
+    const onModalShown = function() {
+        // Remove event listener to avoid multiple calls
+        modalElement.removeEventListener('shown.bs.modal', onModalShown);
+        
+        // Create charts - for rapport-a and rapport-b, hide first chart and make bar chart full width
+        if (reportType === 'rapport-a' || reportType === 'rapport-b') {
+            // Hide first chart container
+            const firstChart = document.querySelector('#reportModal .modal-body .row > .col-lg-6:first-child');
+            if (firstChart) {
+                firstChart.style.display = 'none';
+            }
+            
+            // Make the bar chart container full width and taller
+            const barChartContainer = document.querySelector('#reportModal .modal-body .row > .col-lg-6:last-child');
+            if (barChartContainer) {
+                barChartContainer.className = 'col-12';
+            }
+            
+            // Increase the height of the chart
+            const chartContainer = barChartContainer?.querySelector('.chart-container');
+            if (chartContainer) {
+                chartContainer.style.height = '600px';
+            }
+            
+            createBarChart(report.data);
+        } else {
+            // Reset to original size for other reports
+            const barChartContainer = document.querySelector('#reportModal .modal-body .row > .col-12');
+            if (barChartContainer && barChartContainer.classList.contains('col-12') && !barChartContainer.classList.contains('col-lg-6')) {
+                barChartContainer.className = 'col-12 col-lg-6';
+            }
+            // Reset chart height
+            const chartContainer = document.querySelector('#reportModal .modal-body .row > .col-lg-6:last-child .chart-container');
+            if (chartContainer) {
+                chartContainer.style.height = '';
+            }
+            // Show first chart
+            const firstChart = document.querySelector('#reportModal .modal-body .row > .col-lg-6:first-child');
+            if (firstChart) {
+                firstChart.style.display = 'block';
+            }
+            createPieChart(report.data);
+            createBarChart(report.data);
+        }
+        
+        // Create table
+        createReportTable(report.data);
+    };
+    
+    modalElement.addEventListener('shown.bs.modal', onModalShown);
+    // If modal is already shown, call directly
+    if (document.querySelector('.modal.show')) {
+        setTimeout(onModalShown, 100);
+    }
+}
+
+// Load the existing functions from above (defined at lines 2974-3227)
+// No need to redefine them here
+
 </script>
 
 {% endblock %}

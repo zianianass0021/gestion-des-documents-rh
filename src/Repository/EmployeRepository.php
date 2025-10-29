@@ -41,6 +41,19 @@ class EmployeRepository extends ServiceEntityRepository implements PasswordUpgra
     }
 
     /**
+     * Compte les employés par rôle
+     */
+    public function countByRole(string $role): int
+    {
+        $sql = 'SELECT COUNT(e.id) FROM t_employe e WHERE e.roles::text LIKE :role';
+        
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $result = $stmt->executeQuery(['role' => '%' . $role . '%']);
+        
+        return (int) $result->fetchOne();
+    }
+
+    /**
      * Trouve un employé par son email
      */
     public function findByEmail(string $email): ?Employe
@@ -211,20 +224,22 @@ class EmployeRepository extends ServiceEntityRepository implements PasswordUpgra
      */
     public function findByRoleQuery(string $role)
     {
-        // Utiliser une requête SQL native pour PostgreSQL
-        $sql = 'SELECT e.* FROM t_employe e WHERE e.roles::text LIKE :role ORDER BY e.nom ASC';
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT e.id FROM t_employe e WHERE CAST(e.roles AS TEXT) LIKE :role ORDER BY e.nom ASC';
         
-        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt = $conn->prepare($sql);
         $result = $stmt->executeQuery(['role' => '%' . $role . '%']);
         
-        $data = $result->fetchAllAssociative();
-        $employees = [];
+        $ids = $result->fetchFirstColumn();
         
-        foreach ($data as $row) {
-            $employees[] = $this->find($row['id']);
+        if (empty($ids)) {
+            return $this->createQueryBuilder('e')->where('1 = 0');
         }
         
-        return $employees;
+        return $this->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('e.nom', 'ASC');
     }
 
     /**
@@ -232,23 +247,26 @@ class EmployeRepository extends ServiceEntityRepository implements PasswordUpgra
      */
     public function findActiveByRoleQuery(string $role)
     {
-        // Utiliser une requête SQL native pour PostgreSQL
-        $sql = 'SELECT e.* FROM t_employe e WHERE e.is_active = :active AND e.roles::text LIKE :role ORDER BY e.nom ASC';
+        // Get IDs efficiently
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT e.id FROM t_employe e WHERE e.is_active = :active AND CAST(e.roles AS TEXT) LIKE :role ORDER BY e.nom ASC';
         
-        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt = $conn->prepare($sql);
         $result = $stmt->executeQuery([
             'active' => true,
             'role' => '%' . $role . '%'
         ]);
         
-        $data = $result->fetchAllAssociative();
-        $employees = [];
+        $ids = $result->fetchFirstColumn();
         
-        foreach ($data as $row) {
-            $employees[] = $this->find($row['id']);
+        if (empty($ids)) {
+            return $this->createQueryBuilder('e')->where('1 = 0');
         }
         
-        return $employees;
+        return $this->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('e.nom', 'ASC');
     }
 
     /**
@@ -256,57 +274,62 @@ class EmployeRepository extends ServiceEntityRepository implements PasswordUpgra
      */
     public function findByRoleAndSearchQuery(string $role, string $search)
     {
-        // Utiliser une requête SQL native pour PostgreSQL
-        $sql = 'SELECT DISTINCT e.* FROM t_employe e 
-                WHERE e.roles::text LIKE :role 
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT e.id FROM t_employe e 
+                WHERE CAST(e.roles AS TEXT) LIKE :role 
                 AND (LOWER(e.nom) LIKE LOWER(:search) 
                      OR LOWER(e.prenom) LIKE LOWER(:search) 
                      OR LOWER(e.email) LIKE LOWER(:search))
                 ORDER BY e.nom ASC';
         
-        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt = $conn->prepare($sql);
         $result = $stmt->executeQuery([
             'role' => '%' . $role . '%',
             'search' => '%' . $search . '%'
         ]);
         
-        $data = $result->fetchAllAssociative();
-        $employees = [];
+        $ids = $result->fetchFirstColumn();
         
-        foreach ($data as $row) {
-            $employees[] = $this->find($row['id']);
+        if (empty($ids)) {
+            return $this->createQueryBuilder('e')->where('1 = 0');
         }
         
-        return $employees;
+        return $this->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('e.nom', 'ASC');
     }
 
     /**
      * Crée une QueryBuilder pour les employés actifs par rôle avec recherche
+     * Returns a QueryBuilder for proper pagination support
      */
     public function findActiveByRoleAndSearchQuery(string $role, string $search)
     {
-        // Utiliser une requête SQL native pour PostgreSQL
-        $sql = 'SELECT DISTINCT e.* FROM t_employe e 
-                WHERE e.is_active = :active AND e.roles::text LIKE :role 
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT e.id FROM t_employe e 
+                WHERE e.is_active = :active AND CAST(e.roles AS TEXT) LIKE :role 
                 AND (LOWER(e.nom) LIKE LOWER(:search) 
                      OR LOWER(e.prenom) LIKE LOWER(:search) 
                      OR LOWER(e.email) LIKE LOWER(:search))
                 ORDER BY e.nom ASC';
         
-        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt = $conn->prepare($sql);
         $result = $stmt->executeQuery([
             'active' => true,
             'role' => '%' . $role . '%',
             'search' => '%' . $search . '%'
         ]);
         
-        $data = $result->fetchAllAssociative();
-        $employees = [];
+        $ids = $result->fetchFirstColumn();
         
-        foreach ($data as $row) {
-            $employees[] = $this->find($row['id']);
+        if (empty($ids)) {
+            return $this->createQueryBuilder('e')->where('1 = 0');
         }
         
-        return $employees;
+        return $this->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('e.nom', 'ASC');
     }
 }

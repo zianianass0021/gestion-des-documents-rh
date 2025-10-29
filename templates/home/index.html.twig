@@ -23,7 +23,7 @@
                     <!-- Logo -->
                     <div class="logo-section mb-5">
                         <div class="logo-circle animate-float">
-                            <i class="fas fa-building fa-4x"></i>
+                            <img src="{{ asset('logo.png') }}" alt="Système RH" class="home-logo">
                         </div>
                     </div>
 
@@ -251,21 +251,34 @@
 
     /* Logo Styles */
     .logo-circle {
-        width: 120px;
-        height: 120px;
-        background: rgba(255, 255, 255, 0.1);
+        width: 170px;
+        height: 170px;
+        background: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 2rem;
-        border: 2px solid rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
     }
 
     .logo-circle i {
         color: #ffffff;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .home-logo {
+        width: 140px;
+        height: 140px;
+        object-fit: contain;
+        object-position: center;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        display: block;
+        margin: 0 auto;
+        transform: translate(5px, 3px);
     }
 
     /* Trust Items */
