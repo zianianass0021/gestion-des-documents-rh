@@ -30,16 +30,35 @@ class Insert2000FinalEmployeesCommand extends Command
 
         $connection = $this->entityManager->getConnection();
 
+        // Arrays of diverse Moroccan names
+        $prenoms = ['Ahmed', 'Mohamed', 'Hassan', 'Omar', 'Youssef', 'Karim', 'Rachid', 'Said', 'Ali', 'Mustapha',
+                    'Fatima', 'Aicha', 'Khadija', 'Zineb', 'Sanae', 'Nadia', 'Samira', 'Latifa', 'Houda', 'Salma',
+                    'Brahim', 'Chakib', 'Driss', 'Fouad', 'Ghassan', 'Hicham', 'Ibrahim', 'Jamal', 'Khalid', 'Lahcen',
+                    'Meryem', 'Nabila', 'Rim', 'Souad', 'Wafa', 'Yasmine', 'Zahra', 'Amal', 'Bouchra', 'Chaimae'];
+        
+        $noms = ['Alaoui', 'Benali', 'Chraibi', 'Dakir', 'El Fassi', 'Gharbi', 'Hassani', 'Idrissi', 'Jabri', 'Kabbaj',
+                 'Lahlou', 'Mansouri', 'Naciri', 'Ouafi', 'Rahmani', 'Saadi', 'Tazi', 'Zahiri', 'Amrani', 'Bennani',
+                 'Cherkaoui', 'Daoudi', 'El Idrissi', 'El Mansouri', 'El Ouafi', 'El Yousfi', 'Fassi', 'Lazrak', 'Mekouar', 'Naji',
+                 'Ouali', 'Qadiri', 'Rachidi', 'Sefrioui', 'Tahiri', 'Zeroual', 'Ait', 'Bouazza', 'Chakir', 'Dahbi'];
+        
+        // Create SQL arrays
+        $prenomsArray = "ARRAY['" . implode("', '", $prenoms) . "']";
+        $nomsArray = "ARRAY['" . implode("', '", $noms) . "']";
+        
         // Insérer 2000 employés en une seule requête
         $io->section('Insertion des 2000 employés...');
-        $sql = "INSERT INTO t_employe (id, prenom, nom, email, username, telephone, password, roles, is_active) 
+        $prenomsLength = count($prenoms);
+        $nomsLength = count($noms);
+        
+        $sql = "INSERT INTO t_user (id, prenom, nom, email, username, telephone, password, roles, is_active) 
                 SELECT 
-                    nextval('t_employe_id_seq'),
-                    'Hassan' || i,
-                    'Chraibi' || i,
-                    'hassan' || i || '@uiass.ma',
-                    'hassan' || i,
-                    '06' || (random() * 99999999 + 10000000)::int,
+                    nextval('t_user_id_seq'),
+                    " . $prenomsArray . "[1 + floor(random() * " . $prenomsLength . ")::int],
+                    " . $nomsArray . "[1 + floor(random() * " . $nomsLength . ")::int],
+                    LOWER(" . $prenomsArray . "[1 + floor(random() * " . $prenomsLength . ")::int]) || '.' || 
+                    LOWER(" . $nomsArray . "[1 + floor(random() * " . $nomsLength . ")::int]) || i || '@uiass.ma',
+                    LOWER(" . $prenomsArray . "[1 + floor(random() * " . $prenomsLength . ")::int]) || i,
+                    '06' || LPAD((random() * 99999999 + 10000000)::int::text, 8, '0'),
                     '$2y$12$5AsyzCDJUpvtVlX2e5CvD.xGGIK2vq92zOEHykeLOzdIM1SKN4cCu',
                     '[\"ROLE_EMPLOYEE\"]',
                     true
@@ -49,7 +68,7 @@ class Insert2000FinalEmployeesCommand extends Command
         $io->text("Insérés {$result} employés");
 
         // Récupérer les IDs des nouveaux employés
-        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_employe ORDER BY id DESC LIMIT 2000")->fetchFirstColumn();
+        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_user ORDER BY id DESC LIMIT 2000")->fetchFirstColumn();
         $io->text("Récupérés " . count($newEmployeeIds) . " IDs d'employés");
 
         // Créer les contrats avec distribution
@@ -64,7 +83,7 @@ class Insert2000FinalEmployeesCommand extends Command
                         WHEN e.id % 100 < 99 THEN 3
                         ELSE 4 + (e.id % 2)
                     END as contract_count
-                FROM t_employe e
+                FROM t_user e
                 WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
             ),
             contract_data AS (
@@ -127,7 +146,7 @@ class Insert2000FinalEmployeesCommand extends Command
                 NOW(),
                 (SELECT id FROM p_placards ORDER BY random() LIMIT 1),
                 NULL
-            FROM t_employe e
+            FROM t_user e
             WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
         ";
 
@@ -136,7 +155,7 @@ class Insert2000FinalEmployeesCommand extends Command
 
         // Statistiques finales
         $io->section('Statistiques finales');
-        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_employe")->fetchOne();
+        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_user")->fetchOne();
         $totalDossiers = $connection->executeQuery("SELECT COUNT(*) FROM t_dossier")->fetchOne();
         $totalContrats = $connection->executeQuery("SELECT COUNT(*) FROM t_employee_contrat")->fetchOne();
         $totalPlacards = $connection->executeQuery("SELECT COUNT(*) FROM p_placards")->fetchOne();

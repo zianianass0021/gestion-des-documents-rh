@@ -20,13 +20,13 @@ final class Version20251008213905 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE t_employe DROP department');
+        $this->addSql('ALTER TABLE t_user DROP department');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
-        $this->addSql('ALTER TABLE t_employe ADD department VARCHAR(100) DEFAULT NULL');
+        $this->addSql('ALTER TABLE t_user ADD department VARCHAR(100) DEFAULT NULL');
     }
 }

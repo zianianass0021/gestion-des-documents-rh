@@ -13,8 +13,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
 
 class EmployeeType extends AbstractType
 {
@@ -66,6 +69,54 @@ class EmployeeType extends AbstractType
                     'placeholder' => '••••••••'
                 ]
             ])
+            ->add('isManager', CheckboxType::class, [
+                'label' => 'Cet employé est un manager',
+                'required' => false,
+                'mapped' => false,
+                'attr' => [
+                    'class' => 'form-check-input',
+                    'id' => 'is_manager_checkbox'
+                ],
+                'help' => 'Les managers ont accès aux fonctionnalités d\'employé et de manager'
+            ])
+            ->add('dossiersGeres', TextType::class, [
+                'label' => 'Dossiers gérés',
+                'required' => false,
+                'mapped' => true,
+                'attr' => [
+                    'style' => 'display: none;',
+                    'id' => 'dossiers_geres_input'
+                ]
+            ]);
+
+        // Pré-remplir isManager et dossierGere si l'employé est déjà manager (en mode édition)
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+            $form = $event->getForm();
+            $employee = $event->getData();
+
+            if ($employee && $employee->getId()) {
+                // En mode édition, vérifier si l'employé a déjà le rôle ROLE_MANAGER
+                $isManager = in_array('ROLE_MANAGER', $employee->getRoles());
+                
+                // Forcer la valeur de la checkbox
+                if ($form->has('isManager')) {
+                    $form->get('isManager')->setData($isManager);
+                }
+                
+                // Pré-remplir les dossiers gérés si l'employé est manager
+                if ($isManager && $form->has('dossiersGeres')) {
+                    $dossiersGeres = $employee->getDossiersGeres();
+                    if ($dossiersGeres && !empty($dossiersGeres)) {
+                        $form->get('dossiersGeres')->setData(json_encode($dossiersGeres));
+                    } elseif ($employee->getDossierGere()) {
+                        // Migration depuis l'ancien format
+                        $form->get('dossiersGeres')->setData(json_encode([$employee->getDossierGere()]));
+                    }
+                }
+            }
+        });
+        
+        $builder
             // Section Contrat
             ->add('natureContrat', EntityType::class, [
                 'class' => NatureContrat::class,
@@ -155,5 +206,118 @@ class EmployeeType extends AbstractType
             'data_class' => Employe::class,
             'is_new' => true,
         ]);
+    }
+
+    /**
+     * Retourne les choix de dossiers (niveau 3 de contrôle)
+     * Même liste que dans OrganisationType
+     */
+    private function getDossierChoices(): array
+    {
+        return [
+            // DAS-SIEGE (DSIG)
+            'SFCZ' => 'SFCZ',
+            'CCGA' => 'CCGA',
+            // DAS-GESTION (DGST)
+            'GACH' => 'GACH',
+            'GCMP' => 'GCMP',
+            'GFIN' => 'GFIN',
+            'GRSH' => 'GRSH',
+            'GJUR' => 'GJUR',
+            'GBNQ' => 'GBNQ',
+            'GPRG' => 'GPRG',
+            // DAS-ACTIVITE SOCIALE (DASO)
+            'SUMM' => 'SUMM',
+            'SASE' => 'SASE',
+            'SPSI' => 'SPSI',
+            'SASI' => 'SASI',
+            'SPSE' => 'SPSE',
+            // DAS-ENSEIGNEMENT & FORMATION (DENS)
+            'EUIA' => 'EUIA',
+            'ECSM' => 'ECSM',
+            'IFCP' => 'IFCP',
+            'ECFC' => 'ECFC',
+            'ECRI' => 'ECRI',
+            'ELEZ' => 'ELEZ',
+            'EEAS' => 'EEAS',
+            // DAS-SOINS (DSOI)
+            'SHCZ' => 'SHCZ',
+            'SLMG' => 'SLMG',
+            'SDNT' => 'SDNT',
+            'SHMK' => 'SHMK',
+            'SHMB' => 'SHMB',
+            'SHMY' => 'SHMY',
+            'SLPD' => 'SLPD',
+            'SRAD' => 'SRAD',
+            'SLAB' => 'SLAB',
+            'SAHR' => 'SAHR',
+            'SCOV' => 'SCOV',
+            'SOPH' => 'SOPH',
+            'SKIN' => 'SKIN',
+            'SCVP' => 'SCVP',
+            'SGHJ' => 'SGHJ',
+            'SGYN' => 'SGYN',
+            'SURG' => 'SURG',
+            'SHMS' => 'SHMS',
+            'SHCT' => 'SHCT',
+            'CSDA' => 'CSDA',
+            // DAS-HOTELLERIE-RESTAURATION (DRST)
+            'RRUR' => 'RRUR',
+            'RHUR' => 'RHUR',
+            'RHAR' => 'RHAR',
+            'RRER' => 'RRER',
+            'RRHK' => 'RRHK',
+            'RRHY' => 'RRHY',
+            'RDAR' => 'RDAR',
+            'RRHR' => 'RRHR',
+            'RHSR' => 'RHSR',
+            'RCER' => 'RCER',
+            'RBPR' => 'RBPR',
+            'RHCC' => 'RHCC',
+            // DAS-INFORMATIQUE ET NUMERIQUE (DNUM)
+            'NSIT' => 'NSIT',
+            'NARC' => 'NARC',
+            'NITS' => 'NITS',
+            'NNUM' => 'NNUM',
+            // DAS-INGENIERIE & TRAVAUX (DING)
+            'IMIN' => 'IMIN',
+            'IEIS' => 'IEIS',
+            'ICCI' => 'ICCI',
+            'IESV' => 'IESV',
+            'ISAE' => 'ISAE',
+            'ISAM' => 'ISAM',
+            'IPTT' => 'IPTT',
+            'ISAA' => 'ISAA',
+            // DAS-LOGISTIQUE & APPROVISIONNEMENT (DAPR)
+            'APCC' => 'APCC',
+            'APVR' => 'APVR',
+            'APUR' => 'APUR',
+            'APLM' => 'APLM',
+            'APCH' => 'APCH',
+            'LPDP' => 'LPDP',
+            // DAS-PHARMACEUTIQUE (DPHR)
+            'PVPH' => 'PVPH',
+            'PPPH' => 'PPPH',
+            'PAMD' => 'PAMD',
+            // DAS-PRESTATIONS EXTERNALISEES & ACTIVITES DE PRODUCTION (DPRD)
+            'PIMP' => 'PIMP',
+            'PPTM' => 'PPTM',
+            // DAS-RECHERCHE & EXPERTISE (DEXP)
+            'ECBE' => 'ECBE',
+            'ECRG' => 'ECRG',
+            'EEDF' => 'EEDF',
+            // DAS-SERVICES DE PROXIMITE (DSPR)
+            'PTEX' => 'PTEX',
+            'PBIR' => 'PBIR',
+            'PLAV' => 'PLAV',
+            'PCAP' => 'PCAP',
+            'PEPC' => 'PEPC',
+            'PCOF' => 'PCOF',
+            'PEVN' => 'PEVN',
+            // EPHR (AFRICMED)
+            'PGRO' => 'PGRO',
+            // EPRD (SA2S-METIERS)
+            'PSMS' => 'PSMS',
+        ];
     }
 }

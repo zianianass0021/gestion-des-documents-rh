@@ -1,0 +1,24 @@
+# Fichier d'exemple pour les surcharges de configuration Docker
+# Copiez ce fichier vers docker-compose.override.yml pour personnaliser votre configuration locale
+# Ce fichier est automatiquement ignoré par git (.gitignore)
+
+# Exemple: changer les ports pour éviter les conflits
+# services:
+#   symfony:
+#     ports:
+#       - "8080:8000"
+#   postgres:
+#     ports:
+#       - "5433:5432"
+#   clickhouse:
+#     ports:
+#       - "8124:8123"
+#       - "9001:9000"
+
+# Exemple: ajouter des variables d'environnement spécifiques
+# services:
+#   symfony:
+#     environment:
+#       APP_ENV: dev
+#       APP_DEBUG: 1
+

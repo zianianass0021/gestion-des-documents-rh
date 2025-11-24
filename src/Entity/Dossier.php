@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\DossierRepository;
+use App\Entity\Traits\TimestampableTrait;
+use App\Entity\Traits\BlameableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,6 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 't_dossier')]
 class Dossier
 {
+    use TimestampableTrait;
+    use BlameableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -33,11 +37,12 @@ class Dossier
     #[ORM\JoinColumn(nullable: true)]
     private ?Placard $placard = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(length: 12, nullable: true)]
     private ?string $emplacement = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $dossierCode = null;
 
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: Document::class, cascade: ['persist', 'remove'])]
     private Collection $documents;
@@ -45,7 +50,6 @@ class Dossier
     public function __construct()
     {
         $this->documents = new ArrayCollection();
-        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int
@@ -113,17 +117,6 @@ class Dossier
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
 
     public function getEmplacement(): ?string
     {
@@ -133,6 +126,18 @@ class Dossier
     public function setEmplacement(?string $emplacement): static
     {
         $this->emplacement = $emplacement;
+
+        return $this;
+    }
+
+    public function getDossierCode(): ?string
+    {
+        return $this->dossierCode;
+    }
+
+    public function setDossierCode(?string $dossierCode): static
+    {
+        $this->dossierCode = $dossierCode;
 
         return $this;
     }

@@ -40,7 +40,7 @@ class PerformanceReportCommand extends Command
         
         $stopwatch->start('general_stats');
         
-        $totalEmployes = $connection->executeQuery("SELECT COUNT(*) FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
+        $totalEmployes = $connection->executeQuery("SELECT COUNT(*) FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
         $totalDossiers = $connection->executeQuery("SELECT COUNT(*) FROM t_dossier")->fetchOne();
         $totalContrats = $connection->executeQuery("SELECT COUNT(*) FROM t_organisation_employee_contrat")->fetchOne();
         $totalOrganisations = $connection->executeQuery("SELECT COUNT(*) FROM p_organisation")->fetchOne();
@@ -72,27 +72,27 @@ class PerformanceReportCommand extends Command
         $performanceTests = [];
         
         // Test 1: Compter tous les employés
-        $stopwatch->start('count_employees');
-        $countResult = $connection->executeQuery("SELECT COUNT(*) FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
-        $countEvent = $stopwatch->stop('count_employees');
+        $stopwatch->start('count_useres');
+        $countResult = $connection->executeQuery("SELECT COUNT(*) FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
+        $countEvent = $stopwatch->stop('count_useres');
         $performanceTests[] = ['Compter employés', $countEvent->getDuration() . 'ms', $countResult];
         
         // Test 2: Recherche par nom
         $stopwatch->start('search_by_name');
-        $searchResult = $connection->executeQuery("SELECT COUNT(*) FROM t_employe WHERE nom ILIKE '%Mohamed%'")->fetchOne();
+        $searchResult = $connection->executeQuery("SELECT COUNT(*) FROM t_user WHERE nom ILIKE '%Mohamed%'")->fetchOne();
         $searchEvent = $stopwatch->stop('search_by_name');
         $performanceTests[] = ['Recherche par nom', $searchEvent->getDuration() . 'ms', $searchResult . ' résultats'];
         
         // Test 3: Pagination (première page)
         $stopwatch->start('pagination_first');
-        $paginationResult = $connection->executeQuery("SELECT COUNT(*) FROM (SELECT * FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%' LIMIT 20 OFFSET 0) as page")->fetchOne();
+        $paginationResult = $connection->executeQuery("SELECT COUNT(*) FROM (SELECT * FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%' LIMIT 20 OFFSET 0) as page")->fetchOne();
         $paginationEvent = $stopwatch->stop('pagination_first');
         $performanceTests[] = ['Pagination (page 1)', $paginationEvent->getDuration() . 'ms', $paginationResult . ' éléments'];
         
         // Test 4: Requête complexe avec JOIN
         $stopwatch->start('complex_join');
         $joinResult = $connection->executeQuery("
-            SELECT COUNT(*) FROM t_employe e 
+            SELECT COUNT(*) FROM t_user e 
             LEFT JOIN t_dossier d ON e.id = d.employe_id 
             LEFT JOIN t_employee_contrat ec ON e.id = ec.employe_id
             WHERE e.roles::text LIKE '%ROLE_EMPLOYEE%'

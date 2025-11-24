@@ -58,7 +58,7 @@ class Insert2000EmployeesFastCommand extends Command
         $employeeSql = "
             WITH RECURSIVE employee_data AS (
                 SELECT 
-                    nextval('t_employe_id_seq') as id,
+                    nextval('t_user_id_seq') as id,
                     prenoms.prenom,
                     noms.nom,
                     LOWER(prenoms.prenom || '.' || noms.nom || '.' || (random() * 999 + 100)::int) as email,
@@ -94,7 +94,7 @@ class Insert2000EmployeesFastCommand extends Command
                 ) AS noms(nom)
                 WHERE ROW_NUMBER() OVER() <= 2000
             )
-            INSERT INTO t_employe (id, prenom, nom, email, username, telephone, password, roles, is_active)
+            INSERT INTO t_user (id, prenom, nom, email, username, telephone, password, roles, is_active)
             SELECT id, prenom, nom, email, username, telephone, password, roles, is_active
             FROM employee_data
             ORDER BY random()
@@ -105,7 +105,7 @@ class Insert2000EmployeesFastCommand extends Command
         $io->text("Insérés {$employeeResult} employés");
 
         // 3. Récupérer les IDs des nouveaux employés
-        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_employe ORDER BY id DESC LIMIT 2000")->fetchFirstColumn();
+        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_user ORDER BY id DESC LIMIT 2000")->fetchFirstColumn();
         $io->text("Récupérés " . count($newEmployeeIds) . " IDs d'employés");
 
         // 4. Créer les contrats avec la distribution spécifiée
@@ -126,7 +126,7 @@ class Insert2000EmployeesFastCommand extends Command
                         WHEN e.id % 100 < 99 THEN 3  -- 4% avec 3 contrats
                         ELSE 4 + (e.id % 2)         -- 1% avec 4-5 contrats
                     END as contract_count
-                FROM t_employe e
+                FROM t_user e
                 WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
             ),
             contract_data AS (
@@ -186,7 +186,7 @@ class Insert2000EmployeesFastCommand extends Command
                 NOW(),
                 (SELECT id FROM p_placards ORDER BY random() LIMIT 1),
                 NULL
-            FROM t_employe e
+            FROM t_user e
             WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
         ";
 
@@ -196,7 +196,7 @@ class Insert2000EmployeesFastCommand extends Command
         // 7. Statistiques finales
         $io->section('Statistiques finales');
         
-        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_employe")->fetchOne();
+        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_user")->fetchOne();
         $totalDossiers = $connection->executeQuery("SELECT COUNT(*) FROM t_dossier")->fetchOne();
         $totalContrats = $connection->executeQuery("SELECT COUNT(*) FROM t_employee_contrat")->fetchOne();
         $totalPlacards = $connection->executeQuery("SELECT COUNT(*) FROM p_placards")->fetchOne();
@@ -213,7 +213,7 @@ class Insert2000EmployeesFastCommand extends Command
                 COUNT(ec.id) as contract_count,
                 COUNT(*) as employee_count,
                 ROUND(COUNT(*) * 100.0 / 2000, 2) as percentage
-            FROM t_employe e
+            FROM t_user e
             LEFT JOIN t_employee_contrat ec ON e.id = ec.employe_id
             WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
             GROUP BY e.id

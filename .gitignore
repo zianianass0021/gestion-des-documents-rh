@@ -14,3 +14,7 @@
 
 # Documentation files (personal/local)
 pagination_integration.tex
+
+# Docker configuration files (local)
+/.env.docker
+/docker-compose.override.yml

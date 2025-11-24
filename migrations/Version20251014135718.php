@@ -25,9 +25,9 @@ final class Version20251014135718 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_9E3140051B65292 ON t_reclamation (employe_id)');
         $this->addSql('CREATE INDEX IDX_9E314005783E3463 ON t_reclamation (manager_id)');
         $this->addSql('CREATE INDEX IDX_9E314005167FABE8 ON t_reclamation (traite_par_id)');
-        $this->addSql('ALTER TABLE t_reclamation ADD CONSTRAINT FK_9E3140051B65292 FOREIGN KEY (employe_id) REFERENCES t_employe (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE t_reclamation ADD CONSTRAINT FK_9E314005783E3463 FOREIGN KEY (manager_id) REFERENCES t_employe (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE t_reclamation ADD CONSTRAINT FK_9E314005167FABE8 FOREIGN KEY (traite_par_id) REFERENCES t_employe (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE t_reclamation ADD CONSTRAINT FK_9E3140051B65292 FOREIGN KEY (employe_id) REFERENCES t_user (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE t_reclamation ADD CONSTRAINT FK_9E314005783E3463 FOREIGN KEY (manager_id) REFERENCES t_user (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE t_reclamation ADD CONSTRAINT FK_9E314005167FABE8 FOREIGN KEY (traite_par_id) REFERENCES t_user (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 
     public function down(Schema $schema): void

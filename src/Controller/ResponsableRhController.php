@@ -27,6 +27,7 @@ use App\Repository\PlacardRepository;
 use App\Repository\NatureContratRepository;
 use App\Repository\NatureContratTypeDocumentRepository;
 use App\Repository\OrganisationRepository;
+use App\Repository\OrganisationEmployeeContratRepository;
 use App\Entity\NatureContratTypeDocument;
 use App\Form\OrganisationType;
 use App\Form\OrganisationEmployeeContratType;
@@ -47,11 +48,28 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Knp\Component\Pager\PaginatorInterface;
+use App\Service\ModulePermissionService;
+use App\Service\ResponsableRhOrganisationPermissionService;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 #[Route('/responsable-rh')]
 #[IsGranted('ROLE_RESPONSABLE_RH')]
 class ResponsableRhController extends AbstractController
 {
+    /**
+     * Check if user has access to a module by route prefix
+     */
+    private function checkModuleAccess(ModulePermissionService $modulePermissionService, string $routeName): void
+    {
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\Employe) {
+            throw new AccessDeniedHttpException('User not authenticated');
+        }
+
+        if (!$modulePermissionService->hasAccessToRoute($user, $routeName)) {
+            throw new AccessDeniedHttpException('Vous n\'avez pas accès à ce module.');
+        }
+    }
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
@@ -76,7 +94,7 @@ class ResponsableRhController extends AbstractController
     }
 
     #[Route('/employes', name: 'responsable_manage_employes')]
-    public function manageEmployes(Request $request, EmployeRepository $employeRepository, PaginatorInterface $paginator, EntityManagerInterface $entityManager): Response
+    public function manageEmployes(Request $request, EmployeeContratRepository $contratRepository, PaginatorInterface $paginator, EntityManagerInterface $entityManager, ModulePermissionService $modulePermissionService, ResponsableRhOrganisationPermissionService $orgPermissionService): Response
     {
         // Vérifier que l'utilisateur est toujours authentifié
         if (!$this->getUser()) {
@@ -88,87 +106,138 @@ class ResponsableRhController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
+        // Check module access
+        $this->checkModuleAccess($modulePermissionService, 'responsable_manage_employes');
+
+        // Get current user
+        $user = $this->getUser();
+        if (!$user instanceof Employe) {
+            return $this->redirectToRoute('app_login');
+        }
+
         // Récupérer les paramètres de recherche et filtrage
         $search = $request->query->get('search', '');
+        $status = $request->query->get('status', 'all'); // all, active, inactive, managers (pour contrats)
         $page = $request->query->getInt('page', 1);
-        $limit = 10;
-        $offset = ($page - 1) * $limit;
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
         
-        // Get paginated IDs directly from database (only load current page's IDs)
+        // Get employee IDs with ROLE_EMPLOYEE using native SQL query (Doctrine doesn't support CAST in DQL)
         $conn = $entityManager->getConnection();
         
-        if ($search) {
-            // Get IDs for current page with search filter
-            $countSql = 'SELECT COUNT(DISTINCT e.id) FROM t_employe e 
-                         WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role 
-                         AND (LOWER(e.nom) LIKE LOWER(:search) 
-                              OR LOWER(e.prenom) LIKE LOWER(:search) 
-                              OR LOWER(e.email) LIKE LOWER(:search))';
-            
-            $idsSql = 'SELECT e.id FROM t_employe e 
-                       WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role 
-                       AND (LOWER(e.nom) LIKE LOWER(:search) 
-                            OR LOWER(e.prenom) LIKE LOWER(:search) 
-                            OR LOWER(e.email) LIKE LOWER(:search))
-                       ORDER BY e.nom ASC 
-                       LIMIT :limit OFFSET :offset';
+        // Build SQL query for employee IDs (only filter by role, not by status)
+        // If status is 'managers', filter for employees with ROLE_MANAGER
+        if ($status === 'managers') {
+            $sql = 'SELECT DISTINCT e.id FROM t_user e WHERE CAST(e.roles AS TEXT) LIKE :role';
+            $params = ['role' => '%ROLE_MANAGER%'];
         } else {
-            // Get IDs for current page without search
-            $countSql = 'SELECT COUNT(e.id) FROM t_employe e 
-                         WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role';
-            
-            $idsSql = 'SELECT e.id FROM t_employe e 
-                       WHERE e.is_active = true AND CAST(e.roles AS TEXT) LIKE :role 
-                       ORDER BY e.nom ASC 
-                       LIMIT :limit OFFSET :offset';
+            $sql = 'SELECT DISTINCT e.id FROM t_user e WHERE CAST(e.roles AS TEXT) LIKE :role';
+            $params = ['role' => '%ROLE_EMPLOYEE%'];
         }
+        $types = ['role' => \PDO::PARAM_STR];
         
-        // Get total count
-        $stmt = $conn->prepare($countSql);
-        $result = $stmt->executeQuery(['role' => '%ROLE_EMPLOYEE%'] + ($search ? ['search' => '%' . $search . '%'] : []));
-        $totalCount = $result->fetchOne();
-        
-        // Get only current page's IDs (10 or less)
-        $stmt = $conn->prepare($idsSql);
-        $stmt->bindValue('role', '%ROLE_EMPLOYEE%', \PDO::PARAM_STR);
-        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
-        $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
-        if ($search) {
-            $stmt->bindValue('search', '%' . $search . '%', \PDO::PARAM_STR);
+        $stmt = $conn->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, $types[$key] ?? \PDO::PARAM_STR);
         }
-        $result = $stmt->execute();
-        $rows = $result->fetchAllAssociative();
-        $ids = array_column($rows, 'id');
+        $result = $stmt->executeQuery();
+        $employeeIds = $result->fetchFirstColumn();
         
-        // Fetch only the 10 employees for this page
-        if (empty($ids)) {
-            $employeesArray = [];
+        // Build query for contracts with employee information
+        // Use employee IDs from native SQL query (avoids CAST in DQL)
+        if (empty($employeeIds)) {
+            // No employees with ROLE_EMPLOYEE found
+            $queryBuilder = $contratRepository->createQueryBuilder('ec')
+                ->where('1 = 0'); // No results
         } else {
-            $employeesArray = $employeRepository->createQueryBuilder('e')
-                ->where('e.id IN (:ids)')
-                ->setParameter('ids', $ids)
-                ->orderBy('e.nom', 'ASC')
-                ->getQuery()
-                ->getResult();
+            $queryBuilder = $contratRepository->createQueryBuilder('ec')
+                ->leftJoin('ec.employe', 'e')
+                ->leftJoin('ec.natureContrat', 'nc')
+                ->leftJoin('ec.organisationEmployeeContrats', 'oec')
+                ->leftJoin('oec.organisation', 'org')
+                ->where('e.id IN (:employeeIds)')
+                ->setParameter('employeeIds', $employeeIds);
+            
+            // Apply organisation permission filters
+            $orgFilter = $orgPermissionService->getEmployeeFilterSQL($user);
+            if ($orgFilter['where'] === '1=0') {
+                // No access, return empty result
+                $queryBuilder->andWhere('1 = 0');
+            } elseif ($orgFilter['where'] !== '1=1') {
+                // Apply organisation filters using DQL - only show contracts with matching organisations
+                // Build DQL EXISTS subquery
+                $subQuery = $entityManager->createQueryBuilder()
+                    ->select('1')
+                    ->from('App\Entity\OrganisationEmployeeContrat', 'oec2')
+                    ->innerJoin('oec2.organisation', 'org2')
+                    ->where('oec2.employeeContrat = ec');
+                
+                // Convert SQL WHERE clause to DQL format
+                // Replace org. with org2. for the subquery alias
+                $dqlWhere = str_replace('org.', 'org2.', $orgFilter['where']);
+                $subQuery->andWhere($dqlWhere);
+                
+                // Set parameters on subquery
+                foreach ($orgFilter['params'] as $key => $value) {
+                    $subQuery->setParameter($key, $value);
+                }
+                
+                // Add EXISTS clause to main query
+                $queryBuilder->andWhere('EXISTS (' . $subQuery->getDQL() . ')');
+                
+                // Set parameters on main query as well (needed for pagination)
+                foreach ($orgFilter['params'] as $key => $value) {
+                    $queryBuilder->setParameter($key, $value);
+                }
+            }
+            // If orgFilter['where'] === '1=1', no filter is applied (admin has access to all)
+            
+            // Apply contract status filter (not employee status)
+            // Note: 'managers' filter is already applied in the employee IDs query above
+            if ($status === 'active') {
+                $queryBuilder->andWhere('ec.statut = :contractStatus')
+                           ->setParameter('contractStatus', 'actif');
+            } elseif ($status === 'inactive') {
+                $queryBuilder->andWhere('ec.statut != :contractStatus OR ec.statut IS NULL')
+                           ->setParameter('contractStatus', 'actif');
+            }
+            // If status is 'all' or 'managers', no additional contract status filter is applied
+            
+            // Apply search filter - search in employee fields OR contract type
+            if ($search) {
+                $queryBuilder->andWhere('(LOWER(e.nom) LIKE LOWER(:search) 
+                                          OR LOWER(e.prenom) LIKE LOWER(:search) 
+                                          OR LOWER(e.email) LIKE LOWER(:search)
+                                          OR LOWER(nc.designation) LIKE LOWER(:search))')
+                           ->setParameter('search', '%' . $search . '%');
+            }
+            
+            // Group by contract to avoid duplicates from organisation joins
+            $queryBuilder->groupBy('ec.id')
+                        ->addGroupBy('e.id')
+                        ->addGroupBy('nc.id');
         }
         
-        // Create custom pagination object
-        $pageCount = max(1, (int) ceil($totalCount / $limit));
-        $employees = new \stdClass();
-        $employees->items = $employeesArray;
-        $employees->totalCount = $totalCount;
-        $employees->pageCount = $pageCount;
-        $employees->current = $page;
-        $employees->firstItemNumber = min($offset + 1, $totalCount);
-        $employees->lastItemNumber = min($offset + count($employeesArray), $totalCount);
-        $employees->route = 'responsable_manage_employes';
-        $employees->queryParams = array_filter(['search' => $search]);
-        $employees->pageParameterName = 'page';
+        // Order by employee name and contract start date
+        $queryBuilder->orderBy('e.nom', 'ASC')
+                     ->addOrderBy('e.prenom', 'ASC')
+                     ->addOrderBy('ec.dateDebut', 'DESC');
+        
+        // Paginate contracts
+        $contrats = $paginator->paginate(
+            $queryBuilder,
+            $page,
+            $perPage
+        );
+        
+        // Get total count of contracts for display
+        $totalContrats = $contratRepository->count([]);
 
         $response = $this->render('responsable-rh/employes.html.twig', [
-            'employees' => $employees,
+            'contrats' => $contrats,
             'search' => $search,
-            'totalEmployes' => $totalCount
+            'status' => $status,
+            'totalEmployes' => $totalContrats, // Show total contracts count
+            'perPage' => $perPage
         ]);
         
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
@@ -282,8 +351,36 @@ class ResponsableRhController extends AbstractController
                 ]);
             }
             
-            // Définir automatiquement le rôle d'employé
-            $employee->setRoles(['ROLE_EMPLOYEE']);
+            // Définir les rôles selon si l'employé est un manager ou non
+            $isManager = $form->get('isManager')->getData();
+            $dossiersGeresJson = $form->get('dossiersGeres')->getData();
+            
+            if ($isManager) {
+                // Décoder le JSON des dossiers gérés
+                $dossiersGeres = [];
+                if ($dossiersGeresJson) {
+                    $decoded = json_decode($dossiersGeresJson, true);
+                    if (is_array($decoded)) {
+                        $dossiersGeres = array_filter($decoded); // Retirer les valeurs vides
+                    }
+                }
+                
+                // Vérifier qu'au moins un dossier a été sélectionné
+                if (empty($dossiersGeres)) {
+                    $this->addFlash('error', 'Vous devez sélectionner au moins un dossier pour le manager.');
+                    return $this->render('responsable-rh/add_employe.html.twig', [
+                        'form' => $form->createView()
+                    ]);
+                }
+                
+                // Les managers ont les deux rôles : ROLE_EMPLOYEE et ROLE_MANAGER
+                $employee->setRoles(['ROLE_EMPLOYEE', 'ROLE_MANAGER']);
+                $employee->setDossiersGeres($dossiersGeres);
+            } else {
+                // Employé normal avec seulement ROLE_EMPLOYEE
+                $employee->setRoles(['ROLE_EMPLOYEE']);
+                $employee->setDossiersGeres(null);
+            }
             
             // Générer le username à partir de l'email si non défini
             if (!$employee->getUsername()) {
@@ -423,6 +520,144 @@ class ResponsableRhController extends AbstractController
         return $this->redirectToRoute('responsable_manage_employes');
     }
 
+    #[Route('/contrats/toggle-status/{id}', name: 'responsable_toggle_contrat_status')]
+    public function toggleContratStatus(EmployeeContrat $contrat, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier que l'utilisateur est toujours authentifié
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Vérifier que l'utilisateur a le bon rôle
+        if (!in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Rafraîchir l'entité depuis la base de données pour éviter les problèmes de cache
+        $entityManager->refresh($contrat);
+
+        // Toggle le statut du contrat (actif <-> inactif/terminé)
+        // Utiliser trim() et strtolower() pour une comparaison robuste
+        $currentStatut = strtolower(trim($contrat->getStatut() ?? ''));
+        
+        if ($currentStatut === 'actif') {
+            $newStatut = 'inactif';
+        } else {
+            // Si le statut est 'inactif', 'terminé' ou autre, on le met à 'actif'
+            $newStatut = 'actif';
+        }
+        
+        $contrat->setStatut($newStatut);
+        
+        // Forcer la persistance et le flush
+        $entityManager->persist($contrat);
+        $entityManager->flush();
+
+        $status = $contrat->getStatut();
+        $this->addFlash('success', "Statut du contrat modifié avec succès ! ({$status})");
+        return $this->redirectToRoute('responsable_manage_employes');
+    }
+
+    #[Route('/employes/{id}/modifier', name: 'responsable_edit_employe')]
+    public function editEmploye(int $id, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, EmployeRepository $employeRepository): Response
+    {
+        // Vérifier que l'utilisateur est toujours authentifié
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Vérifier que l'utilisateur a le bon rôle
+        if (!in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $employee = $employeRepository->find($id);
+        if (!$employee) {
+            $this->addFlash('error', 'Employé non trouvé !');
+            return $this->redirectToRoute('responsable_manage_employes');
+        }
+
+        // Vérifier que c'est bien un employé (pas un Responsable RH ou Admin)
+        if (!in_array('ROLE_EMPLOYEE', $employee->getRoles())) {
+            $this->addFlash('error', 'Vous ne pouvez modifier que les employés.');
+            return $this->redirectToRoute('responsable_manage_employes');
+        }
+
+        $form = $this->createForm(EmployeeType::class, $employee, [
+            'is_new' => false
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier si l'email existe déjà pour un autre employé
+            $existingEmployee = $entityManager->getRepository(Employe::class)->findOneBy(['email' => $employee->getEmail()]);
+            if ($existingEmployee && $existingEmployee->getId() !== $employee->getId()) {
+                $this->addFlash('error', 'Cet email est déjà utilisé par un autre employé.');
+                return $this->render('responsable-rh/edit_employe.html.twig', [
+                    'form' => $form->createView(),
+                    'employee' => $employee
+                ]);
+            }
+            
+            // Mettre à jour les rôles selon si l'employé est un manager ou non
+            $isManager = $form->get('isManager')->getData();
+            $dossiersGeresJson = $form->get('dossiersGeres')->getData();
+            
+            if ($isManager) {
+                // Décoder le JSON des dossiers gérés
+                $dossiersGeres = [];
+                if ($dossiersGeresJson) {
+                    $decoded = json_decode($dossiersGeresJson, true);
+                    if (is_array($decoded)) {
+                        $dossiersGeres = array_filter($decoded); // Retirer les valeurs vides
+                    }
+                }
+                
+                // Vérifier qu'au moins un dossier a été sélectionné
+                if (empty($dossiersGeres)) {
+                    $this->addFlash('error', 'Vous devez sélectionner au moins un dossier pour le manager.');
+                    return $this->render('responsable-rh/edit_employe.html.twig', [
+                        'form' => $form->createView(),
+                        'employee' => $employee
+                    ]);
+                }
+                
+                // Les managers ont les deux rôles : ROLE_EMPLOYEE et ROLE_MANAGER
+                $employee->setRoles(['ROLE_EMPLOYEE', 'ROLE_MANAGER']);
+                $employee->setDossiersGeres($dossiersGeres);
+            } else {
+                // Employé normal avec seulement ROLE_EMPLOYEE
+                $employee->setRoles(['ROLE_EMPLOYEE']);
+                // Libérer les dossiers gérés si l'employé n'est plus manager
+                $employee->setDossiersGeres(null);
+            }
+            
+            // Si un nouveau mot de passe est fourni, le hasher
+            $plainPassword = $form->get('password')->getData();
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($employee, $plainPassword);
+                $employee->setPassword($hashedPassword);
+            }
+            
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Employé modifié avec succès !');
+            return $this->redirectToRoute('responsable_manage_employes');
+        }
+
+        $response = $this->render('responsable-rh/edit_employe.html.twig', [
+            'form' => $form->createView(),
+            'employee' => $employee
+        ]);
+        
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+        
+        return $response;
+    }
+
     #[Route('/employes/{id}/details', name: 'responsable_view_employe_details')]
     public function viewEmployeDetails(int $id, EmployeRepository $employeRepository): Response
     {
@@ -449,31 +684,76 @@ class ResponsableRhController extends AbstractController
 
     // Gestion des dossiers
     #[Route('/dossiers', name: 'responsable_manage_dossiers')]
-    public function manageDossiers(Request $request, DossierRepository $dossierRepository, PaginatorInterface $paginator): Response
+    public function manageDossiers(Request $request, DossierRepository $dossierRepository, PaginatorInterface $paginator, EmployeRepository $employeRepository, EntityManagerInterface $entityManager, ModulePermissionService $modulePermissionService, ResponsableRhOrganisationPermissionService $orgPermissionService): Response
     {
         if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_login');
         }
 
+        $this->checkModuleAccess($modulePermissionService, 'responsable_manage_dossiers');
+
+        // Get current user
+        $user = $this->getUser();
+        if (!$user instanceof Employe) {
+            return $this->redirectToRoute('app_login');
+        }
+
         $search = $request->query->get('search', '');
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
         
+        // Get base query
         if ($search) {
             $dossiersQuery = $dossierRepository->findBySearchQuery($search);
         } else {
             $dossiersQuery = $dossierRepository->findAllQuery();
         }
+        
+        // Apply organisation permission filters
+        $orgFilter = $orgPermissionService->getEmployeeFilterSQL($user);
+        if ($orgFilter['where'] === '1=0') {
+            // No access, return empty result
+            $dossiersQuery->andWhere('1 = 0');
+        } elseif ($orgFilter['where'] !== '1=1') {
+            // Get employee IDs that match organisation permissions
+            $conn = $entityManager->getConnection();
+            $sql = 'SELECT DISTINCT e.id FROM t_user e
+                    INNER JOIN t_employee_contrat ec ON ec.employe_id = e.id
+                    INNER JOIN t_organisation_employee_contrat oec ON oec.employee_contrat_id = ec.id
+                    INNER JOIN p_organisation org ON org.id = oec.organisation_id
+                    WHERE (' . $orgFilter['where'] . ')';
+            $stmt = $conn->prepare($sql);
+            foreach ($orgFilter['params'] as $key => $value) {
+                $stmt->bindValue($key, $value, \PDO::PARAM_STR);
+            }
+            $result = $stmt->executeQuery();
+            $allowedEmployeeIds = $result->fetchFirstColumn();
+            
+            if (empty($allowedEmployeeIds)) {
+                // No employees match, return empty result
+                $dossiersQuery->andWhere('1 = 0');
+            } else {
+                // Filter dossiers by allowed employee IDs
+                $dossiersQuery->andWhere('d.employe IN (:allowedEmployeeIds)')
+                             ->setParameter('allowedEmployeeIds', $allowedEmployeeIds);
+            }
+        }
+        // If orgFilter['where'] === '1=1', no filter is applied (admin has access to all)
 
-        // ALWAYS paginate - 10 items per page
+        // Paginate with configurable items per page
         $dossiers = $paginator->paginate(
             $dossiersQuery,
             $request->query->getInt('page', 1),
-            10
+            $perPage
         );
 
+        // Get total employees count (matching dashboard logic) for display
+        $totalEmployees = $employeRepository->count([]);
+        
         $response = $this->render('responsable-rh/dossiers.html.twig', [
             'dossiers' => $dossiers,
             'search' => $search,
-            'totalDossiers' => $dossierRepository->count([])
+            'totalDossiers' => $totalEmployees, // Show total employees like dashboard, not dossiers count
+            'perPage' => $perPage
         ]);
         
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
@@ -481,6 +761,86 @@ class ResponsableRhController extends AbstractController
         $response->headers->set('Expires', '0');
         
         return $response;
+    }
+
+    #[Route('/api/available-dossiers', name: 'responsable_api_available_dossiers', methods: ['GET'])]
+    public function getAvailableDossiers(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $excludeEmployeeId = $request->query->get('exclude_employee_id', null);
+        
+        // Tous les dossiers valides
+        $allDossiers = [
+            'SFCZ', 'CCGA', 'GACH', 'GCMP', 'GFIN', 'GRSH', 'GJUR', 'GBNQ', 'GPRG',
+            'SUMM', 'SASE', 'SPSI', 'SASI', 'SPSE',
+            'EUIA', 'ECSM', 'IFCP', 'ECFC', 'ECRI', 'ELEZ', 'EEAS',
+            'SHCZ', 'SLMG', 'SDNT', 'SHMK', 'SHMB', 'SHMY', 'SLPD', 'SRAD', 'SLAB',
+            'SAHR', 'SCOV', 'SOPH', 'SKIN', 'SCVP', 'SGHJ', 'SGYN', 'SURG', 'SHMS', 'SHCT', 'CSDA',
+            'RRUR', 'RHUR', 'RHAR', 'RRER', 'RRHK', 'RRHY', 'RDAR', 'RRHR', 'RHSR', 'RCER', 'RBPR', 'RHCC',
+            'NSIT', 'NARC', 'NITS', 'NNUM',
+            'IMIN', 'IEIS', 'ICCI', 'IESV', 'ISAE', 'ISAM', 'IPTT', 'ISAA',
+            'APCC', 'APVR', 'APUR', 'APLM', 'APCH', 'LPDP',
+            'PVPH', 'PPPH', 'PAMD',
+            'PIMP', 'PPTM',
+            'ECBE', 'ECRG', 'EEDF',
+            'PTEX', 'PBIR', 'PLAV', 'PCAP', 'PEPC', 'PCOF', 'PEVN',
+            'PGRO', 'PSMS'
+        ];
+        
+        // Récupérer les dossiers actuels de l'employé (si en mode édition)
+        $currentDossiers = [];
+        if ($excludeEmployeeId) {
+            $employee = $entityManager->getRepository(Employe::class)->find($excludeEmployeeId);
+            if ($employee) {
+                $dossiersGeres = $employee->getDossiersGeres();
+                if ($dossiersGeres && is_array($dossiersGeres)) {
+                    $currentDossiers = $dossiersGeres;
+                } elseif ($employee->getDossierGere()) {
+                    // Migration depuis l'ancien format
+                    $currentDossiers = [$employee->getDossierGere()];
+                }
+            }
+        }
+        
+        // Maintenant, plusieurs managers peuvent gérer le même dossier
+        // Retourner tous les dossiers disponibles
+        // Trier les dossiers pour un affichage cohérent
+        sort($allDossiers);
+        
+        return $this->json([
+            'available' => $allDossiers,
+            'current' => $currentDossiers
+        ]);
+    }
+
+    #[Route('/api/search-employees-without-dossier', name: 'responsable_api_search_employees_without_dossier', methods: ['GET'])]
+    public function searchEmployeesWithoutDossier(Request $request, EmployeRepository $employeRepository): Response
+    {
+        $search = trim($request->query->get('search', ''));
+        
+        // Recherche dès 1 caractère
+        if (strlen($search) < 1) {
+            return $this->json(['employees' => []]);
+        }
+        
+        try {
+            $employees = $employeRepository->searchActiveEmployeesWithoutDossierByRole('ROLE_EMPLOYEE', $search, 50);
+            
+            $results = [];
+            foreach ($employees as $employee) {
+                $results[] = [
+                    'id' => $employee['id'],
+                    'label' => sprintf('%s %s (%s)', $employee['prenom'], $employee['nom'], $employee['email']),
+                    'nom' => $employee['nom'],
+                    'prenom' => $employee['prenom'],
+                    'email' => $employee['email'],
+                ];
+            }
+            
+            return $this->json(['employees' => $results]);
+        } catch (\Exception $e) {
+            error_log('Erreur dans searchEmployeesWithoutDossier: ' . $e->getMessage());
+            return $this->json(['employees' => [], 'error' => 'Une erreur est survenue lors de la recherche.'], 500);
+        }
     }
 
     #[Route('/dossiers/ajouter', name: 'responsable_add_dossier')]
@@ -491,7 +851,9 @@ class ResponsableRhController extends AbstractController
         }
 
         $dossier = new Dossier();
-        $form = $this->createForm(DossierType::class, $dossier);
+        $form = $this->createForm(DossierType::class, $dossier, [
+            'is_new' => true
+        ]);
 
         $form->handleRequest($request);
 
@@ -540,10 +902,22 @@ class ResponsableRhController extends AbstractController
             return $this->redirectToRoute('responsable_manage_dossiers');
         }
 
-        $form = $this->createForm(DossierType::class, $dossier);
+        // Sauvegarder l'employé original avant le handleRequest
+        $originalEmployee = $dossier->getEmploye();
+        
+        $form = $this->createForm(DossierType::class, $dossier, [
+            'is_new' => false // Mode édition
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // En mode édition, s'assurer que l'employé n'est pas modifié
+            // Le champ est désactivé donc il n'est pas envoyé dans la requête
+            // On ré-assigne donc l'employé original
+            if ($originalEmployee) {
+                $dossier->setEmploye($originalEmployee);
+            }
+            
             $entityManager->flush();
             $this->addFlash('success', 'Dossier modifié avec succès !');
             return $this->redirectToRoute('responsable_manage_dossiers');
@@ -868,6 +1242,14 @@ class ResponsableRhController extends AbstractController
         $document->setDossier($dossier);
         $document->setStatutAjout('ajoute');
         $document->setStatutTelechargement('non_telecharge');
+        
+        // Définir created_at manuellement pour éviter l'erreur de contrainte NOT NULL
+        $document->setCreatedAt(new \DateTime());
+        
+        // Définir created_by si l'utilisateur est connecté
+        if ($this->getUser()) {
+            $document->setCreatedBy($this->getUser());
+        }
 
         $entityManager->persist($document);
         $entityManager->flush();
@@ -879,31 +1261,76 @@ class ResponsableRhController extends AbstractController
 
 
     #[Route('/demandes', name: 'responsable_manage_demandes')]
-    public function manageDemandes(Request $request, DemandeRepository $demandeRepository, PaginatorInterface $paginator): Response
+    public function manageDemandes(Request $request, DemandeRepository $demandeRepository, PaginatorInterface $paginator, EntityManagerInterface $entityManager, ModulePermissionService $modulePermissionService, ResponsableRhOrganisationPermissionService $orgPermissionService): Response
     {
         if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_login');
         }
 
-        $demandesEnAttenteQuery = $demandeRepository->findEnAttenteQuery();
-        $demandesTraiteesQuery = $demandeRepository->findTraiteesParResponsableQuery($this->getUser());
+        $this->checkModuleAccess($modulePermissionService, 'responsable_manage_demandes');
 
-        // Paginer les résultats - 10 éléments par page
-        $demandesEnAttente = $paginator->paginate(
-            $demandesEnAttenteQuery,
-            $request->query->getInt('page_en_attente', 1),
-            10
+        // Get current user
+        $user = $this->getUser();
+        if (!$user instanceof Employe) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Récupérer le filtre depuis les paramètres de requête
+        $filter = $request->query->get('filter', 'all');
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
+        
+        // Récupérer les demandes selon le filtre
+        if ($filter === 'en_attente') {
+            $demandesQuery = $demandeRepository->findByStatutQuery('en_attente');
+        } elseif ($filter === 'traitees') {
+            $demandesQuery = $demandeRepository->findByStatutQuery('traitees');
+        } else {
+            // Par défaut, afficher toutes les demandes
+            $demandesQuery = $demandeRepository->findAllQuery();
+        }
+        
+        // Apply organisation permission filters
+        $orgFilter = $orgPermissionService->getEmployeeFilterSQL($user);
+        if ($orgFilter['where'] === '1=0') {
+            // No access, return empty result
+            $demandesQuery->andWhere('1 = 0');
+        } elseif ($orgFilter['where'] !== '1=1') {
+            // Get employee IDs that match organisation permissions
+            $conn = $entityManager->getConnection();
+            $sql = 'SELECT DISTINCT e.id FROM t_user e
+                    INNER JOIN t_employee_contrat ec ON ec.employe_id = e.id
+                    INNER JOIN t_organisation_employee_contrat oec ON oec.employee_contrat_id = ec.id
+                    INNER JOIN p_organisation org ON org.id = oec.organisation_id
+                    WHERE (' . $orgFilter['where'] . ')';
+            $stmt = $conn->prepare($sql);
+            foreach ($orgFilter['params'] as $key => $value) {
+                $stmt->bindValue($key, $value, \PDO::PARAM_STR);
+            }
+            $result = $stmt->executeQuery();
+            $allowedEmployeeIds = $result->fetchFirstColumn();
+            
+            if (empty($allowedEmployeeIds)) {
+                // No employees match, return empty result
+                $demandesQuery->andWhere('1 = 0');
+            } else {
+                // Filter demandes by allowed employee IDs
+                $demandesQuery->andWhere('d.employe IN (:allowedEmployeeIds)')
+                             ->setParameter('allowedEmployeeIds', $allowedEmployeeIds);
+            }
+        }
+        // If orgFilter['where'] === '1=1', no filter is applied (admin has access to all)
+
+        // Paginer les résultats avec nombre d'éléments configurable
+        $demandes = $paginator->paginate(
+            $demandesQuery,
+            $request->query->getInt('page', 1),
+            $perPage
         );
-
-        $demandesTraitees = $paginator->paginate(
-            $demandesTraiteesQuery,
-            $request->query->getInt('page_traitees', 1),
-            10
-        );
-
+        
         return $this->render('responsable-rh/demandes.html.twig', [
-            'demandesEnAttente' => $demandesEnAttente,
-            'demandesTraitees' => $demandesTraitees
+            'demandes' => $demandes,
+            'currentFilter' => $filter,
+            'perPage' => $perPage
         ]);
     }
 
@@ -966,24 +1393,42 @@ class ResponsableRhController extends AbstractController
     // ===== GESTION DES PLACARDS =====
 
     #[Route('/placards', name: 'responsable_manage_placards')]
-    public function managePlacards(Request $request, PlacardRepository $placardRepository, PaginatorInterface $paginator): Response
+    public function managePlacards(Request $request, PlacardRepository $placardRepository, PaginatorInterface $paginator, ModulePermissionService $modulePermissionService): Response
     {
         if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_login');
         }
 
-        $placardsQuery = $placardRepository->findAllQuery();
+        $this->checkModuleAccess($modulePermissionService, 'responsable_manage_placards');
 
-        // ALWAYS paginate - 10 items per page
+        // Get filter status (all, active, inactive)
+        $status = $request->query->get('status', 'all');
+        if (!in_array($status, ['all', 'active', 'inactive'])) {
+            $status = 'all';
+        }
+
+        $placardsQuery = $placardRepository->findAllQueryWithFilter($status);
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
+
+        // Paginate with configurable items per page
         $placards = $paginator->paginate(
             $placardsQuery,
             $request->query->getInt('page', 1),
-            10
+            $perPage
         );
+
+        // Get counts for filters
+        $totalPlacards = $placardRepository->count([]);
+        $activePlacards = $placardRepository->countActive();
+        $inactivePlacards = $placardRepository->countInactive();
 
         return $this->render('responsable-rh/placards.html.twig', [
             'placards' => $placards,
-            'totalPlacards' => $placardRepository->count([])
+            'totalPlacards' => $totalPlacards,
+            'activePlacards' => $activePlacards,
+            'inactivePlacards' => $inactivePlacards,
+            'status' => $status,
+            'perPage' => $perPage
         ]);
     }
 
@@ -1041,8 +1486,13 @@ class ResponsableRhController extends AbstractController
     }
 
     #[Route('/placards/voir/{id}', name: 'responsable_view_placard')]
-    public function viewPlacard(int $id, PlacardRepository $placardRepository): Response
-    {
+    public function viewPlacard(
+        int $id, 
+        Request $request,
+        PlacardRepository $placardRepository,
+        DossierRepository $dossierRepository,
+        PaginatorInterface $paginator
+    ): Response {
         if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_login');
         }
@@ -1053,13 +1503,25 @@ class ResponsableRhController extends AbstractController
             return $this->redirectToRoute('responsable_manage_placards');
         }
 
+        // Get paginated dossiers for this placard
+        $dossiersQuery = $dossierRepository->findByPlacardQuery($placard);
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
+        
+        $dossiers = $paginator->paginate(
+            $dossiersQuery,
+            $request->query->getInt('page', 1),
+            $perPage
+        );
+
         return $this->render('responsable-rh/view_placard.html.twig', [
-            'placard' => $placard
+            'placard' => $placard,
+            'dossiers' => $dossiers,
+            'perPage' => $perPage,
         ]);
     }
 
-    #[Route('/placards/supprimer/{id}', name: 'responsable_delete_placard')]
-    public function deletePlacard(int $id, EntityManagerInterface $entityManager, PlacardRepository $placardRepository): Response
+    #[Route('/placards/toggle-actif/{id}', name: 'responsable_toggle_placard_actif')]
+    public function togglePlacardActif(int $id, EntityManagerInterface $entityManager, PlacardRepository $placardRepository): Response
     {
         if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_login');
@@ -1071,16 +1533,13 @@ class ResponsableRhController extends AbstractController
             return $this->redirectToRoute('responsable_manage_placards');
         }
 
-        // Vérifier s'il y a des dossiers dans ce placard
-        if ($placard->getDossiers()->count() > 0) {
-            $this->addFlash('error', 'Impossible de supprimer ce placard car il contient des dossiers !');
-            return $this->redirectToRoute('responsable_manage_placards');
-        }
-
-        $entityManager->remove($placard);
+        // Toggle active status
+        $placard->setIsActive(!$placard->isActive());
         $entityManager->flush();
 
-        $this->addFlash('success', 'Placard supprimé avec succès !');
+        $statusText = $placard->isActive() ? 'activé' : 'désactivé';
+        $this->addFlash('success', "Placard {$statusText} avec succès !");
+        
         return $this->redirectToRoute('responsable_manage_placards');
     }
 
@@ -1144,44 +1603,82 @@ class ResponsableRhController extends AbstractController
     }
 
     #[Route('/contrats', name: 'responsable_manage_contrats')]
-    public function manageContrats(Request $request, EmployeeContratRepository $contratRepository, PaginatorInterface $paginator): Response
+    public function manageContrats(): Response
     {
-        $contratsQuery = $contratRepository->findAllQuery();
-
-        // ALWAYS paginate - 10 items per page
-        $contrats = $paginator->paginate(
-            $contratsQuery,
-            $request->query->getInt('page', 1),
-            10
-        );
-        
-        return $this->render('responsable-rh/contrats.html.twig', [
-            'contrats' => $contrats,
-            'totalContrats' => $contratRepository->count([])
-        ]);
+        // Rediriger vers la page employés qui contient maintenant les contrats
+        return $this->redirectToRoute('responsable_manage_employes');
     }
 
 
     #[Route('/organisations', name: 'responsable_manage_organisations')]
-    public function manageOrganisations(Request $request, OrganisationRepository $organisationRepository, PaginatorInterface $paginator): Response
+    public function manageOrganisations(Request $request, OrganisationRepository $organisationRepository, PaginatorInterface $paginator, EmployeRepository $employeRepository, EntityManagerInterface $entityManager, ModulePermissionService $modulePermissionService, ResponsableRhOrganisationPermissionService $orgPermissionService): Response
     {
-        $organisationsQuery = $organisationRepository->findAllQuery();
+        if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_login');
+        }
 
-        // ALWAYS paginate - 10 items per page
+        $this->checkModuleAccess($modulePermissionService, 'responsable_manage_organisations');
+
+        // Get current user
+        $user = $this->getUser();
+        if (!$user instanceof Employe) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $organisationsQuery = $organisationRepository->findAllQuery();
+        
+        // Apply organisation permission filters
+        $orgFilter = $orgPermissionService->getEmployeeFilterSQL($user);
+        if ($orgFilter['where'] === '1=0') {
+            // No access, return empty result
+            $organisationsQuery->andWhere('1 = 0');
+        } elseif ($orgFilter['where'] !== '1=1') {
+            // Apply organisation filters directly (organisations have groupement, das, dossier fields)
+            // Replace 'org.' with 'o.' to match the query alias
+            $dqlWhere = str_replace('org.', 'o.', $orgFilter['where']);
+            $organisationsQuery->andWhere($dqlWhere);
+            foreach ($orgFilter['params'] as $key => $value) {
+                $organisationsQuery->setParameter($key, $value);
+            }
+        }
+        // If orgFilter['where'] === '1=1', no filter is applied (admin has access to all)
+        
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
+
+        // Paginate with configurable items per page
         $organisations = $paginator->paginate(
             $organisationsQuery,
             $request->query->getInt('page', 1),
-            10
+            $perPage
         );
+        
+        // Get total employees count (matching dashboard logic) for display
+        $totalEmployees = $employeRepository->count([]);
+        
+        // Get total unique DAS count from all organisations (not just paginated ones)
+        $conn = $entityManager->getConnection();
+        $dasCount = $conn->executeQuery('SELECT COUNT(DISTINCT das) FROM p_organisation WHERE das IS NOT NULL AND das != \'\'')->fetchOne();
+        
+        // Get total unique groupements count from all organisations (not just paginated ones)
+        $groupementsCount = $conn->executeQuery('SELECT COUNT(DISTINCT groupement) FROM p_organisation WHERE groupement IS NOT NULL AND groupement != \'\'')->fetchOne();
         
         return $this->render('responsable-rh/organisations.html.twig', [
             'organisations' => $organisations,
+            'totalEmployees' => $totalEmployees, // Pass total employees count like dashboard
+            'dasUnique' => (int)$dasCount, // Total unique DAS from all organisations
+            'groupementsUnique' => (int)$groupementsCount, // Total unique groupements from all organisations
+            'perPage' => $perPage
         ]);
     }
 
     #[Route('/organisations/{id}', name: 'responsable_view_organisation', requirements: ['id' => '\d+'])]
-    public function viewOrganisation(int $id, OrganisationRepository $organisationRepository): Response
-    {
+    public function viewOrganisation(
+        int $id, 
+        Request $request,
+        OrganisationRepository $organisationRepository,
+        OrganisationEmployeeContratRepository $organisationEmployeeContratRepository,
+        PaginatorInterface $paginator
+    ): Response {
         $organisation = $organisationRepository->find($id);
         
         if (!$organisation) {
@@ -1189,8 +1686,20 @@ class ResponsableRhController extends AbstractController
             return $this->redirectToRoute('responsable_manage_organisations');
         }
         
+        // Get paginated organisation employee contrats
+        $orgContratsQuery = $organisationEmployeeContratRepository->findByOrganisationQuery($organisation);
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
+        
+        $orgContrats = $paginator->paginate(
+            $orgContratsQuery,
+            $request->query->getInt('page', 1),
+            $perPage
+        );
+        
         return $this->render('responsable-rh/organisation_details.html.twig', [
             'organisation' => $organisation,
+            'orgContrats' => $orgContrats,
+            'perPage' => $perPage,
         ]);
     }
 
@@ -1261,6 +1770,31 @@ class ResponsableRhController extends AbstractController
         ]);
     }
 
+    #[Route('/api/search-employee-contrats', name: 'api_search_employee_contrats', methods: ['GET'])]
+    public function searchEmployeeContrats(Request $request, EmployeeContratRepository $employeeContratRepository): Response
+    {
+        $search = $request->query->get('search', '');
+        
+        if (strlen($search) < 2) {
+            return $this->json(['contrats' => []]);
+        }
+        
+        $contrats = $employeeContratRepository->findActiveContratsBySearch($search, 100);
+        
+        $results = [];
+        foreach ($contrats as $contrat) {
+            $employe = $contrat->getEmploye();
+            $results[] = [
+                'id' => $contrat->getId(),
+                'label' => $employe->getPrenom() . ' ' . $employe->getNom() . ' (' . $contrat->getNatureContrat()->getDesignation() . ')',
+                'nom' => $employe->getNom(),
+                'prenom' => $employe->getPrenom(),
+            ];
+        }
+        
+        return $this->json(['contrats' => $results]);
+    }
+
     /**
      * Create a document directly from abbreviation using p_document template
      */
@@ -1295,6 +1829,22 @@ class ResponsableRhController extends AbstractController
             $uploadedFile = $request->files->get('document_file');
             
             if ($uploadedFile) {
+                // Validate file extension
+                $originalExtension = strtolower(pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_EXTENSION));
+                $allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'txt', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar'];
+                
+                if (!in_array($originalExtension, $allowedExtensions)) {
+                    $this->addFlash('error', 'Type de fichier non autorisé. Formats acceptés : ' . implode(', ', array_map('strtoupper', $allowedExtensions)));
+                    return $this->redirectToRoute('responsable_view_dossier_documents', ['id' => $dossierId]);
+                }
+                
+                // Validate file size (10MB max)
+                $maxSize = 10 * 1024 * 1024; // 10MB en bytes
+                if ($uploadedFile->getSize() > $maxSize) {
+                    $this->addFlash('error', 'Le fichier est trop volumineux. Taille maximale : 10 MB');
+                    return $this->redirectToRoute('responsable_view_dossier_documents', ['id' => $dossierId]);
+                }
+                
                 // Create upload directory if it doesn't exist
                 $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/documents/';
                 if (!is_dir($uploadDir)) {
@@ -1303,7 +1853,6 @@ class ResponsableRhController extends AbstractController
                 
                 // Generate unique filename
                 $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $originalExtension = strtolower(pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_EXTENSION));
                 $safeFilename = preg_replace('/[^A-Za-z0-9_-]/', '', $originalFilename);
                 if (empty($safeFilename)) {
                     $safeFilename = 'document';
@@ -1353,6 +1902,14 @@ class ResponsableRhController extends AbstractController
                         $newDocument->setStatutTelechargement('telecharge');
                         $newDocument->setStatutAjout('ajoute');
                         
+                        // Définir created_at manuellement pour éviter l'erreur de contrainte NOT NULL
+                        $newDocument->setCreatedAt(new \DateTime());
+                        
+                        // Définir created_by si l'utilisateur est connecté
+                        if ($this->getUser()) {
+                            $newDocument->setCreatedBy($this->getUser());
+                        }
+                        
                         $dossier->addDocument($newDocument);
                         $entityManager->persist($newDocument);
                         $entityManager->flush();
@@ -1374,12 +1931,19 @@ class ResponsableRhController extends AbstractController
         // Use existing document if available, otherwise use template
         $documentToDisplay = $existingDocument ?: $templateDocument;
         
+        // Only pass existingDocument to template if it has an uploaded file
+        // This prevents showing "Document existant" message when document is just marked as "ajouté" without file
+        $existingDocumentWithFile = null;
+        if ($existingDocument && $existingDocument->getFilePath() && $existingDocument->isUploaded()) {
+            $existingDocumentWithFile = $existingDocument;
+        }
+        
         return $this->render('responsable-rh/upload_document.html.twig', [
             'abbreviation' => $abbreviation,
             'templateDocument' => $documentToDisplay,
             'dossier' => $dossier,
             'dossierId' => $dossierId,
-            'existingDocument' => $existingDocument
+            'existingDocument' => $existingDocumentWithFile
         ]);
     }
 
@@ -1422,6 +1986,11 @@ class ResponsableRhController extends AbstractController
     #[Route('/kpi', name: 'responsable_kpi_index')]
     public function kpiIndex(): Response
     {
+        if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // KPIs are accessible to all Responsable RH from the dashboard
         return $this->render('responsable-rh/kpi/index.html.twig');
     }
 
@@ -1545,31 +2114,77 @@ class ResponsableRhController extends AbstractController
     }
 
     #[Route('/reclamations', name: 'responsable_manage_reclamations')]
-    public function manageReclamations(Request $request, ReclamationRepository $reclamationRepository, PaginatorInterface $paginator): Response
+    public function manageReclamations(Request $request, ReclamationRepository $reclamationRepository, PaginatorInterface $paginator, ModulePermissionService $modulePermissionService, EntityManagerInterface $entityManager, ResponsableRhOrganisationPermissionService $orgPermissionService): Response
     {
+        if (!$this->getUser() || !in_array('ROLE_RESPONSABLE_RH', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $this->checkModuleAccess($modulePermissionService, 'responsable_manage_reclamations');
+
+        // Get current user
+        $user = $this->getUser();
+        if (!$user instanceof Employe) {
+            return $this->redirectToRoute('app_login');
+        }
+
         // Récupérer le filtre depuis les paramètres de requête
         $filter = $request->query->get('filter', 'all');
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
         
         // Récupérer les réclamations selon le filtre
         if ($filter === 'en_attente') {
             $reclamationsQuery = $reclamationRepository->findByStatutQuery('en_attente');
         } elseif ($filter === 'traitees') {
-            $reclamationsQuery = $reclamationRepository->findByStatutQuery('traitee');
+            $reclamationsQuery = $reclamationRepository->findByStatutQuery('traitees');
         } else {
             // Par défaut, afficher toutes les réclamations
             $reclamationsQuery = $reclamationRepository->findAllQuery();
         }
+        
+        // Apply organisation permission filters
+        $orgFilter = $orgPermissionService->getEmployeeFilterSQL($user);
+        if ($orgFilter['where'] === '1=0') {
+            // No access, return empty result
+            $reclamationsQuery->andWhere('1 = 0');
+        } elseif ($orgFilter['where'] !== '1=1') {
+            // Get employee IDs that match organisation permissions
+            $conn = $entityManager->getConnection();
+            $sql = 'SELECT DISTINCT e.id FROM t_user e
+                    INNER JOIN t_employee_contrat ec ON ec.employe_id = e.id
+                    INNER JOIN t_organisation_employee_contrat oec ON oec.employee_contrat_id = ec.id
+                    INNER JOIN p_organisation org ON org.id = oec.organisation_id
+                    WHERE (' . $orgFilter['where'] . ')';
+            $stmt = $conn->prepare($sql);
+            foreach ($orgFilter['params'] as $key => $value) {
+                $stmt->bindValue($key, $value, \PDO::PARAM_STR);
+            }
+            $result = $stmt->executeQuery();
+            $allowedEmployeeIds = $result->fetchFirstColumn();
+            
+            if (empty($allowedEmployeeIds)) {
+                // No employees match, return empty result
+                $reclamationsQuery->andWhere('1 = 0');
+            } else {
+                // Filter reclamations by allowed employee IDs
+                // Only show reclamations for employees that the responsable RH has access to
+                $reclamationsQuery->andWhere('r.employe IN (:allowedEmployeeIds)')
+                                  ->setParameter('allowedEmployeeIds', $allowedEmployeeIds);
+            }
+        }
+        // If orgFilter['where'] === '1=1', no filter is applied (admin has access to all)
 
-        // Paginer les résultats - 10 éléments par page
+        // Paginer les résultats avec nombre d'éléments configurable
         $reclamations = $paginator->paginate(
             $reclamationsQuery,
             $request->query->getInt('page', 1),
-            10
+            $perPage
         );
         
         return $this->render('responsable-rh/reclamations.html.twig', [
             'reclamations' => $reclamations,
             'currentFilter' => $filter,
+            'perPage' => $perPage
         ]);
     }
 
@@ -1622,17 +2237,29 @@ class ResponsableRhController extends AbstractController
             // Pre-load all document requirements into memory for fast lookup
             $allDocRequirements = $docRequirementRepo->findAll();
             $docRequirementsLookup = [];
+            $allDocumentAbbreviations = []; // Collect all unique document abbreviations
+            
             foreach ($allDocRequirements as $docReq) {
                 $contractType = $docReq->getContractType();
+                $abbreviation = $docReq->getDocumentAbbreviation();
+                
+                // Collect all unique document abbreviations
+                if (!in_array($abbreviation, $allDocumentAbbreviations)) {
+                    $allDocumentAbbreviations[] = $abbreviation;
+                }
+                
                 if (!isset($docRequirementsLookup[$contractType])) {
                     $docRequirementsLookup[$contractType] = ['obligatoires' => [], 'complementaires' => []];
                 }
                 if ($docReq->isRequired()) {
-                    $docRequirementsLookup[$contractType]['obligatoires'][] = $docReq->getDocumentAbbreviation();
+                    $docRequirementsLookup[$contractType]['obligatoires'][] = $abbreviation;
                 } else {
-                    $docRequirementsLookup[$contractType]['complementaires'][] = $docReq->getDocumentAbbreviation();
+                    $docRequirementsLookup[$contractType]['complementaires'][] = $abbreviation;
                 }
             }
+            
+            // Sort document abbreviations alphabetically for consistent column order
+            sort($allDocumentAbbreviations);
             
             // Also pre-load nature contrat codes for lookup
             $allNatureContrats = $em->getRepository(\App\Entity\NatureContrat::class)->findAll();
@@ -1647,8 +2274,8 @@ class ResponsableRhController extends AbstractController
                 }
             }
             
-            // Define the header row
-            $headerRow = WriterEntityFactory::createRowFromArray([
+            // Define the header row with dynamic document columns
+            $headerColumns = [
                 'ID',
                 'Nom',
                 'Prénom',
@@ -1664,9 +2291,15 @@ class ResponsableRhController extends AbstractController
                 'Statut Contrat',
                 'Placard',
                 'Emplacement',
-                'Statut Employé',
-                'Documents Requis'
-            ]);
+                'Statut Employé'
+            ];
+            
+            // Add each document as a column
+            foreach ($allDocumentAbbreviations as $abbreviation) {
+                $headerColumns[] = $abbreviation;
+            }
+            
+            $headerRow = WriterEntityFactory::createRowFromArray($headerColumns);
             $writer->addRow($headerRow);
             
             // Process employees in batches to avoid memory exhaustion
@@ -1677,7 +2310,7 @@ class ResponsableRhController extends AbstractController
             while (true) {
                 // Get batch of employees using native SQL - ordered by last name then first name
                 $conn = $em->getConnection();
-                $sql = "SELECT id FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%' ORDER BY nom ASC, prenom ASC LIMIT :limit OFFSET :offset";
+                $sql = "SELECT id FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%' ORDER BY nom ASC, prenom ASC LIMIT :limit OFFSET :offset";
                 $stmt = $conn->prepare($sql);
                 $result = $stmt->executeQuery([
                     'limit' => $batchSize,
@@ -1741,32 +2374,34 @@ class ResponsableRhController extends AbstractController
                                     }
                                     
                                     // Get required documents for this contract using lookup
-                                    $documentsRequis = '';
+                                    $contractDocs = ['obligatoires' => [], 'complementaires' => []];
                                     if ($contractType && $natureContrat) {
                                         $contractTypeDesignation = $natureContrat->getDesignation();
                                         $contractTypeCode = $natureContrat->getCode();
                                         
                                         // Try to find documents by designation first
-                                        $docs = null;
                                         if ($contractTypeDesignation && isset($docRequirementsLookup[$contractTypeDesignation])) {
-                                            $docs = $docRequirementsLookup[$contractTypeDesignation];
+                                            $contractDocs = $docRequirementsLookup[$contractTypeDesignation];
                                         }
                                         // If not found, try with code
                                         elseif ($contractTypeCode && isset($docRequirementsLookup[$contractTypeCode])) {
-                                            $docs = $docRequirementsLookup[$contractTypeCode];
-                                        }
-                                        
-                                        if ($docs) {
-                                            $obligatoires = $docs['obligatoires'] ?? [];
-                                            $complementaires = $docs['complementaires'] ?? [];
-                                            
-                                            // Combine: obligatoires first, then complémentaires
-                                            $allDocs = array_merge($obligatoires, $complementaires);
-                                            $documentsRequis = implode(', ', $allDocs);
+                                            $contractDocs = $docRequirementsLookup[$contractTypeCode];
                                         }
                                     }
                                     
-                                    $row = WriterEntityFactory::createRowFromArray([
+                                    // Get existing documents from employee's dossier
+                                    $existingDocuments = [];
+                                    if ($employe->getDossier()) {
+                                        foreach ($employe->getDossier()->getDocuments() as $doc) {
+                                            $abbr = $doc->getAbbreviation();
+                                            // Document is considered "added" if it has statutAjout='ajoute' or has a file
+                                            $isAdded = $doc->getStatutAjout() === 'ajoute' || $doc->isUploaded();
+                                            $existingDocuments[$abbr] = $isAdded;
+                                        }
+                                    }
+                                    
+                                    // Build row data
+                                    $rowData = [
                                         $employe->getId(),
                                         $employe->getNom(),
                                         $employe->getPrenom(),
@@ -1782,9 +2417,34 @@ class ResponsableRhController extends AbstractController
                                         $contrat->getStatut() ?? '',
                                         $placardName,
                                         $emplacement,
-                                        $employe->isActive() ? 'Actif' : 'Inactif',
-                                        $documentsRequis
-                                    ]);
+                                        $employe->isActive() ? 'Actif' : 'Inactif'
+                                    ];
+                                    
+                                    // Add document status columns (OA/ON/CA/CN)
+                                    $obligatoires = $contractDocs['obligatoires'] ?? [];
+                                    $complementaires = $contractDocs['complementaires'] ?? [];
+                                    
+                                    foreach ($allDocumentAbbreviations as $abbreviation) {
+                                        $status = '';
+                                        
+                                        // Check if document is required for this contract
+                                        $isObligatoire = in_array($abbreviation, $obligatoires);
+                                        $isComplementaire = in_array($abbreviation, $complementaires);
+                                        
+                                        if ($isObligatoire || $isComplementaire) {
+                                            $isAdded = isset($existingDocuments[$abbreviation]) && $existingDocuments[$abbreviation];
+                                            
+                                            if ($isObligatoire) {
+                                                $status = $isAdded ? 'OA' : 'ON';
+                                            } else { // complementaire
+                                                $status = $isAdded ? 'CA' : 'CN';
+                                            }
+                                        }
+                                        
+                                        $rowData[] = $status;
+                                    }
+                                    
+                                    $row = WriterEntityFactory::createRowFromArray($rowData);
                                     $writer->addRow($row);
                                 } catch (\Exception $e) {
                                     // Skip this contract if there's an error
@@ -1807,7 +2467,8 @@ class ResponsableRhController extends AbstractController
                                     }
                                 }
                                 
-                                $row = WriterEntityFactory::createRowFromArray([
+                                // Build row data
+                                $rowData = [
                                     $employe->getId(),
                                     $employe->getNom(),
                                     $employe->getPrenom(),
@@ -1823,9 +2484,15 @@ class ResponsableRhController extends AbstractController
                                     '', // No contract status
                                     $placardName,
                                     $emplacement,
-                                    $employe->isActive() ? 'Actif' : 'Inactif',
-                                    '' // No documents required
-                                ]);
+                                    $employe->isActive() ? 'Actif' : 'Inactif'
+                                ];
+                                
+                                // Add empty document status columns (no contract = no documents required)
+                                foreach ($allDocumentAbbreviations as $abbreviation) {
+                                    $rowData[] = '';
+                                }
+                                
+                                $row = WriterEntityFactory::createRowFromArray($rowData);
                                 $writer->addRow($row);
                             }
                         } catch (\Exception $e) {

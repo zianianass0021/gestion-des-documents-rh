@@ -111,7 +111,7 @@ class Insert2000EmployeesSimpleCommand extends Command
             $values = [];
             $params = [];
             foreach ($batchEmployees as $employee) {
-                $values[] = "(nextval('t_employe_id_seq'), ?, ?, ?, ?, ?, ?, ?, ?)";
+                $values[] = "(nextval('t_user_id_seq'), ?, ?, ?, ?, ?, ?, ?, ?)";
                 $params[] = $employee['prenom'];
                 $params[] = $employee['nom'];
                 $params[] = $employee['email'];
@@ -122,7 +122,7 @@ class Insert2000EmployeesSimpleCommand extends Command
                 $params[] = $employee['is_active'];
             }
 
-            $sql = "INSERT INTO t_employe (id, prenom, nom, email, username, telephone, password, roles, is_active) VALUES " . implode(', ', $values);
+            $sql = "INSERT INTO t_user (id, prenom, nom, email, username, telephone, password, roles, is_active) VALUES " . implode(', ', $values);
             $connection->executeStatement($sql, $params);
             
             $io->text("Batch " . ($batch + 1) . "/{$totalBatches} inséré (" . ($end - $start) . " employés)");
@@ -131,7 +131,7 @@ class Insert2000EmployeesSimpleCommand extends Command
         $io->text("2000 employés insérés avec succès !");
 
         // 3. Récupérer les IDs des nouveaux employés
-        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_employe ORDER BY id DESC LIMIT 2000")->fetchFirstColumn();
+        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_user ORDER BY id DESC LIMIT 2000")->fetchFirstColumn();
         $io->text("Récupérés " . count($newEmployeeIds) . " IDs d'employés");
 
         // 4. Créer les contrats avec la distribution spécifiée
@@ -194,7 +194,7 @@ class Insert2000EmployeesSimpleCommand extends Command
                 NOW(),
                 (SELECT id FROM p_placards ORDER BY random() LIMIT 1),
                 NULL
-            FROM t_employe e
+            FROM t_user e
             WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
         ";
 
@@ -204,7 +204,7 @@ class Insert2000EmployeesSimpleCommand extends Command
         // 6. Statistiques finales
         $io->section('Statistiques finales');
         
-        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_employe")->fetchOne();
+        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_user")->fetchOne();
         $totalDossiers = $connection->executeQuery("SELECT COUNT(*) FROM t_dossier")->fetchOne();
         $totalContrats = $connection->executeQuery("SELECT COUNT(*) FROM t_employee_contrat")->fetchOne();
         $totalPlacards = $connection->executeQuery("SELECT COUNT(*) FROM p_placards")->fetchOne();
@@ -220,7 +220,7 @@ class Insert2000EmployeesSimpleCommand extends Command
             SELECT 
                 COUNT(ec.id) as contract_count,
                 COUNT(*) as employee_count
-            FROM t_employe e
+            FROM t_user e
             LEFT JOIN t_employee_contrat ec ON e.id = ec.employe_id
             WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
             GROUP BY e.id

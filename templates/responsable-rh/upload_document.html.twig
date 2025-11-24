@@ -13,7 +13,7 @@
                 </h2>
             </div>
             <div class="card-body">
-                {% if existingDocument %}
+                {% if existingDocument and existingDocument.filePath %}
                     <div class="alert alert-warning">
                         <h5><i class="fas fa-exclamation-triangle me-2"></i>Document existant</h5>
                         <p class="mb-0">Ce document existe déjà dans le dossier. En uploadant un nouveau fichier, vous remplacerez l'ancien.</p>
@@ -59,7 +59,7 @@
                         </a>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-upload me-2"></i>
-                            {% if existingDocument %}Remplacer le Document{% else %}Télécharger le Document{% endif %}
+                            {% if existingDocument and existingDocument.filePath %}Remplacer le Document{% else %}Télécharger le Document{% endif %}
                         </button>
                     </div>
                 </form>

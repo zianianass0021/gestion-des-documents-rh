@@ -38,7 +38,7 @@ class PerformanceReportPdfCommand extends Command
         // Collecter les données
         $io->text('📊 Collecte des données...');
         
-        $totalEmployes = $connection->executeQuery("SELECT COUNT(*) FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
+        $totalEmployes = $connection->executeQuery("SELECT COUNT(*) FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
         $totalDossiers = $connection->executeQuery("SELECT COUNT(*) FROM t_dossier")->fetchOne();
         $totalContrats = $connection->executeQuery("SELECT COUNT(*) FROM t_organisation_employee_contrat")->fetchOne();
         $totalOrganisations = $connection->executeQuery("SELECT COUNT(*) FROM p_organisation")->fetchOne();
@@ -50,20 +50,20 @@ class PerformanceReportPdfCommand extends Command
         $io->text('⚡ Tests de performance...');
         
         $startTime = microtime(true);
-        $connection->executeQuery("SELECT COUNT(*) FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
+        $connection->executeQuery("SELECT COUNT(*) FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
         $countTime = round((microtime(true) - $startTime) * 1000, 2);
         
         $startTime = microtime(true);
-        $connection->executeQuery("SELECT COUNT(*) FROM t_employe WHERE nom ILIKE '%Mohamed%'")->fetchOne();
+        $connection->executeQuery("SELECT COUNT(*) FROM t_user WHERE nom ILIKE '%Mohamed%'")->fetchOne();
         $searchTime = round((microtime(true) - $startTime) * 1000, 2);
         
         $startTime = microtime(true);
-        $connection->executeQuery("SELECT COUNT(*) FROM (SELECT * FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%' LIMIT 20 OFFSET 0) as page")->fetchOne();
+        $connection->executeQuery("SELECT COUNT(*) FROM (SELECT * FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%' LIMIT 20 OFFSET 0) as page")->fetchOne();
         $paginationTime = round((microtime(true) - $startTime) * 1000, 2);
         
         $startTime = microtime(true);
         $connection->executeQuery("
-            SELECT COUNT(*) FROM t_employe e 
+            SELECT COUNT(*) FROM t_user e 
             LEFT JOIN t_dossier d ON e.id = d.employe_id 
             LEFT JOIN t_employee_contrat ec ON e.id = ec.employe_id
             WHERE e.roles::text LIKE '%ROLE_EMPLOYEE%'

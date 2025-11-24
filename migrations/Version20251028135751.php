@@ -23,13 +23,13 @@ final class Version20251028135751 extends AbstractMigration
         // Composite indexes for common query patterns
         
         // For employee search by name/email
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employe_search ON t_employe(nom, prenom, email)');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employe_search ON t_user(nom, prenom, email)');
         
         // For dossier + document lookups
         $this->addSql('CREATE INDEX IF NOT EXISTS idx_document_composite ON p_document(dossier_id, abbreviation)');
         
         // For employee + contract queries
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employee_contrat_composite ON t_employee_contrat(employe_id, statut, nature_contrat_id)');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employee_contrat_composite ON t_usere_contrat(employe_id, statut, nature_contrat_id)');
         
         // For demandes filtering by employee and status
         $this->addSql('CREATE INDEX IF NOT EXISTS idx_demandes_composite ON t_demandes(employe_id, statut, date_creation DESC)');
@@ -38,16 +38,16 @@ final class Version20251028135751 extends AbstractMigration
         $this->addSql('CREATE INDEX IF NOT EXISTS idx_org_contrat_composite ON t_organisation_employee_contrat(organisation_id, employee_contrat_id)');
         
         // Partial indexes for active employees only
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employe_active ON t_employe(id) WHERE is_active = true');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employe_active ON t_user(id) WHERE is_active = true');
         
         // Partial indexes for active contracts only
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_contrat_actif ON t_employee_contrat(employe_id, nature_contrat_id) WHERE statut = \'actif\'');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_contrat_actif ON t_usere_contrat(employe_id, nature_contrat_id) WHERE statut = \'actif\'');
         
         // Index for completed dossiers
         $this->addSql('CREATE INDEX IF NOT EXISTS idx_dossier_completed ON t_dossier(id, employe_id) WHERE status = \'completed\'');
         
         // Full-text search indexes for PostgreSQL
-        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employe_fulltext ON t_employe USING gin(to_tsvector(\'french\', coalesce(nom, \'\') || \' \' || coalesce(prenom, \'\') || \' \' || coalesce(email, \'\')))');
+        $this->addSql('CREATE INDEX IF NOT EXISTS idx_employe_fulltext ON t_user USING gin(to_tsvector(\'french\', coalesce(nom, \'\') || \' \' || coalesce(prenom, \'\') || \' \' || coalesce(email, \'\')))');
         
         $this->addSql('CREATE INDEX IF NOT EXISTS idx_dossier_fulltext ON t_dossier USING gin(to_tsvector(\'french\', coalesce(nom, \'\') || \' \' || coalesce(description, \'\')))');
         
@@ -56,17 +56,17 @@ final class Version20251028135751 extends AbstractMigration
         // Materialized view for dashboard KPIs (optional - uncomment if needed)
         // $this->addSql('CREATE MATERIALIZED VIEW IF NOT EXISTS mv_dashboard_kpis AS 
         //     SELECT 
-        //         (SELECT COUNT(*) FROM t_employe WHERE roles::text LIKE \'%ROLE_EMPLOYEE%\') as total_employees,
+        //         (SELECT COUNT(*) FROM t_user WHERE roles::text LIKE \'%ROLE_EMPLOYEE%\') as total_employees,
         //         (SELECT COUNT(*) FROM t_demandes WHERE statut = \'en_attente\') as demandes_en_attente,
         //         (SELECT COUNT(*) FROM t_reclamation WHERE statut != \'resolu\') as reclamations_non_resolues
         // ');
         // $this->addSql('CREATE UNIQUE INDEX ON mv_dashboard_kpis (total_employees, demandes_en_attente, reclamations_non_resolues)');
         
         // Analyze tables for query planner optimization
-        $this->addSql('ANALYZE t_employe');
+        $this->addSql('ANALYZE t_user');
         $this->addSql('ANALYZE t_dossier');
         $this->addSql('ANALYZE p_document');
-        $this->addSql('ANALYZE t_employee_contrat');
+        $this->addSql('ANALYZE t_usere_contrat');
         $this->addSql('ANALYZE t_demandes');
         $this->addSql('ANALYZE t_organisation_employee_contrat');
         $this->addSql('ANALYZE t_reclamation');

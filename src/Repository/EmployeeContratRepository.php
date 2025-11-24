@@ -80,4 +80,24 @@ class EmployeeContratRepository extends ServiceEntityRepository
             ->leftJoin('ec.natureContrat', 'nc')
             ->orderBy('ec.dateDebut', 'DESC');
     }
+
+    /**
+     * Trouve les contrats actifs par recherche sur nom/prénom d'employé
+     */
+    public function findActiveContratsBySearch(string $search, int $limit = 100): array
+    {
+        return $this->createQueryBuilder('ec')
+            ->join('ec.employe', 'e')
+            ->join('ec.natureContrat', 'nc')
+            ->where('ec.statut = :statut')
+            ->andWhere('(LOWER(e.nom) LIKE LOWER(:search) OR LOWER(e.prenom) LIKE LOWER(:search))')
+            ->setParameter('statut', 'actif')
+            ->setParameter('search', $search . '%')
+            ->orderBy('e.nom', 'ASC')
+            ->addOrderBy('e.prenom', 'ASC')
+            ->addOrderBy('ec.dateDebut', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

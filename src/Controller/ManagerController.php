@@ -8,6 +8,7 @@ use App\Form\ReclamationType;
 use App\Repository\ReclamationRepository;
 use App\Repository\EmployeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,14 +48,93 @@ class ManagerController extends AbstractController
     }
 
     #[Route('/reclamations', name: 'manager_reclamations')]
-    public function mesReclamations(ReclamationRepository $reclamationRepository): Response
+    public function mesReclamations(Request $request, ReclamationRepository $reclamationRepository, PaginatorInterface $paginator): Response
     {
         $manager = $this->getUser();
-        $reclamations = $reclamationRepository->findBy(['manager' => $manager], ['dateCreation' => 'DESC']);
+        
+        // Get search and filter parameters
+        $search = $request->query->get('search', '');
+        $typeFilter = $request->query->get('type', 'all');
+        $statutFilter = $request->query->get('statut', 'all');
+        
+        $reclamationsQuery = $reclamationRepository->findByManagerQuery($manager, $search, $typeFilter, $statutFilter);
+        $perPage = min(max($request->query->getInt('perPage', 10), 10), 100); // Between 10 and 100
+        
+        // Paginate the results
+        $reclamations = $paginator->paginate(
+            $reclamationsQuery,
+            $request->query->getInt('page', 1),
+            $perPage
+        );
         
         return $this->render('manager/reclamations.html.twig', [
             'reclamations' => $reclamations,
+            'perPage' => $perPage,
+            'search' => $search,
+            'typeFilter' => $typeFilter,
+            'statutFilter' => $statutFilter,
         ]);
+    }
+
+    #[Route('/api/search-employees', name: 'manager_api_search_employees', methods: ['GET'])]
+    public function searchEmployees(Request $request, EmployeRepository $employeRepository): Response
+    {
+        $search = trim($request->query->get('search', ''));
+        
+        // Recherche dès 1 caractère
+        if (strlen($search) < 1) {
+            return $this->json(['employees' => []]);
+        }
+        
+        try {
+            // Récupérer le manager connecté et ses dossiers gérés
+            $manager = $this->getUser();
+            $dossiersGeres = null;
+            
+            if ($manager instanceof \App\Entity\Employe) {
+                $dossiersGeres = $manager->getDossiersGeres();
+                // Migration depuis l'ancien format si nécessaire
+                if (empty($dossiersGeres) && $manager->getDossierGere()) {
+                    $dossiersGeres = [$manager->getDossierGere()];
+                }
+            }
+            
+            // Si le manager n'a pas de dossiers gérés, retourner une erreur
+            if (empty($dossiersGeres)) {
+                error_log('Manager sans dossiers gérés - Manager ID: ' . ($manager ? $manager->getId() : 'null'));
+                return $this->json([
+                    'employees' => [], 
+                    'error' => 'Aucun dossier assigné à ce manager. Veuillez contacter l\'administrateur.'
+                ], 400);
+            }
+            
+            error_log('Recherche employés - Terme: "' . $search . '" - Dossiers gérés: ' . implode(', ', $dossiersGeres));
+            
+            // Filtrer par dossiers gérés si le manager en a
+            $employees = $employeRepository->searchActiveEmployeesByRole('ROLE_EMPLOYEE', $search, 50, null, $dossiersGeres);
+            
+            error_log('Employés trouvés: ' . count($employees));
+            
+            $results = [];
+            foreach ($employees as $employee) {
+                $results[] = [
+                    'id' => $employee['id'],
+                    'label' => sprintf('%s %s (%s)', $employee['prenom'], $employee['nom'], $employee['email']),
+                    'nom' => $employee['nom'],
+                    'prenom' => $employee['prenom'],
+                    'email' => $employee['email'],
+                ];
+            }
+            
+            return $this->json(['employees' => $results]);
+        } catch (\Exception $e) {
+            // Log l'erreur pour le débogage
+            error_log('Erreur dans searchEmployees: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+            return $this->json([
+                'employees' => [], 
+                'error' => 'Une erreur est survenue lors de la recherche: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     #[Route('/reclamations/nouvelle', name: 'manager_add_reclamation')]
@@ -63,15 +143,47 @@ class ManagerController extends AbstractController
         $reclamation = new Reclamation();
         $reclamation->setManager($this->getUser());
         
-        // Récupérer uniquement les employés avec le rôle ROLE_EMPLOYEE
-        $employees = $employeRepository->findByRole('ROLE_EMPLOYEE');
-        
-        $form = $this->createForm(ReclamationType::class, $reclamation, [
-            'employees' => $employees
-        ]);
+        $form = $this->createForm(ReclamationType::class, $reclamation);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier que l'employé existe et est valide
+            $employee = $reclamation->getEmploye();
+            if (!$employee) {
+                $this->addFlash('error', 'Veuillez sélectionner un employé.');
+                return $this->render('manager/add_reclamation.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+            
+            if (!in_array('ROLE_EMPLOYEE', $employee->getRoles())) {
+                $this->addFlash('error', 'L\'employé sélectionné n\'est pas valide.');
+                return $this->render('manager/add_reclamation.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+            
+            // Vérifier que l'employé appartient à un des dossiers gérés par le manager
+            $manager = $this->getUser();
+            if ($manager instanceof \App\Entity\Employe) {
+                $dossiersGeres = $manager->getDossiersGeres();
+                // Migration depuis l'ancien format si nécessaire
+                if (empty($dossiersGeres) && $manager->getDossierGere()) {
+                    $dossiersGeres = [$manager->getDossierGere()];
+                }
+                
+                if (!empty($dossiersGeres)) {
+                    // Vérifier si le dossier de l'employé correspond à un des dossiers gérés par le manager
+                    $dossier = $employee->getDossier();
+                    
+                    if (!$dossier || !in_array($dossier->getDossierCode(), $dossiersGeres, true)) {
+                        $this->addFlash('error', 'Vous ne pouvez créer des réclamations que pour les employés dont le dossier a l\'un des types suivants : ' . implode(', ', $dossiersGeres) . '.');
+                        return $this->render('manager/add_reclamation.html.twig', [
+                            'form' => $form->createView(),
+                        ]);
+                    }
+                }
+            }
             // Gérer l'upload du document
             $documentFile = $form->get('document')->getData();
             
@@ -138,6 +250,117 @@ class ManagerController extends AbstractController
         
         return $this->render('manager/view_reclamation.html.twig', [
             'reclamation' => $reclamation,
+        ]);
+    }
+
+    #[Route('/api/list-employees', name: 'manager_api_list_employees', methods: ['GET'])]
+    public function listEmployees(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $manager = $this->getUser();
+        $dossiersGeres = null;
+        
+        if ($manager instanceof \App\Entity\Employe) {
+            $dossiersGeres = $manager->getDossiersGeres();
+            // Migration depuis l'ancien format si nécessaire
+            if (empty($dossiersGeres) && $manager->getDossierGere()) {
+                $dossiersGeres = [$manager->getDossierGere()];
+            }
+        }
+        
+        if (empty($dossiersGeres)) {
+            return $this->json([
+                'employees' => [],
+                'total' => 0,
+                'error' => 'Aucun dossier assigné à ce manager.'
+            ], 400);
+        }
+        
+        $search = trim($request->query->get('search', ''));
+        $page = max(1, $request->query->getInt('page', 1));
+        $perPage = 10; // 10 employés par page
+        
+        // Récupérer les employés assignés au manager via native SQL
+        $conn = $entityManager->getConnection();
+        $searchLower = $search ? '%' . strtolower($search) . '%' : '';
+        
+        // Requête pour compter le total
+        $countSql = 'SELECT COUNT(DISTINCT e.id) as total
+                FROM t_user e 
+                INNER JOIN t_dossier d ON e.id = d.employe_id
+                WHERE e.is_active = :active 
+                AND CAST(e.roles AS TEXT) LIKE :role 
+                AND d.dossier_code IS NOT NULL
+                AND d.dossier_code = ANY(:dossier_codes)';
+        
+        $params = [
+            'active' => true,
+            'role' => '%ROLE_EMPLOYEE%',
+            'dossier_codes' => '{' . implode(',', array_map(function($code) {
+                return '"' . addslashes($code) . '"';
+            }, $dossiersGeres)) . '}'
+        ];
+        
+        if ($search) {
+            $countSql .= ' AND (
+                        LOWER(e.nom) LIKE :search_lower 
+                        OR LOWER(e.prenom) LIKE :search_lower 
+                        OR LOWER(e.email) LIKE :search_lower
+                        OR LOWER(e.prenom || \' \' || e.nom) LIKE :search_lower
+                        OR LOWER(e.nom || \' \' || e.prenom) LIKE :search_lower
+                    )';
+            $params['search_lower'] = $searchLower;
+        }
+        
+        $countStmt = $conn->prepare($countSql);
+        $countResult = $countStmt->executeQuery($params);
+        $total = (int) $countResult->fetchOne();
+        
+        // Requête pour récupérer les employés avec pagination
+        $sql = 'SELECT DISTINCT e.id, e.nom, e.prenom, e.email, d.dossier_code
+                FROM t_user e 
+                INNER JOIN t_dossier d ON e.id = d.employe_id
+                WHERE e.is_active = :active 
+                AND CAST(e.roles AS TEXT) LIKE :role 
+                AND d.dossier_code IS NOT NULL
+                AND d.dossier_code = ANY(:dossier_codes)';
+        
+        if ($search) {
+            $sql .= ' AND (
+                        LOWER(e.nom) LIKE :search_lower 
+                        OR LOWER(e.prenom) LIKE :search_lower 
+                        OR LOWER(e.email) LIKE :search_lower
+                        OR LOWER(e.prenom || \' \' || e.nom) LIKE :search_lower
+                        OR LOWER(e.nom || \' \' || e.prenom) LIKE :search_lower
+                    )';
+        }
+        
+        $sql .= ' ORDER BY e.nom ASC, e.prenom ASC';
+        $sql .= ' LIMIT ' . $perPage . ' OFFSET ' . (($page - 1) * $perPage);
+        
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery($params);
+        $employees = $result->fetchAllAssociative();
+        
+        $results = [];
+        foreach ($employees as $employee) {
+            $results[] = [
+                'id' => $employee['id'],
+                'nom' => $employee['nom'],
+                'prenom' => $employee['prenom'],
+                'email' => $employee['email'],
+                'dossier_code' => $employee['dossier_code'],
+            ];
+        }
+        
+        $totalPages = ceil($total / $perPage);
+        
+        return $this->json([
+            'employees' => $results,
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+            'totalPages' => $totalPages,
+            'dossiersGeres' => $dossiersGeres
         ]);
     }
     

@@ -4,33 +4,496 @@
 {% block page_title %}Ajouter un Employé{% endblock %}
 
 {% block body %}
-<div class="container-fluid">
+<style>
+    .employee-form-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    
+    .employee-form-header {
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #BCCCDC;
+    }
+    
+    .employee-form-card {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .employee-form-card .card-header {
+        background: linear-gradient(135deg, #F8FAFC 0%, #D9EAFD 100%);
+        color: #000000;
+        border-bottom: 1px solid #BCCCDC;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 0.875rem 1.25rem;
+        border: none;
+    }
+    
+    .employee-form-card .card-header h5 {
+        color: #000000;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .employee-form-card .card-body {
+        padding: 1.25rem;
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #6a7682;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #BCCCDC;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-section-title i {
+        color: #9AA6B2;
+    }
+    
+    .form-group-spacing {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 0.625rem 0.875rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #9AA6B2;
+        box-shadow: 0 0 0 0.2rem rgba(154, 166, 178, 0.15);
+    }
+    
+    .form-control:disabled, .form-select:disabled {
+        background-color: #f8fafc;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+    
+    .info-sidebar {
+        position: sticky;
+        top: 1rem;
+    }
+    
+    .info-sidebar .card {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-radius: 8px;
+    }
+    
+    .info-sidebar .card-header {
+        background: linear-gradient(135deg, #F8FAFC 0%, #D9EAFD 100%);
+        color: #000000;
+        border-bottom: 1px solid #BCCCDC;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 0.875rem 1.25rem;
+        border: none;
+    }
+    
+    .info-sidebar .card-header h5 {
+        color: #000000;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .info-sidebar .card-body {
+        padding: 1rem;
+    }
+    
+    .info-sidebar h6 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #495057;
+        margin-top: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-sidebar h6:first-child {
+        margin-top: 0;
+    }
+    
+    .info-sidebar p {
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .form-actions {
+        padding-top: 1.25rem;
+        margin-top: 1.25rem;
+        border-top: 1px solid #BCCCDC;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .form-actions .btn {
+        padding: 0.5rem 1.25rem;
+        font-weight: 500;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .form-actions .btn-primary {
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+        border: none;
+        color: white;
+    }
+    
+    .form-actions .btn-primary:hover {
+        background: linear-gradient(135deg, #7a8692 0%, #6a7682 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(106, 118, 130, 0.3);
+    }
+    
+    .form-actions .btn-secondary {
+        background: #BCCCDC;
+        border: none;
+        color: #000000;
+    }
+    
+    .form-actions .btn-secondary:hover {
+        background: #9AA6B2;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .alert {
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 1rem;
+    }
+    
+    .divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, #BCCCDC, transparent);
+        margin: 1.25rem 0;
+        border: none;
+    }
+    
+    .form-check {
+        padding: 0.5rem 0;
+        background: transparent;
+        border: none;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        min-height: auto;
+    }
+    
+    .form-check-input {
+        margin-top: 0;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .form-check-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0;
+        flex-grow: 1;
+    }
+    
+    @media (max-width: 991px) {
+        .info-sidebar {
+            position: static;
+            margin-top: 2rem;
+        }
+        
+        .employee-form-container {
+            padding: 1rem;
+        }
+        
+        .employee-form-card .card-body {
+            padding: 1.5rem;
+        }
+    }
+    
+    /* Styles pour le modal de sélection des dossiers */
+    #dossierManagerModal .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    #dossierManagerModal .modal-header {
+        background: linear-gradient(135deg, #F8FAFC 0%, #D9EAFD 100%);
+        border-bottom: 2px solid #BCCCDC;
+        border-radius: 12px 12px 0 0;
+        padding: 1.25rem 1.5rem;
+    }
+    
+    #dossierManagerModal .modal-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.25rem;
+    }
+    
+    #dossierManagerModal .modal-title i {
+        color: #9AA6B2;
+    }
+    
+    #dossierManagerModal .modal-body {
+        padding: 1.5rem;
+    }
+    
+    #dossierManagerModal .dossiers-checkboxes-container {
+        max-height: 50vh;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+    
+    /* Scrollbar personnalisée */
+    #dossierManagerModal .dossiers-checkboxes-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    #dossierManagerModal .dossiers-checkboxes-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    #dossierManagerModal .dossiers-checkboxes-container::-webkit-scrollbar-thumb {
+        background: #9AA6B2;
+        border-radius: 4px;
+    }
+    
+    #dossierManagerModal .dossiers-checkboxes-container::-webkit-scrollbar-thumb:hover {
+        background: #7a8692;
+    }
+    
+    /* Styles pour les checkboxes de dossiers */
+    .dossier-checkbox-item {
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        background: #ffffff;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .dossier-checkbox-item:hover {
+        border-color: #9AA6B2;
+        background: #f8f9fa;
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(154, 166, 178, 0.15);
+    }
+    
+    .dossier-checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #9AA6B2;
+        flex-shrink: 0;
+    }
+    
+    .dossier-checkbox-item input[type="checkbox"]:checked {
+        accent-color: #0d6efd;
+    }
+    
+    .dossier-checkbox-item label {
+        cursor: pointer;
+        font-weight: 500;
+        color: #495057;
+        font-size: 0.95rem;
+        margin: 0;
+        flex-grow: 1;
+        user-select: none;
+    }
+    
+    .dossier-checkbox-item input[type="checkbox"]:checked ~ label {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+    
+    .dossier-checkbox-item:has(input[type="checkbox"]:checked) {
+        border-color: #0d6efd;
+        background: #e7f1ff;
+    }
+    
+    /* Barre de recherche */
+    .dossier-search-container {
+        margin-bottom: 1.25rem;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .dossier-search-container input {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    .dossier-search-container input:focus {
+        border-color: #9AA6B2;
+        box-shadow: 0 0 0 0.2rem rgba(154, 166, 178, 0.15);
+    }
+    
+    .dossier-search-icon {
+        position: absolute;
+        left: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9AA6B2;
+        pointer-events: none;
+    }
+    
+    /* Compteur de sélection */
+    .dossier-selection-count {
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-left: auto;
+    }
+    
+    /* Badges pour les dossiers sélectionnés */
+    .selected-dossiers-display {
+        min-height: 2.5rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border: 2px dashed #BCCCDC;
+        border-radius: 8px;
+    }
+    
+    .selected-dossiers-display .badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
+    /* Message d'information amélioré */
+    #dossierManagerModal .modal-body > p {
+        background: #e7f1ff;
+        border-left: 4px solid #0d6efd;
+        padding: 0.875rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.25rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Footer du modal */
+    #dossierManagerModal .modal-footer {
+        border-top: 2px solid #e9ecef;
+        padding: 1rem 1.5rem;
+        background: #f8f9fa;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    #dossierManagerModal .modal-footer .btn {
+        padding: 0.625rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    #dossierManagerModal .modal-footer .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border: none;
+    }
+    
+    #dossierManagerModal .modal-footer .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    /* État de chargement */
+    .dossiers-loading {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #9AA6B2;
+    }
+    
+    .dossiers-loading i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* État vide */
+    .dossiers-empty {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .dossiers-empty i {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        color: #BCCCDC;
+    }
+</style>
+
+<div class="container-fluid employee-form-container">
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0">Ajouter un Nouvel Employé</h1>
+            <div class="employee-form-header d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0 fw-bold">
+                    <i class="fas fa-user-plus me-2 text-primary"></i>
+                    Ajouter un Nouvel Employé
+                </h1>
                 <a href="{{ path('responsable_manage_employes') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Retour
+                    <i class="fas fa-arrow-left me-1"></i> Retour
                 </a>
             </div>
 
             {% for message in app.flashes('success') %}
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
+                    <i class="fas fa-check-circle me-2"></i>{{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
 
             {% for message in app.flashes('error') %}
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ message }}
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
 
             <div class="row">
                 <div class="col-lg-8">
-                    <div class="card">
+                    <div class="card employee-form-card">
                         <div class="card-header">
                             <h5 class="card-title mb-0">
                                 <i class="fas fa-user-plus"></i> Informations de l'Employé
@@ -39,16 +502,23 @@
                         <div class="card-body">
                             {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
                             
+                            <!-- Section Informations Personnelles -->
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-user"></i>
+                                    Informations Personnelles
+                                </h5>
+                            
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="mb-3">
+                                        <div class="form-group-spacing">
                                         {{ form_label(form.prenom, null, {'label_attr': {'class': 'form-label'}}) }}
                                         {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
                                         {{ form_errors(form.prenom) }}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="mb-3">
+                                        <div class="form-group-spacing">
                                         {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label'}}) }}
                                         {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
                                         {{ form_errors(form.nom) }}
@@ -58,49 +528,122 @@
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="mb-3">
+                                        <div class="form-group-spacing">
                                         {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
                                         {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
                                         {{ form_errors(form.email) }}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="mb-3">
+                                        <div class="form-group-spacing">
                                         {{ form_label(form.telephone, null, {'label_attr': {'class': 'form-label'}}) }}
                                         {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
                                         {{ form_errors(form.telephone) }}
                                     </div>
                                 </div>
                             </div>
+                            </div>
 
+                            <hr class="divider">
+
+                            <!-- Section Authentification -->
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-key"></i>
+                                    Authentification
+                                </h5>
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="mb-3">
+                                        <div class="form-group-spacing">
+                                            {{ form_label(form.username, null, {'label_attr': {'class': 'form-label'}}) }}
+                                            {{ form_widget(form.username, {'attr': {'class': 'form-control'}}) }}
+                                            {{ form_errors(form.username) }}
+                                            <small class="form-text text-muted mt-1">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Laissez vide pour générer automatiquement à partir de l'email
+                                            </small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="mb-3">
+                                        <div class="form-group-spacing">
                                         {{ form_label(form.password, null, {'label_attr': {'class': 'form-label'}}) }}
                                         {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
                                         {{ form_errors(form.password) }}
                                     </div>
                                 </div>
                             </div>
+                            </div>
 
-        <hr class="my-4">
-        <h5 class="mb-3"><i class="fas fa-file-contract"></i> Informations du Contrat Principal</h5>
+                            <hr class="divider">
+
+                            <!-- Section Manager -->
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-user-tie"></i>
+                                    Gestion Manager
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group-spacing">
+                                            <div class="form-check">
+                                                {{ form_widget(form.isManager, {'attr': {'class': 'form-check-input', 'id': 'is_manager_checkbox', 'data-manager-checkbox': 'true'}}) }}
+                                                {{ form_label(form.isManager, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                                <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="configure_manager_btn" data-configure-manager-btn="true" style="display: none !important;">
+                                                    <i class="fas fa-cog me-1"></i> Configurer
+                                                </button>
+                                            </div>
+                                            {% if form.isManager.vars.help %}
+                                                <small class="form-text text-muted d-block mt-2">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    {{ form.isManager.vars.help }}
+                                                </small>
+                                            {% endif %}
+                                            {{ form_errors(form.isManager) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Affichage des dossiers gérés sélectionnés -->
+                                <div class="row" id="dossiers_geres_row" style="display: none;">
+                                    <div class="col-md-12">
+                                        <div class="form-group-spacing">
+                                            <label class="form-label">Dossiers gérés</label>
+                                            <div id="selected_dossiers_display" class="selected-dossiers-display mb-2">
+                                                <span class="text-muted">Aucun dossier sélectionné</span>
+                                            </div>
+                                            <!-- Champ caché pour préserver la valeur lors de la soumission -->
+                                            {{ form_widget(form.dossiersGeres, {'attr': {'id': 'dossiers_geres_input'}}) }}
+                                            <small class="form-text text-muted d-block mt-1">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Utilisez le bouton "Configurer" pour sélectionner les dossiers que ce manager gérera.
+                                            </small>
+                                            {{ form_errors(form.dossiersGeres) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="divider">
+
+                            <!-- Section Contrat Principal -->
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-file-contract"></i>
+                                    Informations du Contrat Principal
+                                </h5>
 
         <div class="row">
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.natureContrat, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.natureContrat, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.natureContrat) }}
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.organisation, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.organisation, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.organisation) }}
@@ -110,38 +653,46 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.dateDebutContrat, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.dateDebutContrat, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.dateDebutContrat) }}
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.dateFinContrat, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.dateFinContrat, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.dateFinContrat) }}
                 </div>
             </div>
         </div>
+                            </div>
 
-        <hr class="my-4">
-        <h5 class="mb-3"><i class="fas fa-file-contract"></i> Informations du Contrat Secondaire (Optionnel)</h5>
-        <p class="text-muted mb-3">
-            <i class="fas fa-info-circle me-2"></i>
-            Un employé peut avoir plusieurs contrats avec différentes natures et organisations.
-        </p>
+                            <hr class="divider">
+
+                            <!-- Section Contrat Secondaire -->
+                            <div class="form-section">
+                                <h5 class="form-section-title">
+                                    <i class="fas fa-file-contract"></i>
+                                    Informations du Contrat Secondaire <span class="badge bg-secondary ms-2">Optionnel</span>
+                                </h5>
+                                
+                                <div class="alert alert-info mb-2" style="background: #D9EAFD; border-left: 3px solid #9AA6B2; padding: 0.5rem 0.75rem;">
+                                    <i class="fas fa-info-circle me-2" style="color: #6a7682;"></i>
+                                    <small style="color: #6a7682;">Un employé peut avoir plusieurs contrats avec différentes natures et organisations.</small>
+                                </div>
 
         <div class="row">
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.natureContrat2, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.natureContrat2, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.natureContrat2) }}
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.organisation2, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.organisation2, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.organisation2) }}
@@ -151,27 +702,28 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.dateDebutContrat2, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.dateDebutContrat2, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.dateDebutContrat2) }}
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="mb-3">
+                                        <div class="form-group-spacing">
                     {{ form_label(form.dateFinContrat2, null, {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.dateFinContrat2, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.dateFinContrat2) }}
+                                        </div>
                 </div>
             </div>
         </div>
 
-                            <div class="d-flex justify-content-between">
+                            <div class="form-actions">
                                 <a href="{{ path('responsable_manage_employes') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Annuler
+                                    <i class="fas fa-times me-1"></i> Annuler
                                 </a>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Créer l'Employé et le Contrat
+                                    <i class="fas fa-save me-1"></i> Créer l'Employé et le Contrat
                                 </button>
                             </div>
 
@@ -181,6 +733,7 @@
                 </div>
                 
                 <div class="col-lg-4">
+                    <div class="info-sidebar">
                     <div class="card">
                         <div class="card-header">
                             <h5 class="card-title mb-0">
@@ -188,20 +741,38 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <h6>Création d'Employé</h6>
-                            <p class="text-muted small">
+                                <h6>
+                                    <i class="fas fa-user-plus me-2 text-primary"></i>
+                                    Création d'Employé
+                                </h6>
+                                <p>
                                 Lors de la création d'un employé, un contrat sera automatiquement créé avec les informations fournies.
                             </p>
                             
-                            <h6>Mot de passe</h6>
-                            <p class="text-muted small">
+                                <h6>
+                                    <i class="fas fa-key me-2 text-warning"></i>
+                                    Mot de passe
+                                </h6>
+                                <p>
                                 Le mot de passe doit contenir au moins 8 caractères. L'employé pourra le modifier lors de sa première connexion.
                             </p>
                             
-                            <h6>Contrat</h6>
-                            <p class="text-muted small">
+                                <h6>
+                                    <i class="fas fa-file-contract me-2 text-success"></i>
+                                    Contrat
+                                </h6>
+                                <p>
                                 Le contrat sera créé avec le statut "Actif" par défaut. Vous pourrez le modifier ultérieurement si nécessaire.
                             </p>
+                                
+                                <h6>
+                                    <i class="fas fa-user-tie me-2 text-info"></i>
+                                    Manager
+                                </h6>
+                                <p>
+                                    Les managers ont accès aux fonctionnalités d'employé et de manager. Chaque manager peut gérer un seul dossier.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -209,4 +780,356 @@
         </div>
     </div>
 </div>
+
+<!-- Modal pour sélectionner les dossiers -->
+<div class="modal fade" id="dossierManagerModal" tabindex="-1" aria-labelledby="dossierManagerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dossierManagerModalLabel">
+                    <i class="fas fa-folder-open me-2"></i>
+                    Sélectionner les dossiers à gérer
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    <i class="fas fa-info-circle me-2"></i>
+                    Sélectionnez un ou plusieurs dossiers que ce manager gérera. Plusieurs managers peuvent gérer le même dossier.
+                </p>
+                
+                <!-- Barre de recherche -->
+                <div class="dossier-search-container">
+                    <div class="position-relative">
+                        <i class="fas fa-search dossier-search-icon"></i>
+                        <input type="text" 
+                               id="dossier_search_input" 
+                               class="form-control w-100" 
+                               placeholder="Rechercher un dossier..." 
+                               autocomplete="off">
+                    </div>
+                </div>
+                
+                <!-- Compteur de sélection -->
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-muted small">
+                        <i class="fas fa-check-circle me-1"></i>
+                        <span id="dossier_selection_count">0</span> dossier(s) sélectionné(s)
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="select_all_dossiers_btn">
+                        <i class="fas fa-check-double me-1"></i>
+                        Tout sélectionner
+                    </button>
+                </div>
+                
+                <!-- Container des checkboxes -->
+                <div id="dossiers_checkboxes_container" class="dossiers-checkboxes-container">
+                    <div class="dossiers-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <div class="mt-2">Chargement des dossiers...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel_dossier_btn">Annuler</button>
+                <button type="button" class="btn btn-primary" id="confirm_dossier_btn">Confirmer la sélection</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Utiliser plusieurs méthodes pour trouver les éléments
+    let isManagerCheckbox = document.getElementById('is_manager_checkbox');
+    if (!isManagerCheckbox) {
+        isManagerCheckbox = document.querySelector('[data-manager-checkbox="true"]');
+    }
+    if (!isManagerCheckbox) {
+        isManagerCheckbox = document.querySelector('input[type="checkbox"][class*="isManager"]');
+    }
+    
+    let configureManagerBtn = document.getElementById('configure_manager_btn');
+    if (!configureManagerBtn) {
+        configureManagerBtn = document.querySelector('[data-configure-manager-btn="true"]');
+    }
+    
+    const dossiersGeresRow = document.getElementById('dossiers_geres_row');
+    const dossiersGeresInput = document.getElementById('dossiers_geres_input');
+    const selectedDossiersDisplay = document.getElementById('selected_dossiers_display');
+    const dossiersCheckboxesContainer = document.getElementById('dossiers_checkboxes_container');
+    const confirmDossierBtn = document.getElementById('confirm_dossier_btn');
+    const cancelDossierBtn = document.getElementById('cancel_dossier_btn');
+    const modalElement = document.getElementById('dossierManagerModal');
+    let selectedDossiers = [];
+    
+    // Vérifier que tous les éléments existent
+    if (!isManagerCheckbox) {
+        console.error('Checkbox isManager non trouvée');
+        return;
+    }
+    if (!configureManagerBtn) {
+        console.error('Bouton configure_manager_btn non trouvé');
+        return;
+    }
+    if (!modalElement) {
+        console.error('Modal dossierManagerModal non trouvé');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Charger les dossiers disponibles
+    function loadAvailableDossiers() {
+        fetch('{{ path("responsable_api_available_dossiers") }}')
+            .then(response => response.json())
+            .then(data => {
+                dossiersCheckboxesContainer.innerHTML = '';
+                
+                if (data.available && data.available.length > 0) {
+                    // Initialiser selectedDossiers avec les dossiers actuels
+                    selectedDossiers = data.current && Array.isArray(data.current) ? [...data.current] : [];
+                    
+                    // Créer les checkboxes pour chaque dossier avec un meilleur style
+                    data.available.forEach(dossier => {
+                        const checkboxItem = document.createElement('div');
+                        checkboxItem.className = 'dossier-checkbox-item';
+                        checkboxItem.dataset.dossier = dossier;
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'dossier-checkbox';
+                        checkbox.id = 'dossier_checkbox_' + dossier;
+                        checkbox.value = dossier;
+                        checkbox.dataset.dossier = dossier;
+                        checkbox.checked = selectedDossiers.includes(dossier);
+                        
+                        const label = document.createElement('label');
+                        label.htmlFor = 'dossier_checkbox_' + dossier;
+                        label.textContent = dossier;
+                        
+                        checkboxItem.appendChild(checkbox);
+                        checkboxItem.appendChild(label);
+                        
+                        // Ajouter un event listener pour cliquer sur l'item entier
+                        checkboxItem.addEventListener('click', function(e) {
+                            if (e.target !== checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                                updateSelectedDossiers();
+                                updateSelectedDossiersDisplay();
+                                updateSelectionCount();
+                            }
+                        });
+                        
+                        dossiersCheckboxesContainer.appendChild(checkboxItem);
+                    });
+                    
+                    // Ajouter les event listeners aux checkboxes
+                    document.querySelectorAll('.dossier-checkbox').forEach(checkbox => {
+                        checkbox.addEventListener('change', function() {
+                            updateSelectedDossiers();
+                            updateSelectedDossiersDisplay();
+                            updateSelectionCount();
+                        });
+                    });
+                    
+                    // Initialiser le compteur
+                    updateSelectionCount();
+                } else {
+                    dossiersCheckboxesContainer.innerHTML = '<div class="dossiers-empty"><i class="fas fa-folder-open"></i><div>Aucun dossier disponible</div></div>';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des dossiers:', error);
+                dossiersCheckboxesContainer.innerHTML = '<div class="text-center text-danger py-3">Erreur de chargement</div>';
+            });
+    }
+    
+    // Mettre à jour la liste des dossiers sélectionnés
+    function updateSelectedDossiers() {
+        selectedDossiers = [];
+        document.querySelectorAll('.dossier-checkbox:checked').forEach(checkbox => {
+            selectedDossiers.push(checkbox.value);
+        });
+    }
+    
+    // Mettre à jour l'affichage des dossiers sélectionnés
+    function updateSelectedDossiersDisplay() {
+        if (!selectedDossiersDisplay) return;
+        
+        if (selectedDossiers.length === 0) {
+            selectedDossiersDisplay.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle me-1"></i>Aucun dossier sélectionné</span>';
+        } else {
+            selectedDossiersDisplay.innerHTML = selectedDossiers.map(dossier => 
+                '<span class="badge bg-primary me-1 mb-1"><i class="fas fa-folder me-1"></i>' + dossier + '</span>'
+            ).join('');
+        }
+    }
+    
+    // Mettre à jour le compteur de sélection
+    function updateSelectionCount() {
+        const countElement = document.getElementById('dossier_selection_count');
+        if (countElement) {
+            countElement.textContent = selectedDossiers.length;
+        }
+    }
+    
+    // Fonction de recherche
+    function setupDossierSearch() {
+        const searchInput = document.getElementById('dossier_search_input');
+        if (!searchInput) return;
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.dossier-checkbox-item');
+            
+            items.forEach(item => {
+                const dossier = item.dataset.dossier.toLowerCase();
+                if (dossier.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Fonction pour sélectionner/désélectionner tout
+    function setupSelectAll() {
+        const selectAllBtn = document.getElementById('select_all_dossiers_btn');
+        if (!selectAllBtn) return;
+        
+        selectAllBtn.addEventListener('click', function() {
+            const visibleCheckboxes = Array.from(document.querySelectorAll('.dossier-checkbox-item:not([style*="display: none"]) .dossier-checkbox'));
+            const allChecked = visibleCheckboxes.every(cb => cb.checked);
+            
+            visibleCheckboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked;
+            });
+            
+            updateSelectedDossiers();
+            updateSelectedDossiersDisplay();
+            updateSelectionCount();
+            
+            // Mettre à jour le texte du bouton
+            selectAllBtn.innerHTML = allChecked 
+                ? '<i class="fas fa-check-double me-1"></i>Tout sélectionner'
+                : '<i class="fas fa-times me-1"></i>Tout désélectionner';
+        });
+    }
+    
+    // Afficher/masquer le bouton Configurer selon l'état de la checkbox
+    function toggleConfigureButton() {
+        console.log('toggleConfigureButton called');
+        console.log('isManagerCheckbox:', isManagerCheckbox);
+        console.log('configureManagerBtn:', configureManagerBtn);
+        console.log('isManagerCheckbox.checked:', isManagerCheckbox ? isManagerCheckbox.checked : 'N/A');
+        
+        if (isManagerCheckbox && configureManagerBtn) {
+            if (isManagerCheckbox.checked) {
+                console.log('Showing configure button');
+                configureManagerBtn.style.setProperty('display', 'inline-block', 'important');
+                configureManagerBtn.style.setProperty('visibility', 'visible', 'important');
+                configureManagerBtn.style.setProperty('opacity', '1', 'important');
+                // Vérifier que le bouton est bien visible
+                setTimeout(() => {
+                    const rect = configureManagerBtn.getBoundingClientRect();
+                    console.log('Button position:', rect);
+                    console.log('Button computed style:', window.getComputedStyle(configureManagerBtn).display);
+                }, 100);
+            } else {
+                console.log('Hiding configure button');
+                configureManagerBtn.style.setProperty('display', 'none', 'important');
+                selectedDossiers = [];
+                if (dossiersGeresInput) {
+                    dossiersGeresInput.value = '';
+                }
+                if (dossiersGeresRow) {
+                    dossiersGeresRow.style.display = 'none';
+                }
+                updateSelectedDossiersDisplay();
+            }
+        } else {
+            console.error('Missing elements:', {
+                isManagerCheckbox: !!isManagerCheckbox,
+                configureManagerBtn: !!configureManagerBtn
+            });
+        }
+    }
+    
+    // Quand on coche/décoche isManager, afficher/masquer le bouton Configurer
+    isManagerCheckbox.addEventListener('change', function() {
+        console.log('Checkbox changed, checked:', this.checked);
+        toggleConfigureButton();
+    });
+    
+    // Vérifier l'état initial
+    console.log('Initial state - checkbox checked:', isManagerCheckbox.checked);
+    toggleConfigureButton();
+    
+    // Quand on clique sur le bouton Configurer, ouvrir le modal
+    configureManagerBtn.addEventListener('click', function() {
+        loadAvailableDossiers();
+        setupDossierSearch();
+        setupSelectAll();
+        modal.show();
+    });
+    
+    // Confirmer la sélection
+    confirmDossierBtn.addEventListener('click', function() {
+        updateSelectedDossiers();
+        
+        if (selectedDossiers.length === 0) {
+            alert('Veuillez sélectionner au moins un dossier');
+            return;
+        }
+        
+        // Mettre à jour le champ caché avec le JSON array
+        if (dossiersGeresInput) {
+            dossiersGeresInput.value = JSON.stringify(selectedDossiers);
+        }
+        
+        // Mettre à jour l'affichage
+        updateSelectedDossiersDisplay();
+        updateSelectionCount();
+        
+        // Afficher la ligne des dossiers gérés
+        if (dossiersGeresRow) {
+            dossiersGeresRow.style.display = 'block';
+        }
+        
+        // Fermer le modal
+        modal.hide();
+    });
+    
+    // Annuler - juste fermer le modal
+    cancelDossierBtn.addEventListener('click', function() {
+        modal.hide();
+    });
+    
+    // Si le modal est fermé sans confirmer, ne rien faire (garder l'état actuel)
+    document.getElementById('dossierManagerModal').addEventListener('hidden.bs.modal', function() {
+        // Ne rien faire, garder l'état actuel
+    });
+    
+    // Initialiser l'état du bouton Configurer
+    toggleConfigureButton();
+    
+    // Si des dossiers sont déjà sélectionnés (mode édition), afficher le champ
+    if (dossiersGeresInput && dossiersGeresInput.value) {
+        try {
+            const currentDossiers = JSON.parse(dossiersGeresInput.value);
+            if (Array.isArray(currentDossiers) && currentDossiers.length > 0) {
+                selectedDossiers = currentDossiers;
+                updateSelectedDossiersDisplay();
+                if (dossiersGeresRow) {
+                    dossiersGeresRow.style.display = 'block';
+                }
+            }
+        } catch (e) {
+            console.error('Erreur lors du parsing des dossiers:', e);
+        }
+    }
+});
+</script>
 {% endblock %}

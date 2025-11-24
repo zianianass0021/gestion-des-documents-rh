@@ -22,7 +22,7 @@
                                     Informations responsable RH
                                 </h5>
                                 <div class="alert alert-info">
-                                    <strong>Rôle :</strong> {{ app.user.roles|join(', ') }}
+                                    <strong>Rôle :</strong> {% if app.user %}{{ app.user.roles|join(', ') }}{% else %}Non connecté{% endif %}
                                 </div>
                                 <div class="alert alert-success">
                                     <strong>Statut :</strong> Phase d'authentification terminée

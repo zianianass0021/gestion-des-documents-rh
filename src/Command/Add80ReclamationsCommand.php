@@ -117,7 +117,7 @@ class Add80ReclamationsCommand extends Command
         $responsableRhIds = array_map(fn($rh) => $rh->getId(), $responsablesRh);
 
         // Récupérer les IDs des employés une seule fois
-        $sql = "SELECT id FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%'";
+        $sql = "SELECT id FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%'";
         $employeeIdsQuery = $this->em->getConnection()->executeQuery($sql);
         $employeeIds = $employeeIdsQuery->fetchFirstColumn();
         

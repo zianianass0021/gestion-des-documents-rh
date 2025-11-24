@@ -36,7 +36,7 @@ class CreateMissingDossiersCommand extends Command
         // Utilisation d'une requête SQL directe pour éviter les problèmes avec le type JSON
         $sql = "
             SELECT e.id 
-            FROM t_employe e 
+            FROM t_user e 
             LEFT JOIN t_dossier d ON e.id = d.employe_id 
             WHERE d.id IS NULL 
             AND e.roles::text LIKE '%ROLE_EMPLOYEE%'

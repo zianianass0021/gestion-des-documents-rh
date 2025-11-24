@@ -48,7 +48,13 @@ class DocumentRequirementService
             // Find if document already exists
             $existingDoc = $this->findDocumentByAbbreviation($existingDocuments, $abbreviation);
             
-            $isUploaded = $existingDoc ? $existingDoc->isUploaded() : false;
+            // A document is considered "uploaded" if:
+            // 1. It has a file physically uploaded (isUploaded() returns true), OR
+            // 2. It has statutAjout='ajoute' (marked as added manually)
+            $isUploaded = false;
+            if ($existingDoc) {
+                $isUploaded = $existingDoc->isUploaded() || $existingDoc->getStatutAjout() === 'ajoute';
+            }
             
             $result[] = [
                 'abbreviation' => $abbreviation,

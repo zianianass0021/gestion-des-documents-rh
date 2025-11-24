@@ -4,11 +4,13 @@ namespace App\Form;
 
 use App\Entity\Reclamation;
 use App\Entity\Employe;
+use App\Repository\EmployeRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,14 +21,28 @@ class ReclamationType extends AbstractType
         $builder
             ->add('employe', EntityType::class, [
                 'class' => Employe::class,
-                'choice_label' => function(Employe $employe) {
-                    return $employe->getPrenom() . ' ' . $employe->getNom() . ' (' . $employe->getEmail() . ')';
+                'choice_label' => 'fullName',
+                'query_builder' => function (EmployeRepository $er) {
+                    // Query vide par défaut, sera remplie via AJAX
+                    return $er->createQueryBuilder('e')->where('1 = 0');
                 },
-                'choices' => $options['employees'] ?? [],
-                'placeholder' => 'Sélectionner un employé',
-                'label' => 'Employé concerné',
+                'placeholder' => '',
+                'label' => false,
+                'required' => false, // La validation sera faite dans le contrôleur
                 'attr' => [
-                    'class' => 'form-select'
+                    'class' => 'd-none',
+                    'id' => 'employee-id'
+                ]
+            ])
+            ->add('employee_search', TextType::class, [
+                'label' => 'Employé concerné',
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control form-control-sm',
+                    'placeholder' => 'Rechercher un employé (nom ou prénom) - minimum 2 caractères',
+                    'autocomplete' => 'off',
+                    'id' => 'employee-search'
                 ]
             ])
             ->add('typeReclamation', ChoiceType::class, [
@@ -62,7 +78,6 @@ class ReclamationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Reclamation::class,
-            'employees' => [],
         ]);
     }
 }

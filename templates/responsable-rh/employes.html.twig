@@ -3,165 +3,145 @@
 {% block title %}Gestion des Employés{% endblock %}
 
 {% block body %}
-
-<!-- Statistiques en haut -->
-<div class="row mb-4">
+<div class="row g-0">
     <div class="col-12">
-        <div class="alert alert-primary d-flex align-items-center">
-            <i class="fas fa-users me-3 fa-2x"></i>
-            <div>
-                <h5 class="mb-1">Total des Employés</h5>
-                <h3 class="mb-0 text-primary">{{ totalEmployes }}</h3>
-                <small class="text-muted">Employés de l'entreprise</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="mb-0">
-                        <i class="fas fa-users me-2"></i>
-                        Gestion des Employés
-                    </h1>
-                    <div class="d-flex gap-2">
-                        <a href="{{ path('responsable_rh_add_employe') }}" class="btn btn-success">
-                            <i class="fas fa-plus me-2"></i>Ajouter un Employé
+        <div class="card compact-page">
+            <div class="card-header compact-header py-2">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="mb-0">
+                            <i class="fas fa-users me-1"></i>
+                            Gestion des Employés
+                        </h4>
+                        <div class="d-flex align-items-center gap-1 text-primary">
+                            <i class="fas fa-file-contract small"></i>
+                            <span class="fw-bold small">{{ totalEmployes }}</span>
+                            <small class="text-muted" style="font-size: 0.75rem;">Contrats</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-1 align-items-center flex-wrap">
+                        <a href="{{ path('responsable_manage_employes', {'status': 'all', 'search': search}) }}" 
+                           class="btn btn-xs {{ status == 'all' or status is empty ? 'btn-primary' : 'btn-outline-primary' }}">
+                            Tous
+                        </a>
+                        <a href="{{ path('responsable_manage_employes', {'status': 'active', 'search': search}) }}" 
+                           class="btn btn-xs {{ status == 'active' ? 'btn-success' : 'btn-outline-success' }}">
+                            Actifs
+                        </a>
+                        <a href="{{ path('responsable_manage_employes', {'status': 'inactive', 'search': search}) }}" 
+                           class="btn btn-xs {{ status == 'inactive' ? 'btn-danger' : 'btn-outline-danger' }}">
+                            Inactifs
+                        </a>
+                        <a href="{{ path('responsable_manage_employes', {'status': 'managers', 'search': search}) }}" 
+                           class="btn btn-xs {{ status == 'managers' ? 'btn-warning' : 'btn-outline-warning' }}">
+                            Managers
+                        </a>
+                        <form method="GET" class="d-flex gap-1 compact-search">
+                            {% if status and status != 'all' %}
+                                <input type="hidden" name="status" value="{{ status }}">
+                            {% endif %}
+                            <div class="input-group input-group-xs">
+                                <span class="input-group-text py-0 px-2">
+                                    <i class="fas fa-search" style="font-size: 0.7rem;"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control form-control-xs py-0" 
+                                       name="search" 
+                                       value="{{ search }}" 
+                                       placeholder="Rechercher...">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-xs py-0">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                        <a href="{{ path('responsable_rh_add_employe') }}" class="btn btn-success btn-xs">
+                            <i class="fas fa-plus"></i> Ajouter
                         </a>
                     </div>
                 </div>
-                
-                <!-- Barre de recherche -->
-                <div class="mt-2 pt-2 border-top">
-                <form method="GET" class="row g-2">
-                    <div class="col-lg-7 col-md-6">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">
-                                <i class="fas fa-search"></i>
-                            </span>
-                            <input type="text" 
-                                   class="form-control" 
-                                   name="search" 
-                                   value="{{ search }}" 
-                                   placeholder="Rechercher par nom, prénom, email...">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <button type="submit" class="btn btn-primary btn-sm w-100">
-                            <i class="fas fa-search me-1"></i>Rechercher
-                        </button>
-                    </div>
-                </form>
-                </div>
             </div>
             
-            <div class="card-body">
-                {% if search %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-search me-2"></i>
-                        Recherche pour : "<strong>{{ search }}</strong>" 
-                        ({{ employees|length }} résultat{{ employees|length > 1 ? 's' : '' }})
-                        <a href="{{ path('responsable_manage_employes') }}" class="btn btn-sm btn-outline-primary ms-2">
-                            <i class="fas fa-times"></i> Effacer
+            <div class="card-body compact-body p-2">
+                {% if search or (status and status != 'all') %}
+                    <div class="alert alert-info alert-xs py-1 px-2 mb-2 d-flex align-items-center justify-content-between">
+                        <small class="mb-0">
+                            <i class="fas fa-filter me-1"></i>
+                            {% if search %}
+                                "<strong>{{ search }}</strong>"
+                            {% endif %}
+                            {% if status == 'active' %}
+                                <strong>Actifs</strong>
+                            {% elseif status == 'inactive' %}
+                                <strong>Inactifs</strong>
+                            {% elseif status == 'managers' %}
+                                <strong>Managers</strong>
+                            {% endif %}
+                            ({{ contrats|length }})
+                        </small>
+                        <a href="{{ path('responsable_manage_employes') }}" class="btn btn-xs btn-outline-primary py-0">
+                            <i class="fas fa-times"></i>
                         </a>
                     </div>
                 {% endif %}
                 
-                {% if employees is empty %}
-                    <div class="alert alert-info text-center">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Aucun employé trouvé. 
-                        <a href="{{ path('responsable_rh_add_employe') }}" class="alert-link">Ajouter le premier employé</a>
+                {% if contrats is empty %}
+                    <div class="alert alert-info alert-xs py-2 px-3 text-center mb-0">
+                        <small><i class="fas fa-info-circle me-1"></i>Aucun contrat trouvé.</small>
                     </div>
                 {% else %}
-                    <!-- Desktop Table View -->
-                    <div class="table-responsive desktop-view">
-                        <table class="table table-striped table-sm">
+                    <div class="table-responsive compact-table">
+                        <table class="table table-sm table-hover mb-0 compact-table-inner">
                             <thead>
                                 <tr>
-                                    <th style="width: 50px;">ID</th>
-                                    <th style="width: 120px;">Nom</th>
-                                    <th style="width: 120px;">Prénom</th>
-                                    <th style="width: 200px;">Email</th>
-                                    <th style="width: 250px;">Organisation</th>
-                                    <th style="width: 80px;">Statut</th>
-                                    <th style="width: 100px;">Contrat</th>
-                                    <th style="width: 100px;">Actions</th>
+                                    <th style="padding: 0.25rem;">ID</th>
+                                    <th style="padding: 0.25rem;">Nom</th>
+                                    <th style="padding: 0.25rem;">Prénom</th>
+                                    <th style="padding: 0.25rem;">Contrat</th>
+                                    <th style="padding: 0.25rem;">Début</th>
+                                    <th style="padding: 0.25rem;">Fin</th>
+                                    <th style="padding: 0.25rem;">Statut</th>
+                                    <th style="padding: 0.25rem;">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="animate-stagger">
-                                {% for employe in employees.items %}
-                                <tr class="{{ not employe.isActive ? 'table-secondary' : '' }} animate-fade-in-left" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
-                                    <td>{{ employe.id }}</td>
-                                    <td>{{ employe.nom }}</td>
-                                    <td>{{ employe.prenom }}</td>
-                                    <td>{{ employe.email }}</td>
-                                <td>
-                                    {% if employe.employeeContrats is not empty %}
-                                        {% set uniqueOrgs = [] %}
-                                        {% for contrat in employe.employeeContrats %}
-                                            {% for orgContrat in contrat.organisationEmployeeContrats %}
-                                                {% set orgDesignation = orgContrat.organisation.dossierDesignation %}
-                                                {% if orgDesignation not in uniqueOrgs %}
-                                                    {% set uniqueOrgs = uniqueOrgs|merge([orgDesignation]) %}
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endfor %}
-                                        
-                                        {% if uniqueOrgs|length > 0 %}
-                                            {% for orgName in uniqueOrgs %}
-                                                {% if not loop.first %}<br>{% endif %}
-                                                <span class="badge bg-{{ loop.first ? 'primary' : 'info' }} animate-scale-in small">
-                                                    {{ orgName|slice(0, 30) }}{% if orgName|length > 30 %}...{% endif %}
-                                                </span>
-                                            {% endfor %}
+                            <tbody>
+                                {% for contrat in contrats %}
+                                <tr>
+                                    <td style="padding: 0.25rem;">{{ contrat.employe.id }}</td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ contrat.employe.nom }}</td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ contrat.employe.prenom }}</td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ contrat.natureContrat.designation|slice(0, 20) }}{% if contrat.natureContrat.designation|length > 20 %}...{% endif %}</td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ contrat.dateDebut|date('d/m/Y') }}</td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ contrat.dateFin ? contrat.dateFin|date('d/m/Y') : '-' }}</td>
+                                    <td style="padding: 0.25rem;">
+                                        {% if contrat.statut == 'actif' %}
+                                            <span class="badge bg-success" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">Actif</span>
+                                        {% elseif contrat.statut == 'inactif' %}
+                                            <span class="badge bg-danger" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">Inactif</span>
+                                        {% elseif contrat.statut == 'terminé' %}
+                                            <span class="badge bg-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">Terminé</span>
                                         {% else %}
-                                            <span class="text-muted">Non assigné</span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="text-muted">Non assigné</span>
-                                    {% endif %}
-                                </td>
-                                    <td>
-                                        {% if employe.isActive %}
-                                            <span class="badge bg-success small">
-                                                <i class="fas fa-check me-1"></i>Actif
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-danger small">
-                                                <i class="fas fa-times me-1"></i>Inactif
-                                            </span>
+                                            <span class="badge bg-warning" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">{{ contrat.statut|title }}</span>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        {% if employe.employeeContrats|length > 0 %}
-                                            {% set dernierContrat = employe.employeeContrats|last %}
-                                            {% if dernierContrat.statut == 'actif' %}
-                                                <span class="badge bg-success small">Actif</span>
-                                            {% elseif dernierContrat.statut == 'expire' %}
-                                                <span class="badge bg-danger small">Expiré</span>
-                                            {% elseif dernierContrat.statut == 'suspendu' %}
-                                                <span class="badge bg-warning small">Suspendu</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary small">{{ dernierContrat.statut }}</span>
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="badge bg-secondary small">Aucun</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{{ path('responsable_view_employe_details', {'id': employe.id}) }}" class="btn btn-outline-info" title="Voir les détails">
-                                                <i class="fas fa-eye"></i>
+                                    <td style="padding: 0.25rem;">
+                                        <div class="btn-group btn-group-xs" role="group">
+                                            <a href="{{ path('responsable_view_employe_details', {'id': contrat.employe.id}) }}" 
+                                               class="btn btn-outline-info btn-xs py-0 px-1" 
+                                               title="Voir">
+                                                <i class="fas fa-eye" style="font-size: 0.7rem;"></i>
                                             </a>
-                                            <a href="{{ path('responsable_toggle_employe_status', {'id': employe.id}) }}" 
-                                               class="btn btn-outline-{{ employe.isActive ? 'warning' : 'success' }}"
-                                               title="{{ employe.isActive ? 'Désactiver' : 'Activer' }} l'employé"
-                                               onclick="return confirm('Êtes-vous sûr de vouloir {{ employe.isActive ? 'désactiver' : 'activer' }} cet employé ?')">
-                                                <i class="fas fa-{{ employe.isActive ? 'pause' : 'play' }}"></i>
+                                            <a href="{{ path('responsable_edit_employe', {'id': contrat.employe.id}) }}" 
+                                               class="btn btn-outline-primary btn-xs py-0 px-1" 
+                                               title="Modifier">
+                                                <i class="fas fa-edit" style="font-size: 0.7rem;"></i>
+                                            </a>
+                                            <a href="#" 
+                                               class="btn btn-outline-{{ contrat.statut == 'actif' ? 'danger' : 'success' }} btn-xs py-0 px-1 toggle-contrat-btn"
+                                               title="{{ contrat.statut == 'actif' ? 'Désactiver' : 'Activer' }}"
+                                               data-contrat-id="{{ contrat.id }}"
+                                               data-action="{{ contrat.statut == 'actif' ? 'Désactiver' : 'Activer' }}"
+                                               data-url="{{ path('responsable_toggle_contrat_status', {'id': contrat.id}) }}">
+                                                <i class="fas fa-{{ contrat.statut == 'actif' ? 'pause' : 'play' }}" style="font-size: 0.7rem;"></i>
                                             </a>
                                         </div>
                                     </td>
@@ -170,207 +150,363 @@
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!-- Mobile Card View -->
-                    <div class="mobile-view">
-                        {% for employe in employees %}
-                        <div class="employee-card mb-3 {{ not employe.isActive ? 'inactive-card' : '' }}">
-                            <div class="employee-card-header">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-user me-2"></i>
-                                            {{ employe.nom }} {{ employe.prenom }}
-                                        </h6>
-                                        <small class="text-muted">ID: {{ employe.id }}</small>
-                                    </div>
-                                    <span class="badge {{ employe.isActive ? 'bg-success' : 'bg-secondary' }}">
-                                        {{ employe.isActive ? 'Actif' : 'Inactif' }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="employee-card-body">
-                                <div class="info-row">
-                                    <i class="fas fa-envelope text-primary"></i>
-                                    <span>{{ employe.email }}</span>
-                                </div>
-                                
-                                {% if employe.employeeContrats is not empty %}
-                                    {% set uniqueOrgs = [] %}
-                                    {% for contrat in employe.employeeContrats %}
-                                        {% if contrat.organisationEmployeeContrats is not empty %}
-                                            {% for orgContrat in contrat.organisationEmployeeContrats %}
-                                                {% if orgContrat.organisation %}
-                                                    {% set orgDesignation = orgContrat.organisation.dossierDesignation %}
-                                                    {% if orgDesignation not in uniqueOrgs %}
-                                                        {% set uniqueOrgs = uniqueOrgs|merge([orgDesignation]) %}
-                                                    {% endif %}
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    {% if uniqueOrgs|length > 0 %}
-                                        {% for orgName in uniqueOrgs %}
-                                            {% if loop.index == 1 %}
-                                                <div class="info-row">
-                                                    <i class="fas fa-sitemap text-info"></i>
-                                                    <span>{{ orgName }}</span>
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {% if uniqueOrgs|length > 1 %}
-                                            <div class="info-row">
-                                                <i class="fas fa-plus-circle text-muted"></i>
-                                                <small class="text-muted">+{{ uniqueOrgs|length - 1 }} autre(s)</small>
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endif %}
-                                
-                                {% if employe.employeeContrats is not empty %}
-                                    {% set firstContrat = employe.employeeContrats|first %}
-                                    <div class="info-row">
-                                        <i class="fas fa-file-contract text-success"></i>
-                                        <span>{{ firstContrat.natureContrat }}</span>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="employee-card-actions">
-                                <a href="{{ path('responsable_view_employe_details', {'id': employe.id}) }}" 
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye"></i> Voir
-                                </a>
-                                <a href="{{ path('responsable_toggle_employe_status', {'id': employe.id}) }}" 
-                                   class="btn btn-sm btn-outline-{{ employe.isActive ? 'warning' : 'success' }}"
-                                   onclick="return confirm('Êtes-vous sûr de vouloir {{ employe.isActive ? 'désactiver' : 'activer' }} cet employé ?')">
-                                    <i class="fas fa-{{ employe.isActive ? 'pause' : 'play' }}"></i>
-                                    {{ employe.isActive ? 'Désactiver' : 'Activer' }}
-                                </a>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
                 {% endif %}
             </div>
             
-            <!-- Pagination -->
-            {% if employees is defined and employees.pageCount > 1 %}
-                {% include '_pagination.html.twig' with {'pagination': employees} %}
-            {% endif %}
+            <div class="card-footer compact-footer py-1 px-2">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="perPageSelect" class="mb-0 small text-muted" style="font-size: 0.75rem;">
+                            <i class="fas fa-list-ul"></i> Par page:
+                        </label>
+                        <select id="perPageSelect" class="form-select form-select-sm" style="width: auto; font-size: 0.75rem; padding: 0.125rem 1.5rem 0.125rem 0.5rem;" onchange="changePerPage(this.value)">
+                            <option value="10" {{ (perPage ?? 10) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="20" {{ (perPage ?? 10) == 20 ? 'selected' : '' }}>20</option>
+                            <option value="30" {{ (perPage ?? 10) == 30 ? 'selected' : '' }}>30</option>
+                            <option value="50" {{ (perPage ?? 10) == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ (perPage ?? 10) == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                    </div>
+                    {% if contrats.pageCount > 1 %}
+                        <div>
+                            {{ knp_pagination_render(contrats, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation pour activer/désactiver contrat -->
+<div class="modal fade" id="confirmToggleModal" tabindex="-1" aria-labelledby="confirmToggleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmToggleModalLabel">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmToggleMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <a href="#" id="confirmToggleBtn" class="btn btn-primary">Confirmer</a>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Mobile Card Styles */
-    .mobile-view {
-        display: none;
-    }
-    
-    .employee-card {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
+    .app-wrapper {
+        height: 100vh;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
     }
     
-    .employee-card:hover {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
+    .main-content {
+        overflow: hidden !important;
+        height: 100vh;
     }
     
-    .employee-card.inactive-card {
-        opacity: 0.7;
-        background: #f8fafc;
+    .navbar-area {
+        flex-shrink: 0;
     }
     
-    .employee-card-header {
-        padding: 1rem;
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border-bottom: 1px solid #e2e8f0;
+    .main-area {
+        padding: 0 !important;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
     
-    .employee-card-header h6 {
+    .container-fluid {
+        padding: 0.5rem 0.75rem !important;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .row.g-0 {
         margin: 0;
-        color: #1e293b;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .row.g-0 > .col-12 {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
+    
+    .compact-page {
+        margin-bottom: 0;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .card {
+        margin-bottom: 0;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .compact-header {
+        padding: 0.4rem 0.75rem !important;
+        background-color: #ffffff;
+        border-bottom: 1px solid #bcccdc;
+        flex-shrink: 0;
+    }
+    
+    .compact-header h4 {
+        font-size: 1rem;
         font-weight: 600;
+        margin: 0;
     }
     
-    .employee-card-body {
-        padding: 1rem;
-    }
-    
-    .info-row {
+    .compact-body {
+        padding: 0.4rem !important;
+        flex: 1 1 auto;
         display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f1f5f9;
+        flex-direction: column;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     
-    .info-row:last-child {
-        border-bottom: none;
-    }
-    
-    .info-row i {
-        width: 20px;
-        text-align: center;
-    }
-    
-    .info-row span {
-        flex: 1;
-        font-size: 0.9rem;
-        color: #475569;
-    }
-    
-    .employee-card-actions {
-        padding: 0.75rem 1rem;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
+    .compact-table {
+        margin: 0;
+        overflow-x: visible;
+        flex: 1 1 auto;
         display: flex;
-        gap: 0.5rem;
-        justify-content: space-between;
+        flex-direction: column;
+        min-height: 0;
     }
     
-    .employee-card-actions .btn {
-        flex: 1;
+    .compact-table table {
+        width: 100%;
+        margin-bottom: 0;
+        table-layout: fixed;
+        height: 100%;
     }
     
-    /* Responsive Behavior */
+    /* When there are few rows (less than 5), don't stretch the table */
+    .compact-table.has-few-rows {
+        flex: 0 1 auto;
+        align-self: flex-start;
+    }
+    
+    .compact-table.has-few-rows table {
+        height: auto;
+        table-layout: auto;
+    }
+    
+    /* When there are 5+ rows, stretch to fill available space (default) */
+    .compact-table:not(.has-few-rows) {
+        flex: 1 1 auto;
+    }
+    
+    .compact-table:not(.has-few-rows) table {
+        display: table;
+    }
+    
+    @media (max-width: 768px) {
+        .compact-table {
+            overflow-x: auto;
+        }
+    }
+    
+    .compact-table-inner {
+        margin-bottom: 0;
+        font-size: 0.875rem;
+    }
+    
+    .compact-table-inner th,
+    .compact-table-inner td {
+        font-size: 0.8rem;
+        vertical-align: middle;
+        padding: 0.2rem 0.25rem !important;
+        line-height: 1.3;
+    }
+    
+    .compact-table-inner thead th {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        background-color: #ffffff;
+    }
+    
+    /* Force all table rows to be white, no exceptions */
+    .compact-table-inner tbody tr,
+    .compact-table-inner tbody tr.table-secondary,
+    .compact-table-inner tbody tr.table-primary,
+    .compact-table-inner tbody tr.table-success,
+    .compact-table-inner tbody tr.table-danger,
+    .compact-table-inner tbody tr.table-warning,
+    .compact-table-inner tbody tr.table-info,
+    .compact-table-inner tbody tr.table-light,
+    .compact-table-inner tbody tr.table-dark,
+    .compact-table-inner tbody tr:nth-of-type(odd),
+    .compact-table-inner tbody tr:nth-of-type(even),
+    .compact-table-inner tbody tr[class*="table-"] {
+        background-color: #ffffff !important;
+    }
+    
+    /* Only hover effect should change the background */
+    .compact-table-inner tbody tr:hover {
+        background-color: #d9eafd !important;
+    }
+    
+    .btn-xs {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
+    }
+    
+    .input-group-xs {
+        height: 24px;
+    }
+    
+    .input-group-xs .form-control,
+    .input-group-xs .input-group-text {
+        height: 24px;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .form-control-xs {
+        height: 24px;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .btn-group-xs .btn {
+        padding: 0.1rem 0.3rem;
+        font-size: 0.7rem;
+    }
+    
+    .alert-xs {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .compact-search {
+        min-width: 200px;
+    }
+    
+    .compact-footer {
+        padding: 0.2rem 0.5rem !important;
+        background-color: #ffffff;
+        border-top: 1px solid #bcccdc;
+        flex-shrink: 0;
+    }
+    
+    .compact-footer .pagination {
+        margin-bottom: 0;
+    }
+    
+    .compact-footer .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Optimize pagination */
+    .pagination {
+        font-size: 0.75rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.2rem 0.4rem;
+    }
+    
+    /* Remove unnecessary spacing */
+    body {
+        padding-top: 0;
+    }
+    
+    .main-content {
+        padding: 0.5rem;
+    }
+    
     @media (max-width: 767px) {
-        .desktop-view {
-            display: none !important;
+        .container-fluid {
+            padding: 0.4rem 0.5rem !important;
         }
         
-        .mobile-view {
-            display: block !important;
+        .compact-header {
+            padding: 0.3rem 0.5rem !important;
         }
         
-        .card-header .d-flex {
+        .compact-header .d-flex {
             flex-direction: column;
-            gap: 0.75rem;
+            align-items: flex-start !important;
+            gap: 0.5rem;
         }
         
-        .card-header .d-flex > div {
+        .compact-body {
+            padding: 0.3rem !important;
+        }
+        
+        .compact-search {
             width: 100%;
+            min-width: 100%;
         }
         
-        .card-header .btn {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .card-header h1 {
-            font-size: 1.25rem !important;
-        }
-        
-        .card-header .btn i {
-            margin-right: 0.5rem;
+        .compact-table {
+            overflow-x: auto;
         }
     }
 </style>
-{% endblock %}
 
+<script>
+function changePerPage(value) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('perPage', value);
+    url.searchParams.set('page', '1'); // Reset to first page when changing perPage
+    window.location.href = url.toString();
+}
+
+// Gestion de la modale de confirmation pour activer/désactiver contrat
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.toggle-contrat-btn');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmToggleModal'));
+    const confirmMessage = document.getElementById('confirmToggleMessage');
+    const confirmBtn = document.getElementById('confirmToggleBtn');
+    
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const action = this.getAttribute('data-action');
+            const url = this.getAttribute('data-url');
+            
+            confirmMessage.textContent = action + ' ce contrat ?';
+            confirmBtn.href = url;
+            confirmModal.show();
+        });
+    });
+    
+    // Adjust table height based on number of rows
+    const compactTable = document.querySelector('.compact-table');
+    if (compactTable) {
+        const rowCount = compactTable.querySelectorAll('tbody tr').length;
+        // If there are less than 5 rows, add class to prevent stretching
+        if (rowCount < 5) {
+            compactTable.classList.add('has-few-rows');
+        }
+    }
+});
+</script>
+{% endblock %}

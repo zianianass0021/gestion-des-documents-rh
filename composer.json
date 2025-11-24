@@ -23,6 +23,7 @@
         "symfony/flex": "^2",
         "symfony/form": "7.3.*",
         "symfony/framework-bundle": "7.3.*",
+        "symfony/http-client": "7.3.*",
         "symfony/mime": "7.3.*",
         "symfony/password-hasher": "7.3.*",
         "symfony/runtime": "7.3.*",

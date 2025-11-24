@@ -38,15 +38,22 @@ class OrganisationEmployeeContratType extends AbstractType
                     return $employe->getPrenom() . ' ' . $employe->getNom() . ' (' . $contrat->getNatureContrat()->getDesignation() . ')';
                 },
                 'query_builder' => function(EmployeeContratRepository $repository) {
+                    // Optimize: Only load active contracts and limit to avoid memory exhaustion
+                    // Limit to 2000 active contracts sorted alphabetically for easy selection in dropdown
                     return $repository->createQueryBuilder('ec')
                         ->join('ec.employe', 'e')
                         ->join('ec.natureContrat', 'nc')
+                        ->where('ec.statut = :statut')
+                        ->setParameter('statut', 'actif')
                         ->orderBy('e.nom', 'ASC')
-                        ->addOrderBy('e.prenom', 'ASC');
+                        ->addOrderBy('e.prenom', 'ASC')
+                        ->addOrderBy('ec.dateDebut', 'DESC')
+                        ->setMaxResults(2000);
                 },
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'placeholder' => 'Sélectionner un contrat (limité aux 2000 contrats actifs les plus récents)',
             ])
             ->add('dateDebut', DateType::class, [
                 'label' => 'Date de Début',

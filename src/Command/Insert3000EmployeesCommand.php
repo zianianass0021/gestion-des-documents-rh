@@ -32,9 +32,9 @@ class Insert3000EmployeesCommand extends Command
 
         // Insérer 3000 employés en une seule requête
         $io->section('Insertion des 3000 employés...');
-        $sql = "INSERT INTO t_employe (id, prenom, nom, email, username, telephone, password, roles, is_active) 
+        $sql = "INSERT INTO t_user (id, prenom, nom, email, username, telephone, password, roles, is_active) 
                 SELECT 
-                    nextval('t_employe_id_seq'),
+                    nextval('t_user_id_seq'),
                     'Mohamed' || i,
                     'Benali' || i,
                     'mohamed' || i || '@uiass.ma',
@@ -49,7 +49,7 @@ class Insert3000EmployeesCommand extends Command
         $io->text("Insérés {$result} employés");
 
         // Récupérer les IDs des nouveaux employés
-        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_employe ORDER BY id DESC LIMIT 3000")->fetchFirstColumn();
+        $newEmployeeIds = $connection->executeQuery("SELECT id FROM t_user ORDER BY id DESC LIMIT 3000")->fetchFirstColumn();
         $io->text("Récupérés " . count($newEmployeeIds) . " IDs d'employés");
 
         // Créer les contrats avec distribution
@@ -64,7 +64,7 @@ class Insert3000EmployeesCommand extends Command
                         WHEN e.id % 100 < 99 THEN 3
                         ELSE 4 + (e.id % 2)
                     END as contract_count
-                FROM t_employe e
+                FROM t_user e
                 WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
             ),
             contract_data AS (
@@ -126,7 +126,7 @@ class Insert3000EmployeesCommand extends Command
                 NOW(),
                 (SELECT id FROM p_placards ORDER BY random() LIMIT 1),
                 NULL
-            FROM t_employe e
+            FROM t_user e
             WHERE e.id IN (" . implode(',', $newEmployeeIds) . ")
         ";
 
@@ -135,7 +135,7 @@ class Insert3000EmployeesCommand extends Command
 
         // Statistiques finales
         $io->section('Statistiques finales');
-        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_employe")->fetchOne();
+        $totalEmployees = $connection->executeQuery("SELECT COUNT(*) FROM t_user")->fetchOne();
         $totalDossiers = $connection->executeQuery("SELECT COUNT(*) FROM t_dossier")->fetchOne();
         $totalContrats = $connection->executeQuery("SELECT COUNT(*) FROM t_employee_contrat")->fetchOne();
         $totalPlacards = $connection->executeQuery("SELECT COUNT(*) FROM p_placards")->fetchOne();

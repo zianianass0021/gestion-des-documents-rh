@@ -3,56 +3,330 @@
 {% block title %}Modifier le Responsable RH{% endblock %}
 
 {% block body %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h1 class="mb-0">
-                    <i class="fas fa-user-edit me-2"></i>
-                    Modifier le Responsable RH
-                </h1>
+<div class="form-page-container">
+    <div class="form-wrapper">
+        <div class="modern-form-card">
+            <!-- Header -->
+            <div class="form-header">
+                <div class="header-icon">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <div class="header-content">
+                    <h2 class="form-title">Modifier le Responsable RH</h2>
+                    <p class="form-subtitle">Modifiez les informations et les permissions de {{ employee.prenom }} {{ employee.nom }}</p>
+                </div>
             </div>
-            <div class="card-body">
-                {{ form_start(form) }}
-                    <div class="mb-3">
+
+            <!-- Form Body -->
+            <div class="form-body">
+                {{ form_start(form, {'attr': {'class': 'modern-form'}}) }}
+                
+                <!-- Informations Personnelles Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-user-circle section-icon"></i>
+                        <h3 class="section-title">Informations Personnelles</h3>
+                    </div>
+                    <div class="section-content">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="fas fa-user label-icon"></i>
                         {{ form_label(form.prenom) }}
-                        {{ form_widget(form.prenom) }}
+                                    </label>
+                                    {{ form_widget(form.prenom, {'attr': {'class': 'form-control-modern', 'placeholder': 'Entrez le prénom'}}) }}
                         {{ form_errors(form.prenom) }}
+                                </div>
                     </div>
                     
-                    <div class="mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="fas fa-user label-icon"></i>
                         {{ form_label(form.nom) }}
-                        {{ form_widget(form.nom) }}
+                                    </label>
+                                    {{ form_widget(form.nom, {'attr': {'class': 'form-control-modern', 'placeholder': 'Entrez le nom'}}) }}
                         {{ form_errors(form.nom) }}
+                                </div>
                     </div>
                     
-                    <div class="mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="fas fa-envelope label-icon"></i>
                         {{ form_label(form.email) }}
-                        {{ form_widget(form.email) }}
+                                    </label>
+                                    {{ form_widget(form.email, {'attr': {'class': 'form-control-modern', 'placeholder': 'exemple@uiass.rh'}}) }}
                         {{ form_errors(form.email) }}
+                                </div>
                     </div>
                     
-                    <div class="mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="fas fa-user-circle label-icon"></i>
+                        {{ form_label(form.username) }}
+                                    </label>
+                                    {{ form_widget(form.username, {'attr': {'class': 'form-control-modern', 'placeholder': 'nom.utilisateur'}}) }}
+                        {{ form_errors(form.username) }}
+                                </div>
+                    </div>
+                    
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="fas fa-phone label-icon"></i>
                         {{ form_label(form.telephone) }}
-                        {{ form_widget(form.telephone) }}
+                                    </label>
+                                    {{ form_widget(form.telephone, {'attr': {'class': 'form-control-modern', 'placeholder': '+212 6XX XXX XXX'}}) }}
                         {{ form_errors(form.telephone) }}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="fas fa-lock label-icon"></i>
+                                        {{ form_label(form.password) }}
+                                    </label>
+                                    {{ form_widget(form.password, {'attr': {'class': 'form-control-modern', 'placeholder': '••••••••'}}) }}
+                                    <div class="form-help-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Laissez vide pour conserver le mot de passe actuel
+                                    </div>
+                                    {{ form_errors(form.password) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     </div>
                     
-                    <div class="mb-3">
-                        {{ form_label(form.password) }}
-                        {{ form_widget(form.password) }}
-                        <small class="form-text text-muted">Laissez vide pour conserver le mot de passe actuel</small>
-                        {{ form_errors(form.password) }}
+                <!-- Modules Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-puzzle-piece section-icon"></i>
+                        <h3 class="section-title">Modules Autorisés</h3>
                     </div>
+                    <div class="section-content">
+                        <div class="modules-selection-area">
+                            <button type="button" class="btn-select-modules" data-bs-toggle="modal" data-bs-target="#modulesModal">
+                                <i class="fas fa-edit me-2"></i>
+                                Modifier les modules
+                            </button>
+                            <div id="selectedModulesDisplay" class="selected-modules-display">
+                                <span class="no-modules-text">Aucun module sélectionné</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.modules) }}
+                    </div>
+                    </div>
+
+                <!-- Permissions Organisationnelles Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-sitemap section-icon"></i>
+                        <h3 class="section-title">Permissions Organisationnelles</h3>
+                    </div>
+                    <div class="section-content">
+                        <div class="modules-selection-area">
+                            <button type="button" class="btn-select-modules" data-bs-toggle="modal" data-bs-target="#orgPermissionsModal">
+                                <i class="fas fa-network-wired me-2"></i>
+                                Configurer les permissions organisationnelles
+                            </button>
+                            <div id="selectedOrgPermissionsDisplay" class="selected-modules-display">
+                                <span class="no-modules-text">Aucune restriction (accès à toutes les organisations)</span>
+                            </div>
+                        </div>
+                        <div style="display: none;">
+                            {{ form_widget(form.organisation_permissions) }}
+                        </div>
+                        {{ form_errors(form.organisation_permissions) }}
+                    </div>
+                </div>
                     
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ path('admin_manage_responsables') }}" class="btn btn-secondary me-md-2">
-                            <i class="fas fa-arrow-left me-2"></i>Retour
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Enregistrer
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="{{ path('admin_manage_responsables') }}" class="btn btn-action-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Retour
+                    </a>
+                    <button type="submit" class="btn btn-action-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Enregistrer les modifications
+                    </button>
+                </div>
+                
+                <!-- Hidden modules field to prevent auto-rendering by form_end -->
+                <div style="display: none;">
+                    {{ form_widget(form.modules) }}
+                </div>
+                
+                <!-- Modules Selection Modal -->
+                <div class="modal fade" id="modulesModal" tabindex="-1" aria-labelledby="modulesModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content modules-modal-content">
+                            <div class="modal-header modules-modal-header">
+                                <div class="modal-header-content">
+                                    <div class="modal-icon-wrapper">
+                                        <i class="fas fa-puzzle-piece"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="modal-title" id="modulesModalLabel">Sélectionner les Modules</h5>
+                                        <p class="modal-subtitle">Choisissez les modules auxquels ce responsable RH aura accès</p>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body modules-modal-body">
+                                <div class="modules-grid-new">
+                                    {% for child in form.modules %}
+                                        {% set moduleId = child.vars.value %}
+                                        {% set module = modulesMap[moduleId] %}
+                                        <div class="module-item-new" data-module-id="{{ moduleId }}">
+                                            <label class="module-item-label">
+                                                <input type="checkbox" 
+                                                       name="{{ child.vars.full_name }}" 
+                                                       value="{{ child.vars.value }}" 
+                                                       id="modal_module_{{ moduleId }}"
+                                                       {% if child.vars.checked %}checked="checked"{% endif %}
+                                                       class="module-checkbox-input" 
+                                                       data-module-id="{{ moduleId }}">
+                                                <div class="module-item-card">
+                                                    <div class="module-item-checkbox">
+                                                        <i class="fas fa-check"></i>
+                                                    </div>
+                                                    <div class="module-item-icon">
+                                                        {% if module and module.icon %}
+                                                            <i class="{{ module.icon }}"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-cube"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="module-item-content">
+                                                        <h6 class="module-item-title">{{ child.vars.label }}</h6>
+                                                        {% if module and module.description %}
+                                                            <p class="module-item-desc">{{ module.description }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="modal-footer modules-modal-footer">
+                                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </button>
+                                <button type="button" class="btn btn-modal-confirm" id="confirmModulesSelection">
+                                    <i class="fas fa-check me-2"></i>Confirmer la sélection
                         </button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                
+                <!-- Organisation Permissions Selection Modal -->
+                <div class="modal fade" id="orgPermissionsModal" tabindex="-1" aria-labelledby="orgPermissionsModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content modules-modal-content">
+                            <div class="modal-header modules-modal-header">
+                                <div class="modal-header-content">
+                                    <div class="modal-icon-wrapper">
+                                        <i class="fas fa-sitemap"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="modal-title" id="orgPermissionsModalLabel">Configurer les Permissions Organisationnelles</h5>
+                                        <p class="modal-subtitle">Sélectionnez les organisations que ce responsable RH pourra gérer</p>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body modules-modal-body" style="max-height: 70vh; overflow-y: auto;">
+                                <div id="orgPermissionsTree" class="org-permissions-tree">
+                                    {% if orgHierarchy is defined and orgHierarchy %}
+                                        {% for groupement, dasList in orgHierarchy %}
+                                            <div class="org-permission-group" data-groupement="{{ groupement }}">
+                                                <div class="org-permission-group-header">
+                                                    <button type="button" class="btn-collapse" data-bs-toggle="collapse" data-bs-target="#collapse-groupement-{{ groupement }}">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                    <label class="org-permission-label">
+                                                        <input type="checkbox" class="org-checkbox org-groupement-checkbox" 
+                                                               data-groupement="{{ groupement }}" 
+                                                               data-type="groupement">
+                                                        <span class="org-permission-title">
+                                                            <i class="fas fa-folder me-2"></i>
+                                                            {{ groupementLabels[groupement] ?? groupement }}
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="collapse" id="collapse-groupement-{{ groupement }}">
+                                                    <div class="org-permission-children">
+                                                        {% if dasList %}
+                                                            {% for das, dossiers in dasList %}
+                                                                <div class="org-permission-das" data-das="{{ das }}" data-groupement="{{ groupement }}">
+                                                                    <div class="org-permission-das-header">
+                                                                        <button type="button" class="btn-collapse" data-bs-toggle="collapse" data-bs-target="#collapse-das-{{ groupement }}-{{ das }}">
+                                                                            <i class="fas fa-chevron-down"></i>
+                                                                        </button>
+                                                                        <label class="org-permission-label">
+                                                                            <input type="checkbox" class="org-checkbox org-das-checkbox" 
+                                                                                   data-das="{{ das }}" 
+                                                                                   data-groupement="{{ groupement }}" 
+                                                                                   data-type="das">
+                                                                            <span class="org-permission-title">
+                                                                                <i class="fas fa-folder-open me-2"></i>
+                                                                                {{ dasLabels[das] ?? das }}
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="collapse" id="collapse-das-{{ groupement }}-{{ das }}">
+                                                                        <div class="org-permission-dossiers">
+                                                                            {% if dossiers %}
+                                                                                {% for dossier in dossiers %}
+                                                                                    <div class="org-permission-dossier" data-dossier="{{ dossier }}" data-das="{{ das }}" data-groupement="{{ groupement }}">
+                                                                                        <label class="org-permission-label">
+                                                                                            <input type="checkbox" class="org-checkbox org-dossier-checkbox" 
+                                                                                                   data-dossier="{{ dossier }}" 
+                                                                                                   data-das="{{ das }}" 
+                                                                                                   data-groupement="{{ groupement }}" 
+                                                                                                   data-type="dossier">
+                                                                                            <span class="org-permission-title">
+                                                                                                <i class="fas fa-file me-2"></i>
+                                                                                                {{ dossier }}
+                                                                                            </span>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-center text-muted">Aucune hiérarchie organisationnelle disponible</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="modal-footer modules-modal-footer">
+                                <button type="button" class="btn btn-modal-cancel" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </button>
+                                <button type="button" class="btn btn-modal-confirm" id="confirmOrgPermissionsSelection">
+                                    <i class="fas fa-check me-2"></i>Confirmer la sélection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 {{ form_end(form) }}
             </div>
         </div>
@@ -60,27 +334,1532 @@
 </div>
 
 <style>
-    @media (max-width: 767px) {
-        .col-md-6 {
-            padding: 0 0.5rem;
+    /* Prevent all scrolling - AGGRESSIVE */
+    html, body {
+        overflow: hidden !important;
+        height: 100% !important;
+        max-height: 100vh !important;
+        position: fixed !important;
+        width: 100% !important;
+    }
+    
+    .main-area, .container-fluid {
+        overflow: hidden !important;
+        height: 100% !important;
+        max-height: 100vh !important;
+    }
+    
+    .form-page-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #F8FAFC 0%, #E8F0F8 100%);
+        overflow: hidden !important;
+        padding: 0.4rem 0.75rem;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        width: 100% !important;
+    }
+
+    .form-wrapper {
+        width: 100%;
+        max-width: 1400px;
+        height: 100%;
+        max-height: 100%;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        overflow: hidden !important;
+    }
+
+    .modern-form-card {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden !important;
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+        padding: 0.25rem 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .header-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .header-content {
+        flex: 1;
+    }
+
+    .form-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 0.05rem 0;
+        color: white;
+    }
+
+    .form-subtitle {
+        font-size: 0.7rem;
+        margin: 0;
+        opacity: 0.9;
+        color: white;
+    }
+
+    .form-body {
+        padding: 0.25rem 0.45rem;
+        flex: 1 1 auto;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        max-height: 100%;
+        gap: 0.25rem;
+    }
+
+    .form-section {
+        margin-bottom: 0;
+        background: #F8FAFC;
+        border-radius: 6px;
+        padding: 0.25rem 0.45rem;
+        border: 1px solid #E8F0F8;
+        flex-shrink: 0;
+    }
+
+    .form-section:last-of-type {
+        margin-bottom: 0;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 0.25rem;
+        padding-bottom: 0.15rem;
+        border-bottom: 2px solid #D9EAFD;
+        flex-shrink: 0;
+    }
+
+    .section-icon {
+        font-size: 0.95rem;
+        color: #9AA6B2;
+    }
+
+    .section-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0;
+        color: #2a3642;
+    }
+
+    .section-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .form-group-modern {
+        margin-bottom: 0.25rem;
+    }
+    
+    .form-help-text {
+        font-size: 0.7rem;
+        margin-top: 0.03rem;
+        padding: 0;
+    }
+    
+    .row.g-2 {
+        --bs-gutter-y: 0.25rem;
+        --bs-gutter-x: 0.25rem;
+    }
+
+    .form-label-modern {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #2a3642;
+        margin-bottom: 0.15rem;
+    }
+
+    .label-icon {
+        color: #9AA6B2;
+        font-size: 0.875rem;
+    }
+    
+    .form-control-modern {
+        width: 100%;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+        border: 2px solid #D9EAFD;
+        border-radius: 6px;
+        background: white;
+        color: #2a3642;
+        transition: all 0.3s ease;
+        line-height: 1.4;
+    }
+
+    .form-control-modern:focus {
+        outline: none;
+        border-color: #9AA6B2;
+        box-shadow: 0 0 0 3px rgba(154, 166, 178, 0.1);
+        background: white;
+    }
+
+    .form-control-modern::placeholder {
+        color: #BCCCDC;
+    }
+
+    .form-help-text {
+        margin-top: 0.2rem;
+        font-size: 0.65rem;
+        color: #5a6672;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Modules Selection Area */
+    .modules-selection-area {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .btn-select-modules {
+        padding: 0.35rem 0.85rem;
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: fit-content;
+    }
+
+    .btn-select-modules:hover {
+        background: linear-gradient(135deg, #7a8692 0%, #6a7682 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(154, 166, 178, 0.3);
+        color: white;
+    }
+
+    .selected-modules-display {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem;
+        min-height: 1.4rem;
+        padding: 0.25rem;
+        background: white;
+        border-radius: 6px;
+        border: 2px solid #D9EAFD;
+    }
+
+    .no-modules-text {
+        color: #BCCCDC;
+        font-size: 0.8rem;
+        font-style: italic;
+    }
+
+    .module-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.6rem;
+        background: linear-gradient(135deg, #D9EAFD 0%, #BCCCDC 100%);
+        color: #2a3642;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .module-badge i {
+        font-size: 0.75rem;
+    }
+
+    /* Modal Styles - Rebuilt from scratch */
+    .modules-modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+
+    .modules-modal-header {
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+        color: white;
+        border-bottom: none;
+        padding: 1rem 1.5rem;
+        border-radius: 16px 16px 0 0;
+        flex-shrink: 0;
+    }
+
+    .modal-header-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .modal-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+    }
+
+    .modal-subtitle {
+        font-size: 0.875rem;
+        margin: 0.25rem 0 0 0;
+        opacity: 0.9;
+        color: white;
+    }
+
+    .modules-modal-body {
+        padding: 1rem 1.5rem;
+        overflow: hidden;
+        max-height: none;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .modules-grid-new {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .module-item-new {
+        position: relative;
+    }
+
+    .module-checkbox-input {
+        display: none;
+    }
+
+    .module-item-label {
+        display: block;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .module-item-card {
+        background: white;
+        border: 3px solid #D9EAFD;
+        border-radius: 12px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .module-item-card:hover {
+        border-color: #9AA6B2;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(154, 166, 178, 0.2);
+    }
+
+    .module-item-checkbox {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 28px;
+        height: 28px;
+        background: #E8F0F8;
+        border: 2px solid #BCCCDC;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    .module-item-checkbox i {
+        color: white;
+        font-size: 0.875rem;
+        font-weight: bold;
+    }
+
+    .module-checkbox-input:checked ~ .module-item-card,
+    .module-item-card.selected {
+        background: linear-gradient(135deg, #E8F0F8 0%, #D9EAFD 100%);
+        border-color: #9AA6B2;
+        border-width: 3px;
+    }
+
+    .module-checkbox-input:checked ~ .module-item-card .module-item-checkbox,
+    .module-item-card.selected .module-item-checkbox {
+        background: #9AA6B2;
+        border-color: #9AA6B2;
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .module-checkbox-input:checked ~ .module-item-card .module-item-icon,
+    .module-item-card.selected .module-item-icon {
+        background: #9AA6B2;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .module-item-icon {
+        width: 50px;
+        height: 50px;
+        background: #F8FAFC;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #9AA6B2;
+        transition: all 0.3s ease;
+        margin: 0.25rem 0;
+    }
+
+    .module-item-content {
+        flex: 1;
+        width: 100%;
+    }
+
+    .module-item-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #2a3642;
+        margin: 0 0 0.25rem 0;
+        text-align: center;
+    }
+
+    .module-item-desc {
+        font-size: 0.75rem;
+        color: #5a6672;
+        margin: 0;
+        line-height: 1.3;
+        text-align: center;
+    }
+
+    .modules-modal-footer {
+        border-top: 2px solid #E8F0F8;
+        padding: 1rem 1.5rem;
+        background: #F8FAFC;
+        border-radius: 0 0 16px 16px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .btn-modal-cancel,
+    .btn-modal-confirm {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-modal-cancel {
+        background: white;
+        color: #5a6672;
+        border: 2px solid #D9EAFD;
+    }
+
+    .btn-modal-cancel:hover {
+        background: #F8FAFC;
+        border-color: #9AA6B2;
+        color: #2a3642;
+    }
+
+    .btn-modal-confirm {
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+        color: white;
+    }
+
+    .btn-modal-confirm:hover {
+        background: linear-gradient(135deg, #7a8692 0%, #6a7682 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(154, 166, 178, 0.3);
+        color: white;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.35rem;
+        padding: 0.35rem 0.45rem;
+        margin-top: 0;
+        border-top: 2px solid #E8F0F8;
+        flex-shrink: 0;
+        background: #ffffff;
+    }
+
+    .btn-action-primary,
+    .btn-action-secondary {
+        padding: 0.45rem 1.1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+
+    .btn-action-primary {
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+        color: white;
+    }
+
+    .btn-action-primary:hover {
+        background: linear-gradient(135deg, #7a8692 0%, #6a7682 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(154, 166, 178, 0.3);
+        color: white;
+    }
+
+    .btn-action-secondary {
+        background: white;
+        color: #5a6672;
+        border: 2px solid #D9EAFD;
+    }
+
+    .btn-action-secondary:hover {
+        background: #F8FAFC;
+        border-color: #9AA6B2;
+        color: #2a3642;
+        transform: translateY(-1px);
+    }
+
+    /* Error Messages */
+    .invalid-feedback {
+        display: block;
+        margin-top: 0.3rem;
+        font-size: 0.75rem;
+        color: #e74a3b;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-page-container {
+            padding: 0.25rem;
         }
-        
-        .card-header h1 {
-            font-size: 1.25rem !important;
+
+        .form-header {
+            padding: 0.5rem 1rem;
         }
-        
-        .d-grid {
-            flex-direction: column !important;
+
+        .header-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
         }
-        
-        .d-grid .btn {
-            width: 100% !important;
-            margin-bottom: 0.5rem !important;
+
+        .form-title {
+            font-size: 1rem;
         }
-        
-        .d-grid .btn:last-child {
-            margin-bottom: 0 !important;
+
+        .form-subtitle {
+            font-size: 0.7rem;
+        }
+
+        .form-body {
+            padding: 0.5rem;
+        }
+
+        .form-section {
+            padding: 0.5rem;
+        }
+
+        .modules-modal-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn-action-primary,
+        .btn-action-secondary {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modulesModal = document.getElementById('modulesModal');
+    const confirmBtn = document.getElementById('confirmModulesSelection');
+    const selectedModulesDisplay = document.getElementById('selectedModulesDisplay');
+    const moduleCheckboxes = document.querySelectorAll('.module-checkbox-input');
+    
+    // Store modules data
+    const modulesData = {};
+    {% for child in form.modules %}
+        {% set moduleId = child.vars.value %}
+        {% set module = modulesMap[moduleId] %}
+        modulesData[{{ moduleId }}] = {
+            id: {{ moduleId }},
+            label: '{{ child.vars.label|e('js') }}',
+            icon: '{% if module and module.icon %}{{ module.icon|e('js') }}{% else %}fas fa-cube{% endif %}'
+        };
+    {% endfor %}
+    
+    // Add click handlers to checkboxes for visual feedback
+    moduleCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const card = this.closest('.module-item-new').querySelector('.module-item-card');
+            if (this.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+    });
+    
+    // Update display when modal is shown
+    modulesModal.addEventListener('show.bs.modal', function() {
+        // Sync visual state with checkbox state
+        moduleCheckboxes.forEach(function(checkbox) {
+            const card = checkbox.closest('.module-item-new').querySelector('.module-item-card');
+            if (checkbox.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+        updateSelectedModulesDisplay();
+    });
+    
+    // Confirm selection
+    confirmBtn.addEventListener('click', function() {
+        const bootstrapModal = bootstrap.Modal.getInstance(modulesModal);
+        bootstrapModal.hide();
+        updateSelectedModulesDisplay();
+    });
+    
+    // Store current modules from server (passed via form checkboxes state)
+    const currentModulesFromServer = [];
+    moduleCheckboxes.forEach(function(checkbox) {
+        if (checkbox.checked) {
+            const moduleId = checkbox.getAttribute('data-module-id');
+            currentModulesFromServer.push(parseInt(moduleId));
+        }
+    });
+    
+    // Update selected modules display
+    function updateSelectedModulesDisplay() {
+        const selected = [];
+        // Check both modal checkboxes and hidden checkboxes
+        const allCheckboxes = document.querySelectorAll('.module-checkbox-input, input[name="responsable_rh[modules][]"]');
+        allCheckboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                const moduleId = checkbox.getAttribute('data-module-id') || checkbox.value;
+                const module = modulesData[moduleId];
+                if (module) {
+                    // Avoid duplicates
+                    if (!selected.find(function(m) { return m.id == moduleId; })) {
+                        selected.push(module);
+                    }
+                }
+            }
+        });
+        
+        if (selected.length === 0) {
+            selectedModulesDisplay.innerHTML = '<span class="no-modules-text">Aucun module sélectionné</span>';
+        } else {
+            selectedModulesDisplay.innerHTML = selected.map(function(module) {
+                return '<span class="module-badge"><i class="' + module.icon + '"></i>' + module.label + '</span>';
+            }).join('');
+        }
+    }
+    
+    // Initialize display with current selections from server
+    // This will show modules even if modal hasn't been opened yet
+    setTimeout(function() {
+        updateSelectedModulesDisplay();
+        if (currentModulesFromServer.length > 0) {
+            currentModulesFromServer.forEach(function(moduleId) {
+                const module = modulesData[moduleId];
+                if (module) {
+                    // Ensure checkbox is checked
+                    const checkbox = document.querySelector('.module-checkbox-input[data-module-id="' + moduleId + '"]');
+                    if (checkbox && !checkbox.checked) {
+                        checkbox.checked = true;
+                        const card = checkbox.closest('.module-item-new');
+                        if (card) {
+                            const cardElement = card.querySelector('.module-item-card');
+                            if (cardElement) {
+                                cardElement.classList.add('selected');
+                            }
+                        }
+                    }
+                }
+            });
+            updateSelectedModulesDisplay();
+        }
+    }, 100);
+    
+    // Initialize display with current selections
+    updateSelectedModulesDisplay();
+    
+    // ===== ORGANISATION PERMISSIONS MANAGEMENT =====
+    const orgPermissionsModal = document.getElementById('orgPermissionsModal');
+    const confirmOrgPermissionsBtn = document.getElementById('confirmOrgPermissionsSelection');
+    const selectedOrgPermissionsDisplay = document.getElementById('selectedOrgPermissionsDisplay');
+    let orgPermissionsInput = document.getElementById('organisation_permissions_input');
+    
+    // CRITICAL: If input not found, try to find it by name
+    if (!orgPermissionsInput) {
+        orgPermissionsInput = document.querySelector('input[name="responsable_rh[organisation_permissions]"]');
+        console.log('Input not found by ID, trying by name...', !!orgPermissionsInput);
+    }
+    
+    // Check if elements exist and are valid Nodes
+    const isElementValid = function(element) {
+        return element && element instanceof Node && element.parentNode;
+    };
+    
+    if (!orgPermissionsInput) {
+        console.error('✗✗✗ CRITICAL: organisation_permissions input NOT FOUND! ✗✗✗');
+        console.error('Tried by ID: organisation_permissions_input');
+        console.error('Tried by name: responsable_rh[organisation_permissions]');
+        // Try to find all inputs in the form
+        const form = document.querySelector('.modern-form');
+        if (form) {
+            const allInputs = form.querySelectorAll('input[type="text"], input[type="hidden"]');
+            console.error('All inputs in form:', Array.from(allInputs).map(i => ({name: i.name, id: i.id, value: i.value.substring(0, 50)})));
+        }
+    }
+    
+    if (!orgPermissionsModal || !confirmOrgPermissionsBtn || !isElementValid(selectedOrgPermissionsDisplay)) {
+        console.error('Organisation permissions modal elements not found or invalid:', {
+            modal: !!orgPermissionsModal,
+            btn: !!confirmOrgPermissionsBtn,
+            display: !!selectedOrgPermissionsDisplay && selectedOrgPermissionsDisplay instanceof Node,
+            displayInDOM: isElementValid(selectedOrgPermissionsDisplay),
+            input: !!orgPermissionsInput
+        });
+    } else {
+        // Organisation hierarchy data
+        const orgHierarchy = {{ orgHierarchy|default({})|json_encode|raw }};
+        const dasLabels = {{ dasLabels|default({})|json_encode|raw }};
+        const groupementLabels = {{ groupementLabels|default({})|json_encode|raw }};
+        
+        // Store selected permissions from server
+        let selectedPermissions = {{ (currentOrgPermissions|default([]))|json_encode|raw }};
+        
+        // CRITICAL: Initialize hidden input field with current permissions from DB
+        if (orgPermissionsInput) {
+            if (selectedPermissions && selectedPermissions.length > 0) {
+                const jsonValue = JSON.stringify(selectedPermissions);
+                orgPermissionsInput.value = jsonValue;
+                orgPermissionsInput.setAttribute('value', jsonValue);
+                console.log('✓ Initialized hidden input with', selectedPermissions.length, 'permissions from DB');
+                console.log('Initial value:', jsonValue);
+            } else {
+                orgPermissionsInput.value = '[]';
+                orgPermissionsInput.setAttribute('value', '[]');
+                console.log('✓ Initialized hidden input with empty array (no permissions in DB)');
+            }
+            console.log('Input name:', orgPermissionsInput.name);
+            console.log('Input id:', orgPermissionsInput.id);
+            console.log('Input in form:', orgPermissionsInput.form ? 'YES' : 'NO');
+        } else {
+            console.error('✗✗✗ CRITICAL: Cannot initialize - input not found! ✗✗✗');
+        }
+        
+        // Debug: log initial permissions
+        console.log('Initial org permissions from server:', selectedPermissions);
+        console.log('Hidden input initial value:', orgPermissionsInput ? orgPermissionsInput.value : 'N/A');
+        console.log('Number of permissions:', selectedPermissions ? selectedPermissions.length : 0);
+        
+        // Store initial permissions for display (before modal is opened)
+        const initialPermissions = selectedPermissions && selectedPermissions.length > 0 
+            ? JSON.parse(JSON.stringify(selectedPermissions)) 
+            : [];
+        
+        // Ensure we use initial permissions for display if selectedPermissions gets cleared
+        const getDisplayPermissions = function() {
+            // Always prefer initialPermissions if they exist (they represent what's saved in DB)
+            if (initialPermissions && initialPermissions.length > 0) {
+                console.log('getDisplayPermissions: Using initialPermissions (', initialPermissions.length, 'items):', initialPermissions);
+                return initialPermissions;
+            }
+            // Fallback to selectedPermissions
+            if (selectedPermissions && selectedPermissions.length > 0) {
+                console.log('getDisplayPermissions: Using selectedPermissions (', selectedPermissions.length, 'items):', selectedPermissions);
+                return selectedPermissions;
+            }
+            // No permissions at all
+            console.log('getDisplayPermissions: No permissions found, returning empty array');
+            return [];
+        };
+        
+        // Initialize permissions from current data
+        function initializeOrgPermissions() {
+            console.log('=== initializeOrgPermissions() called ===');
+            console.log('initialPermissions:', initialPermissions);
+            console.log('selectedPermissions before restore:', selectedPermissions);
+            
+            // CRITICAL: Restore initial permissions from DB (they represent what's saved)
+            if (initialPermissions && initialPermissions.length > 0) {
+                selectedPermissions = JSON.parse(JSON.stringify(initialPermissions));
+                console.log('✓ Restored selectedPermissions from initialPermissions:', selectedPermissions);
+            } else {
+                selectedPermissions = [];
+                console.log('✓ No initial permissions, cleared selectedPermissions');
+            }
+            
+            // CRITICAL: Update hidden input field with restored permissions
+            if (orgPermissionsInput) {
+                orgPermissionsInput.value = JSON.stringify(selectedPermissions);
+                console.log('✓ Updated hidden input with restored permissions:', orgPermissionsInput.value);
+            }
+            
+            // First, update display with initial permissions (before checking checkboxes)
+            updateOrgPermissionsDisplay();
+            
+            // Then initialize checkboxes in modal (if modal is available)
+            // Use a small delay to ensure modal DOM is ready
+            setTimeout(function() {
+                console.log('Initializing checkboxes in modal...');
+                let checkboxesUpdated = 0;
+                
+                selectedPermissions.forEach(function(perm) {
+                    const type = perm.type;
+                    const groupement = perm.groupement;
+                    const das = perm.das;
+                    const dossier = perm.dossier;
+                    
+                    if (type === 'GROUPEMENT' && groupement) {
+                        const checkbox = document.querySelector(`.org-groupement-checkbox[data-groupement="${groupement}"]`);
+                        if (checkbox) {
+                            checkbox.dataset.processing = 'true';
+                            checkbox.checked = true;
+                            checkboxesUpdated++;
+                            // Also check all children
+                            document.querySelectorAll(`.org-das-checkbox[data-groupement="${groupement}"], .org-dossier-checkbox[data-groupement="${groupement}"]`).forEach(function(cb) {
+                                cb.checked = true;
+                                checkboxesUpdated++;
+                            });
+                            delete checkbox.dataset.processing;
+                        } else {
+                            console.warn('Groupement checkbox not found for:', groupement);
+                        }
+                    } else if (type === 'DAS' && das && groupement) {
+                        const checkbox = document.querySelector(`.org-das-checkbox[data-das="${das}"][data-groupement="${groupement}"]`);
+                        if (checkbox) {
+                            checkbox.dataset.processing = 'true';
+                            checkbox.checked = true;
+                            checkboxesUpdated++;
+                            // Also check all dossiers in this DAS
+                            document.querySelectorAll(`.org-dossier-checkbox[data-das="${das}"][data-groupement="${groupement}"]`).forEach(function(cb) {
+                                cb.checked = true;
+                                checkboxesUpdated++;
+                            });
+                            delete checkbox.dataset.processing;
+                        } else {
+                            console.warn('DAS checkbox not found for:', das, 'in', groupement);
+                        }
+                    } else if (type === 'DOSSIER' && dossier && das && groupement) {
+                        const checkbox = document.querySelector(`.org-dossier-checkbox[data-dossier="${dossier}"][data-das="${das}"][data-groupement="${groupement}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                            checkboxesUpdated++;
+                        } else {
+                            console.warn('Dossier checkbox not found for:', dossier, 'in', das, groupement);
+                        }
+                    }
+                });
+                
+                console.log('✓ Updated', checkboxesUpdated, 'checkboxes in modal');
+                
+                // Update parent checkboxes based on children
+                updateParentCheckboxes();
+                // Update permissions from checkboxes to ensure consistency
+                updateOrgPermissionsFromCheckboxes();
+            }, 100);
+        }
+        
+        // Update permissions when checkboxes change - SIMPLIFIED VERSION
+        function updateOrgPermissionsFromCheckboxes() {
+            console.log('=== updateOrgPermissionsFromCheckboxes() called ===');
+            
+            // ALWAYS read from checkboxes in DOM (even if modal is closed, they might still be there)
+            const checkedBoxes = document.querySelectorAll('.org-checkbox:checked');
+            console.log('Found', checkedBoxes.length, 'checked checkboxes in DOM');
+            
+            // Reset selectedPermissions
+            selectedPermissions = [];
+            
+            if (checkedBoxes.length > 0) {
+                // Collect all checked permissions
+                const allPerms = [];
+                checkedBoxes.forEach(function(checkbox) {
+                    let type = checkbox.getAttribute('data-type');
+                    if (type) {
+                        type = type.toUpperCase();
+                    }
+                    const groupement = checkbox.getAttribute('data-groupement');
+                    const das = checkbox.getAttribute('data-das');
+                    const dossier = checkbox.getAttribute('data-dossier');
+                    
+                    allPerms.push({
+                        type: type || 'DOSSIER',
+                        groupement: groupement || null,
+                        das: das || null,
+                        dossier: dossier || null
+                    });
+                });
+                
+                // Deduplicate: if groupement selected, don't include DAS/dossiers
+                const selectedGroupements = new Set();
+                const selectedDas = new Set();
+                
+                allPerms.forEach(function(perm) {
+                    if (perm.type === 'GROUPEMENT' && perm.groupement) {
+                        selectedGroupements.add(perm.groupement);
+                    } else if (perm.type === 'DAS' && perm.das && perm.groupement) {
+                        selectedDas.add(perm.groupement + '|' + perm.das);
+                    }
+                });
+                
+                allPerms.forEach(function(perm) {
+                    if (perm.type === 'GROUPEMENT' && perm.groupement) {
+                        selectedPermissions.push(perm);
+                    } else if (perm.type === 'DAS' && perm.das && perm.groupement) {
+                        if (!selectedGroupements.has(perm.groupement)) {
+                            selectedPermissions.push(perm);
+                        }
+                    } else if (perm.type === 'DOSSIER' && perm.dossier && perm.das && perm.groupement) {
+                        const dasKey = perm.groupement + '|' + perm.das;
+                        if (!selectedGroupements.has(perm.groupement) && !selectedDas.has(dasKey)) {
+                            selectedPermissions.push(perm);
+                        }
+                    }
+                });
+            }
+            
+            // ALWAYS update hidden input - this is CRITICAL
+            if (orgPermissionsInput) {
+                const jsonValue = JSON.stringify(selectedPermissions);
+                orgPermissionsInput.value = jsonValue;
+                
+                // Also try to set it via setAttribute to be sure
+                orgPermissionsInput.setAttribute('value', jsonValue);
+                
+                console.log('✓ Updated hidden input:', selectedPermissions.length, 'permissions');
+                console.log('JSON value:', jsonValue);
+                console.log('Input name:', orgPermissionsInput.name);
+                console.log('Input id:', orgPermissionsInput.id);
+                
+                // Verify it was set
+                if (orgPermissionsInput.value !== jsonValue) {
+                    console.error('✗✗✗ WARNING: Value was not set correctly! ✗✗✗');
+                    console.error('Expected:', jsonValue);
+                    console.error('Got:', orgPermissionsInput.value);
+                }
+            } else {
+                console.error('✗✗✗ CRITICAL: orgPermissionsInput NOT FOUND! ✗✗✗');
+                // Try to find it again
+                const foundInput = document.getElementById('organisation_permissions_input');
+                if (foundInput) {
+                    console.log('Found input on retry, updating...');
+                    const jsonValue = JSON.stringify(selectedPermissions);
+                    foundInput.value = jsonValue;
+                    foundInput.setAttribute('value', jsonValue);
+                } else {
+                    console.error('Input still not found after retry!');
+                }
+            }
+            
+            updateOrgPermissionsDisplay();
+        }
+        
+        // Update permissions display
+        function updateOrgPermissionsDisplay() {
+            // Double check element is valid and in DOM
+            if (!selectedOrgPermissionsDisplay) {
+                console.warn('selectedOrgPermissionsDisplay is null/undefined');
+                return;
+            }
+            
+            if (!(selectedOrgPermissionsDisplay instanceof Node)) {
+                console.warn('selectedOrgPermissionsDisplay is not a Node instance');
+                return;
+            }
+            
+            if (!selectedOrgPermissionsDisplay.parentNode && !document.body.contains(selectedOrgPermissionsDisplay)) {
+                console.warn('selectedOrgPermissionsDisplay is not in DOM');
+                return;
+            }
+            
+            // Use display permissions (initial if selectedPermissions is empty)
+            const displayPermissions = getDisplayPermissions();
+            console.log('updateOrgPermissionsDisplay - displayPermissions:', displayPermissions);
+            console.log('updateOrgPermissionsDisplay - displayPermissions.length:', displayPermissions ? displayPermissions.length : 0);
+            
+            if (!displayPermissions || displayPermissions.length === 0) {
+                try {
+                    selectedOrgPermissionsDisplay.innerHTML = '<span class="no-modules-text">Aucune restriction (accès à toutes les organisations)</span>';
+                } catch (e) {
+                    console.error('Error setting innerHTML:', e);
+                }
+            } else {
+                console.log('Processing', displayPermissions.length, 'permissions for display');
+                const groupements = new Map();
+                const dasMap = new Map();
+                const dossiersSet = new Set();
+                
+                // Organize permissions by type
+                displayPermissions.forEach(function(perm, index) {
+                    console.log('Processing permission', index + ':', perm);
+                    if (perm.type === 'GROUPEMENT' && perm.groupement) {
+                        console.log('  -> Adding groupement:', perm.groupement);
+                        groupements.set(perm.groupement, true);
+                    } else if (perm.type === 'DAS' && perm.das && perm.groupement) {
+                        const key = perm.groupement + '-' + perm.das;
+                        console.log('  -> Adding DAS:', key);
+                        if (!dasMap.has(key)) {
+                            dasMap.set(key, {
+                                groupement: perm.groupement,
+                                das: perm.das
+                            });
+                        }
+                    } else if (perm.type === 'DOSSIER' && perm.dossier && perm.das && perm.groupement) {
+                        const key = perm.groupement + '-' + perm.das + '-' + perm.dossier;
+                        console.log('  -> Adding dossier:', key);
+                        dossiersSet.add(key);
+                    } else {
+                        console.log('  -> Permission skipped (missing required fields):', perm);
+                    }
+                });
+                
+                console.log('After processing:');
+                console.log('  - groupements:', groupements.size, Array.from(groupements.keys()));
+                console.log('  - dasMap:', dasMap.size);
+                console.log('  - dossiersSet:', dossiersSet.size);
+                
+                // Build display HTML with badges
+                let displayHTML = [];
+                
+                // Display groupements
+                if (groupements.size > 0) {
+                    console.log('Building groupement badges...');
+                    groupements.forEach(function(hasAccess, groupement) {
+                        const label = groupementLabels[groupement] || groupement;
+                        const badge = '<span class="module-badge"><i class="fas fa-building"></i> ' + label + '</span>';
+                        console.log('  -> Adding badge for groupement:', groupement, '->', label);
+                        displayHTML.push(badge);
+                    });
+                } else {
+                    console.log('No groupements to display');
+                }
+                
+                // Display DAS (only if not already covered by groupement)
+                if (dasMap.size > 0) {
+                    dasMap.forEach(function(dasInfo, key) {
+                        // Only show DAS if its groupement is not already shown
+                        if (!groupements.has(dasInfo.groupement)) {
+                            const dasLabel = dasLabels[dasInfo.das] || dasInfo.das;
+                            displayHTML.push('<span class="module-badge"><i class="fas fa-layer-group"></i> ' + dasLabel + '</span>');
+                        }
+                    });
+                }
+                
+                // Display dossiers count if any
+                if (dossiersSet.size > 0) {
+                    // Count unique dossiers
+                    const uniqueDossiers = new Set();
+                    dossiersSet.forEach(function(key) {
+                        const parts = key.split('-');
+                        if (parts.length >= 3) {
+                            uniqueDossiers.add(parts[2]);
+                        }
+                    });
+                    if (uniqueDossiers.size > 0) {
+                        displayHTML.push('<span class="module-badge"><i class="fas fa-folder"></i> ' + uniqueDossiers.size + ' dossier(s)</span>');
+                    }
+                }
+                
+                console.log('Final displayHTML array length:', displayHTML.length);
+                console.log('displayHTML content:', displayHTML);
+                
+                if (displayHTML.length > 0) {
+                    console.log('Setting display with', displayHTML.length, 'badges');
+                    try {
+                        // Clear first, then set content to avoid MutationObserver issues
+                        while (selectedOrgPermissionsDisplay.firstChild) {
+                            selectedOrgPermissionsDisplay.removeChild(selectedOrgPermissionsDisplay.firstChild);
+                        }
+                        // Create a temporary div to parse HTML safely
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = displayHTML.join('');
+                        // Append all children
+                        while (tempDiv.firstChild) {
+                            selectedOrgPermissionsDisplay.appendChild(tempDiv.firstChild);
+                        }
+                        console.log('✓ Successfully updated org permissions display with', displayHTML.length, 'badges');
+                    } catch (e) {
+                        console.error('✗ Error setting org permissions display:', e);
+                        // Fallback to innerHTML
+                        try {
+                            selectedOrgPermissionsDisplay.innerHTML = displayHTML.join('');
+                            console.log('✓ Fallback innerHTML succeeded');
+                        } catch (e2) {
+                            console.error('✗ Fallback also failed:', e2);
+                        }
+                    }
+                } else {
+                    console.log('No badges to display, showing "Aucune restriction"');
+                    try {
+                        selectedOrgPermissionsDisplay.textContent = '';
+                        selectedOrgPermissionsDisplay.innerHTML = '<span class="no-modules-text">Aucune restriction (accès à toutes les organisations)</span>';
+                    } catch (e) {
+                        console.error('Error setting innerHTML (no restrictions):', e);
+                    }
+                }
+            }
+        }
+        
+        // Function to update parent checkboxes based on children
+        function updateParentCheckboxes() {
+            // Update all DAS checkboxes based on their dossiers
+            document.querySelectorAll('.org-das-checkbox').forEach(function(dasCheckbox) {
+                if (dasCheckbox.dataset.processing) return; // Skip if being processed
+                
+                const das = dasCheckbox.getAttribute('data-das');
+                const groupement = dasCheckbox.getAttribute('data-groupement');
+                const allDossiers = document.querySelectorAll(`.org-dossier-checkbox[data-das="${das}"][data-groupement="${groupement}"]`);
+                const checkedDossiers = document.querySelectorAll(`.org-dossier-checkbox[data-das="${das}"][data-groupement="${groupement}"]:checked`);
+                
+                if (allDossiers.length > 0) {
+                    dasCheckbox.dataset.processing = 'true';
+                    dasCheckbox.checked = allDossiers.length === checkedDossiers.length;
+                    delete dasCheckbox.dataset.processing;
+                }
+            });
+            
+            // Update all groupement checkboxes based on their DAS and dossiers
+            document.querySelectorAll('.org-groupement-checkbox').forEach(function(groupementCheckbox) {
+                if (groupementCheckbox.dataset.processing) return; // Skip if being processed
+                
+                const groupement = groupementCheckbox.getAttribute('data-groupement');
+                
+                // Check all dossiers in all DAS
+                const allDossiersInGroupement = document.querySelectorAll(`.org-dossier-checkbox[data-groupement="${groupement}"]`);
+                const checkedDossiersInGroupement = document.querySelectorAll(`.org-dossier-checkbox[data-groupement="${groupement}"]:checked`);
+                
+                if (allDossiersInGroupement.length > 0) {
+                    groupementCheckbox.dataset.processing = 'true';
+                    groupementCheckbox.checked = allDossiersInGroupement.length === checkedDossiersInGroupement.length;
+                    delete groupementCheckbox.dataset.processing;
+                } else {
+                    // If no dossiers, check DAS level
+                    const allDas = document.querySelectorAll(`.org-das-checkbox[data-groupement="${groupement}"]`);
+                    const checkedDas = document.querySelectorAll(`.org-das-checkbox[data-groupement="${groupement}"]:checked`);
+                    
+                    if (allDas.length > 0) {
+                        groupementCheckbox.dataset.processing = 'true';
+                        groupementCheckbox.checked = allDas.length === checkedDas.length;
+                        delete groupementCheckbox.dataset.processing;
+                    }
+                }
+            });
+        }
+        
+        // Handle groupement checkbox - select/deselect all DAS and dossiers
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('org-groupement-checkbox') && !e.target.dataset.processing) {
+                e.target.dataset.processing = 'true';
+                const groupement = e.target.getAttribute('data-groupement');
+                const checked = e.target.checked;
+                
+                // Select/deselect all DAS in this groupement
+                document.querySelectorAll(`.org-das-checkbox[data-groupement="${groupement}"]`).forEach(function(dasCheckbox) {
+                    if (!dasCheckbox.dataset.processing) {
+                        dasCheckbox.dataset.processing = 'true';
+                        dasCheckbox.checked = checked;
+                        // Also select/deselect all dossiers in each DAS
+                        const das = dasCheckbox.getAttribute('data-das');
+                        document.querySelectorAll(`.org-dossier-checkbox[data-das="${das}"][data-groupement="${groupement}"]`).forEach(function(dossierCheckbox) {
+                            if (!dossierCheckbox.dataset.processing) {
+                                dossierCheckbox.dataset.processing = 'true';
+                                dossierCheckbox.checked = checked;
+                                delete dossierCheckbox.dataset.processing;
+                            }
+                        });
+                        delete dasCheckbox.dataset.processing;
+                    }
+                });
+                
+                // Also select/deselect any dossiers directly under groupement (if any)
+                document.querySelectorAll(`.org-dossier-checkbox[data-groupement="${groupement}"]`).forEach(function(cb) {
+                    if (!cb.dataset.processing) {
+                        cb.checked = checked;
+                    }
+                });
+                
+                delete e.target.dataset.processing;
+                setTimeout(function() {
+                    updateOrgPermissionsFromCheckboxes();
+                }, 50);
+            }
+        });
+        
+        // Handle DAS checkbox - select/deselect all dossiers in this DAS
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('org-das-checkbox') && !e.target.dataset.processing) {
+                e.target.dataset.processing = 'true';
+                const das = e.target.getAttribute('data-das');
+                const groupement = e.target.getAttribute('data-groupement');
+                const checked = e.target.checked;
+                
+                // Select/deselect all dossiers in this DAS
+                document.querySelectorAll(`.org-dossier-checkbox[data-das="${das}"][data-groupement="${groupement}"]`).forEach(function(cb) {
+                    if (!cb.dataset.processing) {
+                        cb.dataset.processing = 'true';
+                        cb.checked = checked;
+                        // Trigger change event manually to ensure it's processed
+                        cb.dispatchEvent(new Event('change', { bubbles: false }));
+                        delete cb.dataset.processing;
+                    }
+                });
+                
+                delete e.target.dataset.processing;
+                
+                // Update parent groupement checkbox based on all DAS states
+                setTimeout(function() {
+                    updateParentCheckboxes();
+                    updateOrgPermissionsFromCheckboxes();
+                }, 50);
+            }
+        });
+        
+        // Handle dossier checkbox - update parent DAS and groupement
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('org-dossier-checkbox') && !e.target.dataset.processing) {
+                // Update parent DAS and groupement checkboxes
+                updateParentCheckboxes();
+                updateOrgPermissionsFromCheckboxes();
+            }
+        });
+        
+        // Confirm organisation permissions selection
+        confirmOrgPermissionsBtn.addEventListener('click', function() {
+            console.log('=== CONFIRMING ORGANISATION PERMISSIONS SELECTION ===');
+            
+            // CRITICAL: Update permissions from checkboxes
+            updateOrgPermissionsFromCheckboxes();
+            
+            // Verify and update display
+            if (orgPermissionsInput) {
+                console.log('Hidden input value:', orgPermissionsInput.value);
+            }
+            updateOrgPermissionsDisplay();
+            
+            // Close the modal
+            let bootstrapModal;
+            try {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    bootstrapModal = bootstrap.Modal.getInstance(orgPermissionsModal);
+                }
+                if (bootstrapModal) {
+                    bootstrapModal.hide();
+                } else {
+                    // Fallback
+                    orgPermissionsModal.classList.remove('show');
+                    orgPermissionsModal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) backdrop.remove();
+                }
+            } catch (e) {
+                console.error('Error closing org permissions modal:', e);
+                // Fallback
+                orgPermissionsModal.classList.remove('show');
+                orgPermissionsModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+        });
+        
+        // Update display immediately on page load (before modal is opened)
+        // This uses the initial permissions passed from the server
+        // FORCE UPDATE IMMEDIATELY - This is critical for showing the summary
+        console.log('=== INITIALIZING ORG PERMISSIONS DISPLAY ===');
+        console.log('selectedPermissions:', selectedPermissions);
+        console.log('initialPermissions:', initialPermissions);
+        console.log('selectedOrgPermissionsDisplay element:', selectedOrgPermissionsDisplay);
+        
+        // Call updateOrgPermissionsDisplay immediately and multiple times to ensure it works
+        function forceUpdateDisplay() {
+            if (selectedOrgPermissionsDisplay) {
+                console.log('Calling updateOrgPermissionsDisplay()...');
+                try {
+                    updateOrgPermissionsDisplay();
+                    console.log('✓ Display update completed');
+                } catch (e) {
+                    console.error('✗ Error updating display:', e);
+                    console.error('Stack:', e.stack);
+                }
+            } else {
+                console.error('✗ selectedOrgPermissionsDisplay element is null!');
+            }
+        }
+        
+        // Call immediately
+        forceUpdateDisplay();
+        
+        // Also call after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(forceUpdateDisplay, 50);
+            });
+        } else {
+            setTimeout(forceUpdateDisplay, 50);
+        }
+        
+        // One more time after a longer delay to catch any edge cases
+        setTimeout(forceUpdateDisplay, 300);
+        
+        // CRITICAL: Update hidden input before form submission
+        const form = document.querySelector('.modern-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('=== FORM SUBMISSION ===');
+                
+                // FORCE update from checkboxes
+                updateOrgPermissionsFromCheckboxes();
+                
+                // Wait and verify
+                setTimeout(function() {
+                    if (!orgPermissionsInput) {
+                        console.error('✗✗✗ CRITICAL: Input element not found!');
+                        alert('ERREUR: Le champ de permissions est introuvable. Rechargez la page.');
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    const value = orgPermissionsInput.value;
+                    const name = orgPermissionsInput.name;
+                    
+                    console.log('=== FINAL CHECK ===');
+                    console.log('Input name:', name);
+                    console.log('Input value:', value);
+                    console.log('Input in form:', form.contains(orgPermissionsInput));
+                    
+                    if (!value || value === '[]' || value.trim() === '') {
+                        console.error('✗✗✗ VALUE IS EMPTY! ✗✗✗');
+                        // Try one more time
+                        updateOrgPermissionsFromCheckboxes();
+                        setTimeout(function() {
+                            const newValue = orgPermissionsInput.value;
+                            if (!newValue || newValue === '[]') {
+                                console.error('✗✗✗ STILL EMPTY AFTER RETRY! ✗✗✗');
+                                console.error('selectedPermissions:', selectedPermissions);
+                                // Don't prevent - let it submit and check server logs
+                            }
+                        }, 50);
+                    } else {
+                        console.log('✓ Value is present, should save');
+                    }
+                }, 50);
+            }, true); // Use capture phase
+        } else {
+            console.error('Form element not found!');
+        }
+        
+        // CRITICAL: Initialize checkboxes when modal is opened
+        if (orgPermissionsModal) {
+            orgPermissionsModal.addEventListener('show.bs.modal', function() {
+                console.log('=== ORG PERMISSIONS MODAL OPENED ===');
+                console.log('Initializing checkboxes with permissions:', initialPermissions);
+                // Restore permissions from DB
+                if (initialPermissions && initialPermissions.length > 0) {
+                    selectedPermissions = JSON.parse(JSON.stringify(initialPermissions));
+                    // Update hidden input
+                    if (orgPermissionsInput) {
+                        orgPermissionsInput.value = JSON.stringify(selectedPermissions);
+                    }
+                }
+                // Initialize checkboxes
+                setTimeout(function() {
+                    initializeOrgPermissions();
+                }, 50);
+            });
+            
+            orgPermissionsModal.addEventListener('shown.bs.modal', function() {
+                console.log('=== ORG PERMISSIONS MODAL FULLY SHOWN ===');
+                // One more time after modal is fully shown
+                setTimeout(function() {
+                    initializeOrgPermissions();
+                }, 100);
+            });
+        }
+        
+        // Initialize permissions on page load (for modal checkboxes)
+        initializeOrgPermissions();
+    }
+});
+</script>
+
+<style>
+/* Organisation Permissions Tree Styles */
+.org-permissions-tree {
+    padding: 0.5rem 0;
+}
+
+.org-permission-group {
+    margin-bottom: 0.5rem;
+    border: 1px solid #D9EAFD;
+    border-radius: 8px;
+    background: white;
+}
+
+.org-permission-group-header {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #F8FAFC;
+    border-bottom: 1px solid #D9EAFD;
+}
+
+.org-permission-das {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+    border-left: 2px solid #D9EAFD;
+    padding-left: 0.5rem;
+}
+
+.org-permission-das-header {
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.org-permission-dossiers {
+    margin-left: 1.5rem;
+    padding-left: 0.5rem;
+}
+
+.org-permission-dossier {
+    padding: 0.4rem 0.75rem;
+    margin-left: 1rem;
+}
+
+.org-permission-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin: 0;
+    flex: 1;
+}
+
+.org-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #9AA6B2;
+}
+
+.org-permission-title {
+    font-size: 0.9rem;
+    color: #2a3642;
+    font-weight: 500;
+}
+
+.org-permission-title i {
+    color: #9AA6B2;
+    font-size: 0.85rem;
+}
+
+.btn-collapse {
+    background: none;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    color: #9AA6B2;
+    transition: transform 0.3s ease;
+}
+
+.btn-collapse i {
+    font-size: 0.75rem;
+}
+
+.btn-collapse[aria-expanded="false"] i {
+    transform: rotate(-90deg);
+}
+
+.org-permission-children {
+    padding: 0.5rem;
+}
+</style>
+
 {% endblock %}

@@ -3,19 +3,19 @@
 {% block title %}Détails de la Réclamation{% endblock %}
 
 {% block body %}
-<div class="row">
+<div class="row g-0">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h1 class="mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
+        <div class="card compact-page">
+            <div class="card-header compact-header py-2 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
                     Détails de la Réclamation
-                </h1>
-                <a href="{{ path('manager_reclamations') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Retour
+                </h4>
+                <a href="{{ path('manager_reclamations') }}" class="btn btn-secondary btn-xs">
+                    <i class="fas fa-arrow-left"></i> Retour
                 </a>
             </div>
-            <div class="card-body">
+            <div class="card-body compact-body p-2">
                 <div class="row">
                     <div class="col-md-8">
                         <div class="reclamation-details">
@@ -155,13 +155,40 @@
 
 <style>
     .reclamation-details {
-        padding-right: 1rem;
+        padding-right: 0.75rem;
+    }
+    
+    .compact-page {
+        margin-bottom: 0;
+    }
+    
+    .compact-header {
+        padding: 0.4rem 0.75rem !important;
+        background-color: #F8FAFC;
+        border-bottom: 1px solid #BCCCDC;
+    }
+    
+    .compact-header h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .compact-body {
+        padding: 0.75rem !important;
+    }
+    
+    .btn-xs {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
     }
     
     .detail-section {
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #BCCCDC;
     }
     
     .detail-section:last-child {
@@ -172,21 +199,22 @@
     .section-title {
         color: #495057;
         font-weight: 600;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #007bff;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid #9AA6B2;
         display: inline-block;
+        font-size: 1rem;
     }
     
     .detail-content {
-        padding-left: 1rem;
+        padding-left: 0.75rem;
     }
     
     .user-avatar {
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -247,31 +275,31 @@
     }
     
     .comment-box, .response-box {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
+        background: #F8FAFC;
+        border: 1px solid #BCCCDC;
         border-radius: 8px;
-        padding: 1rem;
+        padding: 0.75rem;
         white-space: pre-wrap;
-        font-size: 0.95rem;
+        font-size: 0.875rem;
         line-height: 1.5;
     }
     
     .response-box {
-        background: #e8f5e8;
-        border-color: #c3e6c3;
+        background: #D9EAFD;
+        border-color: #BCCCDC;
     }
     
     .sidebar-info {
         position: sticky;
-        top: 2rem;
+        top: 1rem;
     }
     
     .info-card {
         background: white;
-        border: 1px solid #e9ecef;
+        border: 1px solid #BCCCDC;
         border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
@@ -342,16 +370,16 @@
             margin-top: 2rem;
         }
         
-        .card-header {
+        .compact-header {
             flex-direction: column !important;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
         
-        .card-header h1 {
-            font-size: 1.25rem !important;
+        .compact-header h4 {
+            font-size: 0.95rem !important;
         }
         
-        .card-header .btn {
+        .compact-header .btn {
             width: 100%;
         }
     }

@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Employés{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        Mes Employés Assignés
+                    </h4>
+                    <span class="badge bg-primary">
+                        Dossier: {{ dossierGere }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <!-- Barre de recherche -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <form method="GET" action="{{ path('manager_employees') }}" class="d-flex">
+                                <input type="text" 
+                                       name="search" 
+                                       class="form-control me-2" 
+                                       placeholder="Rechercher par nom, prénom ou email..." 
+                                       value="{{ search }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                {% if search %}
+                                    <a href="{{ path('manager_employees') }}" class="btn btn-outline-secondary ms-2">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                {% endif %}
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                Total: <strong>{{ total }}</strong> employé(s)
+                            </small>
+                        </div>
+                    </div>
+
+                    {% if employees|length > 0 %}
+                        <!-- Tableau des employés -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Email</th>
+                                        <th>Type Dossier</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for employee in employees %}
+                                        <tr>
+                                            <td>{{ employee.id }}</td>
+                                            <td><strong>{{ employee.nom }}</strong></td>
+                                            <td>{{ employee.prenom }}</td>
+                                            <td>
+                                                <a href="mailto:{{ employee.email }}">{{ employee.email }}</a>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ employee.dossier_code }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if totalPages > 1 %}
+                            <nav aria-label="Pagination">
+                                <ul class="pagination justify-content-center">
+                                    {% if page > 1 %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ path('manager_employees', {'page': page - 1, 'search': search, 'perPage': perPage}) }}">
+                                                <i class="fas fa-chevron-left"></i> Précédent
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for p in 1..totalPages %}
+                                        {% if p == page %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ p }}</span>
+                                            </li>
+                                        {% elseif p <= 3 or p > totalPages - 3 or (p >= page - 1 and p <= page + 1) %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ path('manager_employees', {'page': p, 'search': search, 'perPage': perPage}) }}">{{ p }}</a>
+                                            </li>
+                                        {% elseif p == 4 or p == totalPages - 3 %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if page < totalPages %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ path('manager_employees', {'page': page + 1, 'search': search, 'perPage': perPage}) }}">
+                                                Suivant <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+
+                        <!-- Informations de pagination -->
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                Affichage de {{ ((page - 1) * perPage) + 1 }} à {{ min(page * perPage, total) }} sur {{ total }} employé(s)
+                            </small>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {% if search %}
+                                Aucun employé trouvé pour "{{ search }}".
+                            {% else %}
+                                Aucun employé assigné à votre dossier.
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

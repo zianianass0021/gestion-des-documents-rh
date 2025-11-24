@@ -3,184 +3,160 @@
 {% block title %}Mes Demandes et Réclamations{% endblock %}
 
 {% block body %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-envelope me-2"></i>Mes Demandes et Réclamations
-                    </h5>
-                    <a href="{{ path('employee_nouvelle_demande') }}" class="btn btn-success">
-                        <i class="fas fa-plus me-2"></i>Nouvelle Demande/Réclamation
+<div class="row g-0">
+    <div class="col-12">
+        <div class="card compact-page">
+            <div class="card-header compact-header py-2">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0">
+                        <i class="fas fa-envelope me-1"></i>Mes Demandes et Réclamations
+                    </h4>
+                    <a href="{{ path('employee_nouvelle_demande') }}" class="btn btn-success btn-xs">
+                        <i class="fas fa-plus"></i> Nouvelle Demande
                     </a>
                 </div>
-                <div class="card-body">
-                    {% if demandes is empty %}
-                        <div class="alert alert-info text-center">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Vous n'avez encore envoyé aucune demande ou réclamation.
-                            <a href="{{ path('employee_nouvelle_demande') }}" class="alert-link">Envoyer votre première demande</a>
-                        </div>
-                    {% else %}
-                        <!-- Desktop Table View -->
-                        <div class="table-responsive desktop-view">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Titre</th>
-                                        <th>Date d'envoi</th>
-                                        <th>Statut</th>
-                                        <th>Date de réponse</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for demande in demandes %}
-                                    <tr>
-                                        <td>
-                                            <strong>{{ demande.titre }}</strong>
-                                            <br>
-                                            <small class="text-muted">{{ demande.contenu|slice(0, 100) }}{% if demande.contenu|length > 100 %}...{% endif %}</small>
-                                        </td>
-                                        <td>{{ demande.dateCreation|date('d/m/Y H:i') }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ demande.statutCouleur }}">
-                                                {{ demande.statutLibelle }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {% if demande.dateReponse %}
-                                                {{ demande.dateReponse|date('d/m/Y H:i') }}
-                                            {% else %}
-                                                <span class="text-muted">-</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <a href="{{ path('employee_voir_demande', {'id': demande.id}) }}" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye"></i> Voir
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Mobile Card View -->
-                        <div class="mobile-view">
-                            {% for demande in demandes %}
-                            <div class="demande-card mb-3">
-                                <div class="demande-card-header">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <h6 class="mb-1">{{ demande.titre }}</h6>
-                                        <span class="badge bg-{{ demande.statutCouleur }}">{{ demande.statutLibelle }}</span>
-                                    </div>
-                                </div>
-                                <div class="demande-card-body">
-                                    <div class="info-row">
-                                        <i class="fas fa-comment text-muted"></i>
-                                        <span class="text-truncate">{{ demande.contenu|slice(0, 80) }}...</span>
-                                    </div>
-                                    <div class="info-row">
-                                        <i class="fas fa-calendar text-primary"></i>
-                                        <span>Envoyé: {{ demande.dateCreation|date('d/m/Y') }}</span>
-                                    </div>
-                                    {% if demande.dateReponse %}
-                                    <div class="info-row">
-                                        <i class="fas fa-check text-success"></i>
-                                        <span>Répondu: {{ demande.dateReponse|date('d/m/Y') }}</span>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="demande-card-actions">
-                                    <a href="{{ path('employee_voir_demande', {'id': demande.id}) }}" 
-                                       class="btn btn-sm btn-outline-primary w-100">
-                                        <i class="fas fa-eye me-1"></i>Voir Détails
-                                    </a>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
             </div>
+            <div class="card-body compact-body p-2">
+                {% if demandes is empty %}
+                    <div class="alert alert-info alert-xs py-2 px-3 text-center mb-0">
+                        <small><i class="fas fa-info-circle me-1"></i>Aucune demande envoyée.</small>
+                    </div>
+                {% else %}
+                    <div class="table-responsive compact-table">
+                        <table class="table table-sm table-hover table-striped mb-0 compact-table-inner">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 200px; padding: 0.25rem;">Titre</th>
+                                    <th style="width: 100px; padding: 0.25rem;">Date envoi</th>
+                                    <th style="width: 80px; padding: 0.25rem;">Statut</th>
+                                    <th style="width: 100px; padding: 0.25rem;">Date réponse</th>
+                                    <th style="width: 70px; padding: 0.25rem;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for demande in demandes %}
+                                <tr>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">
+                                        <strong>{{ demande.titre|slice(0, 30) }}{% if demande.titre|length > 30 %}...{% endif %}</strong>
+                                        <br><small class="text-muted" style="font-size: 0.7rem;">{{ demande.contenu|slice(0, 40) }}...</small>
+                                    </td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ demande.dateCreation|date('d/m/Y') }}</td>
+                                    <td style="padding: 0.25rem;">
+                                        <span class="badge bg-{{ demande.statutCouleur }}" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">
+                                            {{ demande.statutLibelle }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">
+                                        {% if demande.dateReponse %}
+                                            {{ demande.dateReponse|date('d/m/Y') }}
+                                        {% else %}
+                                            <span class="text-muted" style="font-size: 0.75rem;">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 0.25rem;">
+                                        <a href="{{ path('employee_voir_demande', {'id': demande.id}) }}" 
+                                           class="btn btn-outline-primary btn-xs py-0 px-1" 
+                                           title="Voir">
+                                            <i class="fas fa-eye" style="font-size: 0.7rem;"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if demandes.pageCount > 1 %}
+                <div class="card-footer compact-footer py-1 px-2">
+                    <div class="d-flex justify-content-center">
+                        {{ knp_pagination_render(demandes, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <style>
-    .mobile-view { display: none; }
-    
-    .demande-card {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    .compact-page {
+        margin-bottom: 0;
     }
     
-    .demande-card-header {
-        padding: 1rem;
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border-bottom: 1px solid #e2e8f0;
+    .compact-header {
+        padding: 0.5rem 0.75rem !important;
+        background-color: #F8FAFC;
+        border-bottom: 1px solid #BCCCDC;
     }
     
-    .demande-card-header h6 {
-        color: #1e293b;
+    .compact-header h4 {
+        font-size: 1.1rem;
         font-weight: 600;
     }
     
-    .demande-card-body {
-        padding: 1rem;
+    .compact-body {
+        padding: 0.5rem !important;
+        max-height: calc(100vh - 280px);
+        overflow-y: auto;
     }
     
-    .info-row {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f1f5f9;
+    .compact-table {
+        margin: 0;
     }
     
-    .info-row:last-child {
-        border-bottom: none;
+    .compact-table-inner {
+        margin-bottom: 0;
+        font-size: 0.875rem;
     }
     
-    .info-row i {
-        width: 20px;
-        text-align: center;
+    .compact-table-inner th,
+    .compact-table-inner td {
+        font-size: 0.8rem;
+        vertical-align: middle;
     }
     
-    .info-row span {
-        flex: 1;
-        font-size: 0.9rem;
-        color: #475569;
+    .compact-table-inner thead th {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        background-color: #F8FAFC;
     }
     
-    .demande-card-actions {
-        padding: 0.75rem 1rem;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
+    .btn-xs {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
     }
     
-    @media (max-width: 767px) {
-        .desktop-view { display: none !important; }
-        .mobile-view { display: block !important; }
-        
-        .card-header {
-            flex-direction: column !important;
-            gap: 0.75rem;
-        }
-        
-        .card-header h5 {
-            font-size: 1.1rem !important;
-        }
-        
-        .card-header .btn {
-            width: 100%;
-        }
+    .alert-xs {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .compact-footer {
+        padding: 0.25rem 0.5rem !important;
+        background-color: #F8FAFC;
+        border-top: 1px solid #BCCCDC;
+    }
+    
+    .compact-footer .pagination {
+        margin-bottom: 0;
+    }
+    
+    .compact-footer .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .pagination {
+        font-size: 0.75rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.2rem 0.4rem;
     }
 </style>
 {% endblock %}

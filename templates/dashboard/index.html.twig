@@ -4,25 +4,61 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block body %}
+<!-- Page Transition Styles -->
+<style>
+    @keyframes pageFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pageFadeOut {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+
+    body {
+        animation: pageFadeIn 0.2s ease-out;
+    }
+</style>
+
+<!-- Page Transition Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Removed transition delays for faster navigation
+    });
+</script>
+
 <!-- Welcome Section -->
-<div class="row mb-3">
+<div class="row mb-0" style="margin-bottom: 0.3rem !important;">
     <div class="col-12">
         <div class="welcome-card card border-0 shadow-lg animate-fade-in-up">
-            <div class="card-body py-3">
+            <div class="card-body py-1" style="padding: 0.5rem 1rem !important;">
                 <div class="row align-items-center">
                     <div class="col-lg-8">
-                        <h4 class="mb-2 animate-fade-in-left">
+                        <h5 class="mb-0 animate-fade-in-left" style="font-size: 1rem; line-height: 1.2;">
                             <i class="fas fa-sun me-2 text-warning animate-float"></i>
                             Bonjour, {{ app.user.email|split('@')[0]|title }} !
-                        </h4>
-                        <p class="text-muted mb-0 animate-fade-in-left" style="animation-delay: 0.2s;">
+                        </h5>
+                        <p class="text-muted mb-0 animate-fade-in-left small" style="animation-delay: 0.2s; font-size: 0.8rem; line-height: 1.2;">
                             Bienvenue sur votre tableau de bord. Voici un aperçu de votre système RH.
                         </p>
                     </div>
                     <div class="col-lg-4 text-lg-end">
                         <div class="current-time animate-fade-in-right">
-                            <div class="time-display h4 mb-0 text-primary" id="currentTime"></div>
-                            <small class="text-muted" id="currentDate"></small>
+                            <div class="time-display h5 mb-0 text-primary" id="currentTime" style="font-size: 0.95rem;"></div>
+                            <small class="text-muted" id="currentDate" style="font-size: 0.7rem;"></small>
                         </div>
                     </div>
                 </div>
@@ -32,82 +68,83 @@
 </div>
 
 <!-- Quick Stats -->
-<div class="row g-3 mb-3 animate-stagger justify-content-center">
+<div class="row g-1 mb-0 animate-stagger justify-content-center" style="margin-bottom: 0.3rem !important;">
     <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up">
-            <div class="card-body text-center py-3">
-                <div class="stat-icon bg-primary mb-2 animate-scale-in">
-                    <i class="fas fa-users fa-lg text-white"></i>
+            <div class="card-body text-center" style="padding: 0.75rem 0.5rem !important;">
+                <div class="stat-icon bg-primary mb-1 animate-scale-in" style="margin-bottom: 0.4rem !important;">
+                    <i class="fas fa-users text-white"></i>
                 </div>
-                <h4 class="stat-number text-primary mb-1 animate-fade-in-up" style="animation-delay: 0.3s;">{{ kpis.total_employees }}</h4>
-                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.4s;">Employés</p>
+                <h5 class="stat-number mb-0 animate-fade-in-up" style="animation-delay: 0.3s; font-size: 1.4rem; line-height: 1.2;">{{ kpis.total_employees }}</h5>
+                <p class="stat-label mb-0 small animate-fade-in-up" style="animation-delay: 0.4s; font-size: 0.75rem; margin-top: 0.25rem;">Employés</p>
             </div>
         </div>
     </div>
     
     <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.1s;">
-            <div class="card-body text-center py-3">
-                <div class="stat-icon bg-success mb-2 animate-scale-in" style="animation-delay: 0.4s;">
-                    <i class="fas fa-file-contract fa-lg text-white"></i>
+            <div class="card-body text-center" style="padding: 0.75rem 0.5rem !important;">
+                <div class="stat-icon bg-success mb-1 animate-scale-in" style="animation-delay: 0.4s; margin-bottom: 0.4rem !important;">
+                    <i class="fas fa-file-contract text-white"></i>
                 </div>
-                <h4 class="stat-number text-success mb-1 animate-fade-in-up" style="animation-delay: 0.5s;">{{ kpis.total_contrats }}</h4>
-                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.6s;">Contrats</p>
+                <h5 class="stat-number mb-0 animate-fade-in-up" style="animation-delay: 0.5s; font-size: 1.4rem; line-height: 1.2;">{{ kpis.total_contrats }}</h5>
+                <p class="stat-label mb-0 small animate-fade-in-up" style="animation-delay: 0.6s; font-size: 0.75rem; margin-top: 0.25rem;">Contrats</p>
             </div>
         </div>
     </div>
     
     <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.2s;">
-            <div class="card-body text-center py-3">
-                <div class="stat-icon bg-warning mb-2 animate-scale-in" style="animation-delay: 0.5s;">
-                    <i class="fas fa-envelope fa-lg text-white"></i>
+            <div class="card-body text-center" style="padding: 0.75rem 0.5rem !important;">
+                <div class="stat-icon bg-warning mb-1 animate-scale-in" style="animation-delay: 0.5s; margin-bottom: 0.4rem !important;">
+                    <i class="fas fa-envelope text-white"></i>
                 </div>
-                <h4 class="stat-number text-warning mb-1 animate-fade-in-up" style="animation-delay: 0.6s;">{{ kpis.total_demandes }}</h4>
-                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.7s;">Demandes</p>
+                <h5 class="stat-number mb-0 animate-fade-in-up" style="animation-delay: 0.6s; font-size: 1.4rem; line-height: 1.2;">{{ kpis.total_demandes }}</h5>
+                <p class="stat-label mb-0 small animate-fade-in-up" style="animation-delay: 0.7s; font-size: 0.75rem; margin-top: 0.25rem;">Demandes</p>
             </div>
         </div>
     </div>
     
     <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="stat-card card border-0 shadow-lg h-100 animate-fade-in-up" style="animation-delay: 0.3s;">
-            <div class="card-body text-center py-3">
-                <div class="stat-icon bg-danger mb-2 animate-scale-in" style="animation-delay: 0.6s;">
-                    <i class="fas fa-exclamation-triangle fa-lg text-white"></i>
+            <div class="card-body text-center" style="padding: 0.75rem 0.5rem !important;">
+                <div class="stat-icon bg-danger mb-1 animate-scale-in" style="animation-delay: 0.6s; margin-bottom: 0.4rem !important;">
+                    <i class="fas fa-exclamation-triangle text-white"></i>
                 </div>
-                <h4 class="stat-number text-danger mb-1 animate-fade-in-up" style="animation-delay: 0.7s;">{{ kpis.total_reclamations }}</h4>
-                <p class="stat-label text-muted mb-0 small animate-fade-in-up" style="animation-delay: 0.8s;">Réclamations</p>
+                <h5 class="stat-number mb-0 animate-fade-in-up" style="animation-delay: 0.7s; font-size: 1.4rem; line-height: 1.2;">{{ kpis.total_reclamations }}</h5>
+                <p class="stat-label mb-0 small animate-fade-in-up" style="animation-delay: 0.8s; font-size: 0.75rem; margin-top: 0.25rem;">Réclamations</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- KPI Reports Section -->
-{% if 'ROLE_RESPONSABLE_RH' in app.user.roles or 'ROLE_ADMINISTRATEUR_RH' in app.user.roles %}
-<div class="row g-3 mb-3">
+{% set userRoles = app.user ? app.user.roles : [] %}
+{% if 'ROLE_RESPONSABLE_RH' in userRoles or 'ROLE_ADMINISTRATEUR_RH' in userRoles %}
+<div class="row g-1 mb-0" style="margin-bottom: 0 !important;">
     <div class="col-12">
         <div class="card border-0 shadow-lg">
-            <div class="card-header py-2">
-                <h6 class="mb-0">
+            <div class="card-header py-1" style="padding: 0.35rem 0.75rem !important;">
+                <h6 class="mb-0" style="font-size: 0.85rem; line-height: 1.2;">
                     <i class="fas fa-chart-line me-2 animate-pulse"></i>
                     Rapports de Performance
                 </h6>
             </div>
-            <div class="card-body p-3">
-                <div class="row g-3">
+            <div class="card-body" style="padding: 0.4rem !important;">
+                <div class="row g-1">
                     <!-- KPI Card A: Fiabilisation par Nature de Contrat -->
                     <div class="col-lg-4 col-md-6">
                         <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.1s;">
-                            <div class="kpi-icon kpi-icon-blue" style="width: 50px; height: 50px;">
+                            <div class="kpi-icon kpi-icon-blue" style="width: 40px; height: 40px;">
                                 <i class="fas fa-file-alt"></i>
                             </div>
-                            <div class="kpi-card-body py-2">
+                            <div class="kpi-card-body" style="padding: 0.6rem 0.5rem !important;">
                                 <div>
-                                    <h6 class="kpi-title">A. Fiabilisation par Nature de Contrat</h6>
-                                    <p class="kpi-description">Rapport de fiabilisation des dossiers RH organisés par type de contrat</p>
+                                    <h6 class="kpi-title" style="font-size: 0.8rem; margin-bottom: 0.3rem; line-height: 1.2; font-weight: 600;">A. Fiabilisation par Nature de Contrat</h6>
+                                    <p class="kpi-description" style="font-size: 0.65rem; margin-bottom: 0.4rem; min-height: 1.3rem; line-height: 1.3;">Rapport de fiabilisation des dossiers RH organisés par type de contrat</p>
                                 </div>
-                                <button class="btn kpi-btn kpi-btn-blue" onclick="openReportModal('rapport-a')">
-                                    <i class="fas fa-chart-bar me-2"></i>Voir le Rapport
+                                <button class="btn kpi-btn kpi-btn-blue" onclick="openReportModal('rapport-a')" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; line-height: 1.2;">
+                                    <i class="fas fa-chart-bar me-1"></i>Voir le Rapport
                                 </button>
                             </div>
                         </div>
@@ -116,16 +153,16 @@
                     <!-- KPI Card B: Fiabilisation par DAS -->
                     <div class="col-lg-4 col-md-6">
                         <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.2s;">
-                            <div class="kpi-icon kpi-icon-green">
+                            <div class="kpi-icon kpi-icon-green" style="width: 40px; height: 40px;">
                                 <i class="fas fa-building"></i>
                             </div>
-                            <div class="kpi-card-body">
+                            <div class="kpi-card-body" style="padding: 0.6rem 0.5rem !important;">
                                 <div>
-                                    <h6 class="kpi-title">B. Fiabilisation par DAS</h6>
-                                    <p class="kpi-description">Rapport de fiabilisation des dossiers RH organisés par Direction/Service</p>
+                                    <h6 class="kpi-title" style="font-size: 0.8rem; margin-bottom: 0.3rem; line-height: 1.2; font-weight: 600;">B. Fiabilisation par DAS</h6>
+                                    <p class="kpi-description" style="font-size: 0.65rem; margin-bottom: 0.4rem; min-height: 1.3rem; line-height: 1.3;">Rapport de fiabilisation des dossiers RH organisés par Direction/Service</p>
                                 </div>
-                                <button class="btn kpi-btn kpi-btn-green" onclick="openReportModal('rapport-b')">
-                                    <i class="fas fa-chart-pie me-2"></i>Voir le Rapport
+                                <button class="btn kpi-btn kpi-btn-green" onclick="openReportModal('rapport-b')" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; line-height: 1.2;">
+                                    <i class="fas fa-chart-pie me-1"></i>Voir le Rapport
                                 </button>
                             </div>
                         </div>
@@ -134,16 +171,16 @@
                     <!-- KPI Card C: Détails par DAS -->
                     <div class="col-lg-4 col-md-6">
                         <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.3s;">
-                            <div class="kpi-icon kpi-icon-cyan">
+                            <div class="kpi-icon kpi-icon-cyan" style="width: 40px; height: 40px;">
                                 <i class="fas fa-list"></i>
                             </div>
-                            <div class="kpi-card-body">
+                            <div class="kpi-card-body" style="padding: 0.6rem 0.5rem !important;">
                                 <div>
-                                    <h6 class="kpi-title">C. Détails par DAS</h6>
-                                    <p class="kpi-description">Rapport détaillé des documents par Direction/Service avec pourcentages individuels</p>
+                                    <h6 class="kpi-title" style="font-size: 0.8rem; margin-bottom: 0.3rem; line-height: 1.2; font-weight: 600;">C. Détails par DAS</h6>
+                                    <p class="kpi-description" style="font-size: 0.65rem; margin-bottom: 0.4rem; min-height: 1.3rem; line-height: 1.3;">Rapport détaillé des documents par Direction/Service avec pourcentages individuels</p>
                                 </div>
-                                <button class="btn kpi-btn kpi-btn-cyan" onclick="openReportModal('rapport-c')">
-                                    <i class="fas fa-list-alt me-2"></i>Voir le Rapport
+                                <button class="btn kpi-btn kpi-btn-cyan" onclick="openReportModal('rapport-c')" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; line-height: 1.2;">
+                                    <i class="fas fa-list-alt me-1"></i>Voir le Rapport
                                 </button>
                             </div>
                         </div>
@@ -152,16 +189,16 @@
                     <!-- KPI Card D: Détails par Contrat -->
                     <div class="col-lg-4 col-md-6">
                         <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.4s;">
-                            <div class="kpi-icon kpi-icon-orange">
+                            <div class="kpi-icon kpi-icon-orange" style="width: 40px; height: 40px;">
                                 <i class="fas fa-users-cog"></i>
                             </div>
-                            <div class="kpi-card-body">
+                            <div class="kpi-card-body" style="padding: 0.6rem 0.5rem !important;">
                                 <div>
-                                    <h6 class="kpi-title">D. Détails par Contrat</h6>
-                                    <p class="kpi-description">Rapport détaillé des documents par type de contrat avec pourcentages individuels</p>
+                                    <h6 class="kpi-title" style="font-size: 0.8rem; margin-bottom: 0.3rem; line-height: 1.2; font-weight: 600;">D. Détails par Contrat</h6>
+                                    <p class="kpi-description" style="font-size: 0.65rem; margin-bottom: 0.4rem; min-height: 1.3rem; line-height: 1.3;">Rapport détaillé des documents par type de contrat avec pourcentages individuels</p>
                                 </div>
-                                <button class="btn kpi-btn kpi-btn-orange" onclick="openReportModal('rapport-d')">
-                                    <i class="fas fa-users-cog me-2"></i>Voir le Rapport
+                                <button class="btn kpi-btn kpi-btn-orange" onclick="openReportModal('rapport-d')" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; line-height: 1.2;">
+                                    <i class="fas fa-chart-line me-1"></i>Voir le Rapport
                                 </button>
                             </div>
                         </div>
@@ -170,16 +207,16 @@
                     <!-- KPI Card E: Matrice Personnel -->
                     <div class="col-lg-4 col-md-6">
                         <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.5s;">
-                            <div class="kpi-icon kpi-icon-red">
+                            <div class="kpi-icon kpi-icon-red" style="width: 40px; height: 40px;">
                                 <i class="fas fa-th"></i>
                             </div>
-                            <div class="kpi-card-body">
+                            <div class="kpi-card-body" style="padding: 0.6rem 0.5rem !important;">
                                 <div>
-                                    <h6 class="kpi-title">E. Matrice Personnel</h6>
-                                    <p class="kpi-description">Rapport croisé des documents "Personnel" par contrat et DAS</p>
+                                    <h6 class="kpi-title" style="font-size: 0.8rem; margin-bottom: 0.3rem; line-height: 1.2; font-weight: 600;">E. Matrice Personnel</h6>
+                                    <p class="kpi-description" style="font-size: 0.65rem; margin-bottom: 0.4rem; min-height: 1.3rem; line-height: 1.3;">Rapport croisé des documents "Personnel" par contrat et DAS</p>
                                 </div>
-                                <button class="btn kpi-btn kpi-btn-red" onclick="openReportModal('rapport-e')">
-                                    <i class="fas fa-th me-2"></i>Voir le Rapport
+                                <button class="btn kpi-btn kpi-btn-red" onclick="openReportModal('rapport-e')" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; line-height: 1.2;">
+                                    <i class="fas fa-th me-1"></i>Voir le Rapport
                                 </button>
                             </div>
                         </div>
@@ -188,16 +225,16 @@
                     <!-- KPI Card F: Matrice Ayant Droits -->
                     <div class="col-lg-4 col-md-6">
                         <div class="kpi-card card border-0 shadow-sm h-100 animate-fade-in-up" style="animation-delay: 0.6s;">
-                            <div class="kpi-icon kpi-icon-dark">
+                            <div class="kpi-icon kpi-icon-dark" style="width: 40px; height: 40px;">
                                 <i class="fas fa-users"></i>
                             </div>
-                            <div class="kpi-card-body">
+                            <div class="kpi-card-body" style="padding: 0.6rem 0.5rem !important;">
                                 <div>
-                                    <h6 class="kpi-title">F. Matrice Ayant Droits</h6>
-                                    <p class="kpi-description">Rapport croisé des documents "Ayant Droits" par contrat et DAS</p>
+                                    <h6 class="kpi-title" style="font-size: 0.8rem; margin-bottom: 0.3rem; line-height: 1.2; font-weight: 600;">F. Matrice Ayant Droits</h6>
+                                    <p class="kpi-description" style="font-size: 0.65rem; margin-bottom: 0.4rem; min-height: 1.3rem; line-height: 1.3;">Rapport croisé des documents "Ayant Droits" par contrat et DAS</p>
                                 </div>
-                                <button class="btn kpi-btn kpi-btn-dark" onclick="openReportModal('rapport-f')">
-                                    <i class="fas fa-users me-2"></i>Voir le Rapport
+                                <button class="btn kpi-btn kpi-btn-dark" onclick="openReportModal('rapport-f')" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; line-height: 1.2;">
+                                    <i class="fas fa-user-friends me-1"></i>Voir le Rapport
                                 </button>
                             </div>
                         </div>
@@ -209,239 +246,144 @@
 </div>
 {% endif %}
 
-<!-- Main Content -->
-<div class="row g-3">
-    <!-- Quick Actions -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-lg h-100 animate-fade-in-left">
-            <div class="card-header dark-header py-2">
-                <h6 class="mb-0">
-                    <i class="fas fa-bolt me-2 animate-bounce"></i>
-                    Actions Rapides
-                </h6>
-            </div>
-            <div class="card-body py-3">
-                <div class="quick-actions animate-stagger">
-                    {% if 'ROLE_RESPONSABLE_RH' in app.user.roles %}
-                        <a href="{{ path('responsable_manage_employes') }}" class="quick-action-item">
-                            <div class="quick-action-icon bg-primary">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <div class="quick-action-content">
-                                <h6 class="mb-1">Gérer les Employés</h6>
-                                <small class="text-muted">Voir et gérer tous les employés</small>
-                            </div>
-                            <i class="fas fa-chevron-right quick-action-arrow"></i>
-                        </a>
-
-                        <a href="{{ path('responsable_manage_contrats') }}" class="quick-action-item">
-                            <div class="quick-action-icon bg-success">
-                                <i class="fas fa-file-contract"></i>
-                            </div>
-                            <div class="quick-action-content">
-                                <h6 class="mb-1">Gérer les Contrats</h6>
-                                <small class="text-muted">Créer et gérer les contrats</small>
-                            </div>
-                            <i class="fas fa-chevron-right quick-action-arrow"></i>
-                        </a>
-
-                        <a href="{{ path('responsable_manage_demandes') }}" class="quick-action-item">
-                            <div class="quick-action-icon bg-warning">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="quick-action-content">
-                                <h6 class="mb-1">Voir les Demandes</h6>
-                                <small class="text-muted">Traiter les demandes</small>
-                            </div>
-                            <i class="fas fa-chevron-right quick-action-arrow"></i>
-                        </a>
-
-                    {% endif %}
-
-                    {% if 'ROLE_EMPLOYEE' in app.user.roles %}
-                        <a href="{{ path('employee_profile') }}" class="quick-action-item">
-                            <div class="quick-action-icon bg-primary">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="quick-action-content">
-                                <h6 class="mb-1">Mon Profil</h6>
-                                <small class="text-muted">Consulter mon profil</small>
-                            </div>
-                            <i class="fas fa-chevron-right quick-action-arrow"></i>
-                        </a>
-
-                        <a href="{{ path('employee_contrats') }}" class="quick-action-item">
-                            <div class="quick-action-icon bg-success">
-                                <i class="fas fa-file-contract"></i>
-                            </div>
-                            <div class="quick-action-content">
-                                <h6 class="mb-1">Mes Contrats</h6>
-                                <small class="text-muted">Voir mes contrats</small>
-                            </div>
-                            <i class="fas fa-chevron-right quick-action-arrow"></i>
-                        </a>
-
-                        <a href="{{ path('employee_demandes') }}" class="quick-action-item">
-                            <div class="quick-action-icon bg-warning">
-                                <i class="fas fa-plus-circle"></i>
-                            </div>
-                            <div class="quick-action-content">
-                                <h6 class="mb-1">Nouvelle Demande</h6>
-                                <small class="text-muted">Soumettre une demande</small>
-                            </div>
-                            <i class="fas fa-chevron-right quick-action-arrow"></i>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-lg h-100 animate-fade-in-right">
-            <div class="card-header dark-header py-2">
-                <h6 class="mb-0">
-                    <i class="fas fa-clock me-2 animate-pulse"></i>
-                    Activité Récente
-                </h6>
-            </div>
-            <div class="card-body py-3">
-                <div class="activity-list animate-stagger">
-                    {% if recent_demandes|length > 0 %}
-                        {% for demande in recent_demandes|slice(0, 3) %}
-                            <div class="activity-item">
-                                <div class="activity-icon bg-warning">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <h6 class="mb-1">Nouvelle demande</h6>
-                                    <p class="text-muted mb-1">{{ demande.type|default('Demande') }} - {{ demande.employe.nom }} {{ demande.employe.prenom }}</p>
-                                    <small class="text-muted">
-                                        <i class="fas fa-clock me-1"></i>{{ demande.dateCreation|date('d/m/Y H:i') }}
-                                    </small>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="activity-item">
-                            <div class="activity-icon bg-success">
-                                <i class="fas fa-sign-in-alt"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h6 class="mb-1">Connexion réussie</h6>
-                                <p class="text-muted mb-1">Vous vous êtes connecté au système</p>
-                                <small class="text-muted">
-                                    <i class="fas fa-clock me-1"></i>Maintenant
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-icon bg-info">
-                                <i class="fas fa-home"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h6 class="mb-1">Accès au dashboard</h6>
-                                <p class="text-muted mb-1">Page d'accueil chargée</p>
-                                <small class="text-muted">
-                                    <i class="fas fa-clock me-1"></i>Il y a quelques secondes
-                                </small>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Custom Styles -->
 <style>
+    /* Ensure no scrolling - fit everything in viewport */
+    .content-area {
+        overflow: hidden !important;
+        max-height: calc(100vh - 80px) !important;
+        padding: 6px 10px !important;
+        height: calc(100vh - 80px) !important;
+    }
+    
+    body {
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+    }
+    
+    html {
+        overflow: hidden !important;
+    }
+    
+    /* Remove all bottom margins to fit content */
+    .row {
+        margin-bottom: 0.3rem !important;
+    }
+    
+    .card {
+        margin-bottom: 0.3rem !important;
+    }
+    
+    /* Modern card styling with subtle shadows */
+    .card {
+        border-radius: 12px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+    }
+    
     .welcome-card {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border-left: 4px solid #0284c7;
-        color: #1e293b;
+        background: linear-gradient(135deg, #f8fafc 0%, #d9eafd 100%);
+        border-left: 4px solid #9aa6b2;
+        color: #000000;
+        margin-bottom: 0.3rem !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+    
+    .welcome-card .card-body {
+        padding: 0.4rem 0.75rem !important;
     }
 
     .welcome-card h2 {
-        color: #1e293b !important;
+        color: #000000 !important;
     }
 
     .welcome-card .text-muted {
-        color: #475569 !important;
+        color: #000000 !important;
     }
 
     .stat-card {
-        transition: var(--transition);
+        transition: all 0.3s ease;
+        border-radius: 12px !important;
     }
 
     .stat-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-xl);
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
     }
 
     .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: var(--radius-lg);
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto;
-        box-shadow: var(--shadow-md);
-        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #5a6672 0%, #4a5662 100%) !important;
+        font-size: 0.95rem !important;
     }
 
     .stat-number {
-        font-size: 2rem;
+        font-size: 1.35rem;
         font-weight: 800;
         margin: 0;
-        color: #0284c7 !important;
+        color: #5a6672 !important;
+        line-height: 1.2;
     }
 
     .stat-label {
         font-weight: 500;
         margin: 0;
-        color: #64748b !important;
+        color: #5a6672 !important;
+        font-size: 0.75rem !important;
+        line-height: 1.2;
     }
 
 
     .quick-actions {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.4rem;
     }
 
     .quick-action-item {
         display: flex;
         align-items: center;
-        padding: 1rem;
-        border-radius: var(--radius-lg);
+        padding: 0.4rem 0.5rem;
+        border-radius: 8px;
         text-decoration: none;
-        color: #1e293b;
-        transition: var(--transition);
-        border: 1px solid #e2e8f0;
+        color: #000000;
+        transition: all 0.3s ease;
+        border: 1px solid #bcccdc;
         background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .quick-action-item:hover {
-        background: #f0f9ff;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
         border-color: #bae6fd;
-        transform: translateX(8px);
-        color: #1e293b;
+        transform: translateX(4px) scale(1.02);
+        color: #000000;
         text-decoration: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .quick-action-icon {
-        width: 45px;
-        height: 45px;
+        width: 35px;
+        height: 35px;
         border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        margin-right: 1rem;
+        margin-right: 0.5rem;
+        background: linear-gradient(135deg, #5a6672 0%, #4a5662 100%) !important;
+        font-size: 0.9rem !important;
     }
 
     .quick-action-content {
@@ -449,30 +391,40 @@
     }
 
     .quick-action-content h6 {
-        margin-bottom: 0.25rem;
-        color: #1e293b;
+        margin-bottom: 0.15rem;
+        color: #000000;
         font-weight: 600;
+        font-size: 0.85rem !important;
     }
 
     .quick-action-content p {
-        color: #64748b;
+        color: #000000;
         margin: 0;
+        font-size: 0.75rem !important;
     }
 
     .quick-action-arrow {
-        color: var(--secondary-400);
+        color: #000000;
         transition: var(--transition);
     }
 
     .quick-action-item:hover .quick-action-arrow {
-        color: var(--primary-600);
+        color: #000000;
         transform: translateX(4px);
+    }
+    
+    /* Ensure all text elements are black on light backgrounds */
+    .time-display,
+    .current-time small,
+    .welcome-card h4,
+    .welcome-card p {
+        color: #000000 !important;
     }
 
     .activity-list {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 0.4rem;
     }
 
     .activity-item {
@@ -481,31 +433,40 @@
     }
 
     .activity-icon {
-        width: 40px;
-        height: 40px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        margin-right: 1rem;
+        margin-right: 0.5rem;
         box-shadow: var(--shadow-md);
+        background: linear-gradient(135deg, #5a6672 0%, #4a5662 100%) !important;
+        font-size: 0.75rem !important;
+        flex-shrink: 0;
     }
 
     .activity-content h6 {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.15rem;
         color: var(--secondary-900);
         font-weight: 600;
+        font-size: 0.85rem !important;
     }
 
     .activity-content p {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.15rem;
         color: var(--secondary-600);
+        font-size: 0.75rem !important;
+    }
+    
+    .activity-content small {
+        font-size: 0.7rem !important;
     }
 
     .current-time {
         background: rgba(255, 255, 255, 0.1);
-        padding: 1rem;
+        padding: 0.5rem 0.75rem;
         border-radius: var(--radius-lg);
         backdrop-filter: blur(10px);
     }
@@ -562,32 +523,32 @@
 
     /* KPI Cards Styles */
     .kpi-card {
-        transition: var(--transition);
+        transition: all 0.3s ease;
         border: none;
         position: relative;
         overflow: hidden;
-        border-radius: 16px;
-        box-shadow: var(--shadow-sm);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         height: 100%;
         background: var(--bg-primary);
     }
 
     .kpi-card:hover {
-        transform: translateY(-12px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
     }
 
     .kpi-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1rem;
+        margin: 0 auto 0.4rem;
         color: white;
-        font-size: 1.3rem;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        font-size: 0.95rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         position: relative;
         overflow: hidden;
     }
@@ -608,7 +569,7 @@
         z-index: 1;
     }
 
-    .kpi-icon-blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+    .kpi-icon-blue { background: linear-gradient(135deg, #5a6672 0%, #4a5662 100%); }
     .kpi-icon-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
     .kpi-icon-cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
     .kpi-icon-orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
@@ -617,25 +578,25 @@
 
     .kpi-title {
         font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-        font-size: 1rem;
-        line-height: 1.3;
+        color: #000000;
+        margin-bottom: 0.25rem;
+        font-size: 0.85rem;
+        line-height: 1.2;
     }
 
     .kpi-description {
-        color: var(--text-secondary);
-        font-size: 0.85rem;
-        line-height: 1.4;
-        margin-bottom: 1rem;
-        min-height: 2.5rem;
+        color: #000000;
+        font-size: 0.7rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+        min-height: 1.5rem;
     }
 
     .kpi-btn {
         border: none;
-        padding: 0.6rem 1.2rem;
+        padding: 0.35rem 0.75rem;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.75rem;
         border-radius: 12px;
         transition: all 0.3s ease;
         text-transform: none;
@@ -649,14 +610,13 @@
     }
 
     .kpi-card-body {
-        padding: 2rem 1.5rem;
+        padding: 0.6rem 0.5rem;
         text-align: center;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         height: 100%;
         border-radius: 8px;
-        padding: 0.75rem 1.5rem;
         font-weight: 600;
         transition: var(--transition);
         position: relative;
@@ -664,7 +624,7 @@
     }
 
     .kpi-btn-blue { 
-        background: #3b82f6; 
+        background: linear-gradient(135deg, #5a6672 0%, #4a5662 100%); 
         color: white; 
     }
     .kpi-btn-green { 
@@ -730,7 +690,7 @@
 
         /* Chart Styling */
         .bg-gradient {
-            background: linear-gradient(45deg, #007bff, #0056b3) !important;
+            background: linear-gradient(45deg, #9aa6b2, #7a8692) !important;
         }
         
         .chart-bar {
@@ -2202,8 +2162,8 @@
                                </div>
                                     <div class="mt-2 text-center">
                                         <small class="text-muted">
-                                            <span class="badge me-2" style="background-color: #007bff;"></span>Personnel
-                                            <span class="badge ms-2" style="background-color: #007bff; opacity: 0.5;"></span>Ayant Droits
+                                            <span class="badge me-2" style="background-color: #9aa6b2;"></span>Personnel
+                                            <span class="badge ms-2" style="background-color: #9aa6b2; opacity: 0.5;"></span>Ayant Droits
                                         </small>
                                     </div>
                                 `;
@@ -2549,7 +2509,7 @@
                         .summary { margin: 20px 0; }
                         .stats { display: flex; justify-content: space-around; margin: 20px 0; }
                         .stat-item { text-align: center; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-                        .stat-number { font-size: 24px; font-weight: bold; color: #007bff; }
+                        .stat-number { font-size: 24px; font-weight: bold; color: #000000; }
                         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                         th { background-color: #f2f2f2; }
@@ -2623,6 +2583,18 @@
 </script>
 
 <style>
+    /* Ensure all text on light backgrounds is black */
+    .card-header:not(.dark-header) h6,
+    .card-header:not(.dark-header),
+    .card-body,
+    .card-body h4,
+    .card-body h5,
+    .card-body h6,
+    .card-body p,
+    .card-body small {
+        color: #000000 !important;
+    }
+
     /* Dark Header Styles for Actions Rapides and Activité Récente */
     .dark-header {
         background: #0f172a !important;
@@ -2656,16 +2628,16 @@
     /* Light mode - keep normal appearance */
     [data-bs-theme="light"] .dark-header {
         background: #f8fafc !important;
-        border-bottom: 1px solid #e2e8f0 !important;
-        color: #1e293b !important;
+        border-bottom: 1px solid #bcccdc !important;
+        color: #000000 !important;
     }
 
     [data-bs-theme="light"] .dark-header h5 {
-        color: #1e293b !important;
+        color: #000000 !important;
     }
 
     [data-bs-theme="light"] .dark-header i {
-        color: #1e293b !important;
+        color: #000000 !important;
     }
 
     /* Modal Styles */
@@ -2972,7 +2944,19 @@ function openReportModal(reportType) {
 }
 
 function createPieChart(data) {
-    const ctx = document.getElementById('pieChart').getContext('2d');
+    // Destroy existing chart if it exists
+    if (pieChart) {
+        pieChart.destroy();
+        pieChart = null;
+    }
+    
+    const canvas = document.getElementById('pieChart');
+    if (!canvas) {
+        console.error('pieChart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
     
     // Determine the structure of the data
     let labels = [];
@@ -2984,47 +2968,110 @@ function createPieChart(data) {
         // Doughnut chart for contract types
         chartType = 'doughnut';
         chartTitle = 'Performance par Type de Contrat';
-        labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
+        console.log('[createPieChart] rapport-a - Extracting data');
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data[1]:', data[1]);
+        console.log('  - data[0].slice(2):', data[0]?.slice(2));
+        console.log('  - data[1].slice(2):', data[1]?.slice(2));
+        labels = data[0]?.slice(2)?.filter(h => h !== '') || [];
+        values = data[1]?.slice(2)?.filter(v => v !== '' && v !== 'N/A') || [];
+        console.log('  - labels after filter:', labels);
+        console.log('  - values after filter:', values);
     } else if (currentReportType === 'rapport-b') {
         // Pie chart not used for rapport-b (hidden, only bar chart shown)
         chartType = 'doughnut';
         chartTitle = 'Performance par Organisation';
-        labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
+        console.log('[createPieChart] rapport-b - Extracting data');
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data[1]:', data[1]);
+        console.log('  - data[0].slice(2):', data[0]?.slice(2));
+        console.log('  - data[1].slice(2):', data[1]?.slice(2));
+        labels = data[0]?.slice(2)?.filter(h => h !== '') || [];
+        values = data[1]?.slice(2)?.filter(v => v !== '' && v !== 'N/A') || [];
+        console.log('  - labels after filter:', labels, 'length:', labels.length);
+        console.log('  - values after filter:', values, 'length:', values.length);
     } else if (currentReportType === 'rapport-c') {
         // Radar chart for detailed organization performance
         chartType = 'radar';
         chartTitle = 'Performance Détaillée par Organisation';
-        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        console.log('[createPieChart] rapport-c - Extracting data');
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data.length:', data.length);
+        const headerIndex = data[0]?.indexOf('% DOSSIER PERSONNEL');
+        console.log('  - headerIndex for "% DOSSIER PERSONNEL":', headerIndex);
         if (headerIndex !== -1) {
+            console.log('  - data.slice(2):', data.slice(2));
             labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
             values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+            console.log('  - labels after map/filter:', labels, 'length:', labels.length);
+            console.log('  - values after map/filter:', values, 'length:', values.length);
+        } else {
+            console.error('[createPieChart] rapport-c - Column "% DOSSIER PERSONNEL" not found in header!');
         }
     } else if (currentReportType === 'rapport-d') {
         // Doughnut for contract nature details
         chartType = 'doughnut';
         chartTitle = 'Performance par Nature de Contrat';
-        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        console.log('[createPieChart] rapport-d - Extracting data');
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data.length:', data.length);
+        const headerIndex = data[0]?.indexOf('% DOSSIER PERSONNEL');
+        console.log('  - headerIndex for "% DOSSIER PERSONNEL":', headerIndex);
         if (headerIndex !== -1) {
+            console.log('  - data.slice(2):', data.slice(2));
             labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
             values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+            console.log('  - labels after map/filter:', labels, 'length:', labels.length);
+            console.log('  - values after map/filter:', values, 'length:', values.length);
+        } else {
+            console.error('[createPieChart] rapport-d - Column "% DOSSIER PERSONNEL" not found in header!');
         }
     } else if (currentReportType === 'rapport-e') {
         // Pie chart for personnel matrix
         chartType = 'pie';
         chartTitle = 'Performance Personnel par Contrat';
+        console.log('[createPieChart] rapport-e - Extracting data');
+        console.log('  - data:', data);
+        console.log('  - data.length:', data?.length);
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data[1]:', data[1]);
         if (data && data.length > 1) {
-            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
-            values = data[1].slice(2).filter(v => v !== '' && v !== '|');
+            console.log('  - data[0].slice(2):', data[0]?.slice(2));
+            console.log('  - data[1].slice(2):', data[1]?.slice(2));
+            labels = data[0]?.slice(2)?.filter(h => h !== '' && h !== '|') || [];
+            values = data[1]?.slice(2)?.filter(v => v !== '' && v !== '|') || [];
+            console.log('  - labels after filter:', labels, 'length:', labels.length);
+            console.log('  - values after filter:', values, 'length:', values.length);
+            console.log('  - First 5 labels:', labels.slice(0, 5));
+            console.log('  - First 5 values:', values.slice(0, 5));
+        } else {
+            console.error('[createPieChart] rapport-e - Insufficient data!');
+            console.error('  - data exists:', !!data);
+            console.error('  - data.length:', data?.length);
         }
     } else if (currentReportType === 'rapport-f') {
         // Pie chart for ayant droits matrix
         chartType = 'pie';
         chartTitle = 'Performance Ayant Droits par Contrat';
+        console.log('[createPieChart] rapport-f - Extracting data');
+        console.log('  - data:', data);
+        console.log('  - data.length:', data?.length);
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data[2]:', data[2]);
         if (data && data.length > 2) {
-            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
-            values = data[2].slice(2).filter(v => v !== '' && v !== '|');
+            console.log('  - data[0].slice(2):', data[0]?.slice(2));
+            console.log('  - data[2].slice(2):', data[2]?.slice(2));
+            labels = data[0]?.slice(2)?.filter(h => h !== '' && h !== '|') || [];
+            values = data[2]?.slice(2)?.filter(v => v !== '' && v !== '|') || [];
+            console.log('  - labels after filter:', labels, 'length:', labels.length);
+            console.log('  - values after filter:', values, 'length:', values.length);
+            console.log('  - First 5 labels:', labels.slice(0, 5));
+            console.log('  - First 5 values:', values.slice(0, 5));
+        } else {
+            console.error('[createPieChart] rapport-f - Insufficient data!');
+            console.error('  - data exists:', !!data);
+            console.error('  - data.length:', data?.length);
+            console.error('  - Need length > 2, got:', data?.length);
         }
     }
     
@@ -3032,23 +3079,51 @@ function createPieChart(data) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     
     // Check if we have data
+    console.log(`[createPieChart] ${currentReportType} - Before validation:`);
+    console.log(`  - labels type: ${typeof labels}, length: ${labels?.length}, content:`, labels);
+    console.log(`  - values type: ${typeof values}, length: ${values?.length}, content:`, values);
+    console.log(`  - labels check: ${!!labels}, length check: ${labels?.length > 0}`);
+    console.log(`  - values check: ${!!values}, length check: ${values?.length > 0}`);
+    
     if (!labels || labels.length === 0 || !values || values.length === 0) {
-        console.log('No data to display in chart. Labels:', labels, 'Values:', values);
+        console.error(`[createPieChart] ${currentReportType} - NO DATA TO DISPLAY!`);
+        console.error(`  - labels is falsy: ${!labels}, length: ${labels?.length}`);
+        console.error(`  - values is falsy: ${!values}, length: ${values?.length}`);
+        console.error(`  - Full context:`, { labels, values, data, currentReportType });
         return;
     }
     
+    console.log(`[createPieChart] ${currentReportType} - Data validated, proceeding to create chart`);
+    console.log(`  - About to create ${chartType} chart with ${labels.length} labels and ${values.length} values`);
+    console.log(`  - Sample labels (first 5):`, labels.slice(0, 5));
+    console.log(`  - Sample values (first 5):`, values.slice(0, 5));
+    
+    // Process values for Chart.js
+    const processedValues = values.map(v => {
+        // Convert to string first to handle numbers
+        const vStr = String(v ?? '');
+        if (vStr.includes('%')) {
+            return parseFloat(vStr.replace('%', '')) || 0;
+        }
+        return parseFloat(vStr) || 0;
+    });
+    console.log(`  - Processed values for Chart.js:`, processedValues.slice(0, 5));
+    
     // Create chart
-    pieChart = new Chart(ctx, {
+    try {
+        pieChart = new Chart(ctx, {
         type: chartType,
         data: {
             labels: labels,
         datasets: [{
             label: chartTitle,
                 data: values.map(v => {
-                    if (typeof v === 'string' && v.includes('%')) {
-                        return parseFloat(v.replace('%', ''));
+                    // Convert to string first to handle numbers
+                    const vStr = String(v ?? '');
+                    if (vStr.includes('%')) {
+                        return parseFloat(vStr.replace('%', '')) || 0;
                     }
-                    return parseFloat(v) || 0;
+                    return parseFloat(vStr) || 0;
                 }),
             backgroundColor: [
                     'rgba(54, 162, 235, 0.8)',
@@ -3075,15 +3150,28 @@ function createPieChart(data) {
             }
         }
     });
+        console.log(`[createPieChart] ${currentReportType} - Chart created successfully`);
+    } catch (error) {
+        console.error(`[createPieChart] ${currentReportType} - ERROR creating chart:`, error);
+        console.error(`  - Error details:`, error.message, error.stack);
+        console.error(`  - Chart config:`, { labels, values: processedValues, chartType });
+    }
 }
 
 function createBarChart(data) {
-    const ctx = document.getElementById('barChart').getContext('2d');
-    
-    // Destroy existing chart
+    // Destroy existing chart if it exists
     if (barChart) {
         barChart.destroy();
+        barChart = null;
     }
+    
+    const canvas = document.getElementById('barChart');
+    if (!canvas) {
+        console.error('barChart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
     
     // Determine the structure of the data
     let labels = [];
@@ -3093,78 +3181,190 @@ function createBarChart(data) {
     let isHorizontal = false;
     
     if (currentReportType === 'rapport-a') {
-        // Horizontal bar for contract types
+        // Horizontal bar for contract types showing missing documents
+        // data[0] = header with contract types
+        // data[1] = DOSSIER PERSONNEL - Avancement (percentages)
+        // data[2] = DOSSIER PERSONNEL - Nombre de documents manquants (counts)
+        // data[3] = AYANT DROITS - Avancement (percentages)
+        // data[4] = AYANT DROITS - Nombre de documents manquants (counts)
         chartType = 'bar';
         isHorizontal = true;
-        chartTitle = 'Comparaison des Contrats';
-        labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
+        chartTitle = 'Documents Manquants - DOSSIER PERSONNEL (Obligatoire)';
+        console.log('[createBarChart] rapport-a - Extracting data');
+        console.log('  - Full data:', data);
+        console.log('  - data length:', data?.length);
+        console.log('  - data[0] (header):', data[0]);
+        console.log('  - data[2] (missing docs personnel):', data[2]);
+        if (data && data.length > 2 && data[0] && data[2]) {
+            // Extract contract types from header (skip first 2 empty cells)
+            labels = data[0].slice(2).filter(h => h !== '' && h !== null && h !== undefined);
+            // Extract missing documents counts from DOSSIER PERSONNEL row (data[2])
+            // Skip first 2 cells (empty, 'Nombre de documents manquants')
+            values = data[2].slice(2).map(v => {
+                const str = String(v ?? '').trim();
+                if (str === '' || str === 'N/A') return null;
+                // Parse as integer (remove any commas, spaces, etc)
+                const num = parseInt(str.replace(/[,\s]/g, ''), 10);
+                return isNaN(num) ? null : num;
+            }).filter(v => v !== null);
+            
+            // Only keep labels that have corresponding values
+            labels = labels.slice(0, values.length);
+            
+            console.log('  - labels after filter:', labels, 'length:', labels.length);
+            console.log('  - values after filter:', values, 'length:', values.length);
+        } else {
+            console.error('[createBarChart] rapport-a - Missing data structure!');
+            console.error('  - data exists:', !!data);
+            console.error('  - data.length:', data?.length);
+            console.error('  - data[0] exists:', !!data?.[0]);
+            console.error('  - data[2] exists:', !!data?.[2]);
+        }
     } else if (currentReportType === 'rapport-b') {
         // Horizontal bar chart for organizations
         chartType = 'bar';
         isHorizontal = true;
         chartTitle = 'Comparaison par Organisation';
-        labels = data[0].slice(2).filter(h => h !== '');
-        values = data[1].slice(2).filter(v => v !== '' && v !== 'N/A');
+        console.log('[createBarChart] rapport-b - Extracting data');
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data[1]:', data[1]);
+        labels = data[0]?.slice(2)?.filter(h => h !== '') || [];
+        values = data[1]?.slice(2)?.filter(v => v !== '' && v !== 'N/A') || [];
+        console.log('  - labels after filter:', labels, 'length:', labels.length);
+        console.log('  - values after filter:', values, 'length:', values.length);
     } else if (currentReportType === 'rapport-c') {
         // Grouped bar chart for detailed organization
         chartType = 'bar';
         isHorizontal = false;
         chartTitle = 'Documents par Organisation';
-        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        console.log('[createBarChart] rapport-c - Extracting data');
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data.length:', data.length);
+        const headerIndex = data[0]?.indexOf('% DOSSIER PERSONNEL');
+        console.log('  - headerIndex for "% DOSSIER PERSONNEL":', headerIndex);
         if (headerIndex !== -1) {
-        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+            console.log('  - data.slice(2):', data.slice(2));
+            labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
             values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+            console.log('  - labels after map/filter:', labels, 'length:', labels.length);
+            console.log('  - values after map/filter:', values, 'length:', values.length);
+        } else {
+            console.error('[createBarChart] rapport-c - Column "% DOSSIER PERSONNEL" not found in header!');
         }
     } else if (currentReportType === 'rapport-d') {
         // Grouped bar for contract nature details
         chartType = 'bar';
         isHorizontal = false;
         chartTitle = 'Documents par Nature de Contrat';
-        const headerIndex = data[0].indexOf('% DOSSIER PERSONNEL');
+        console.log('[createBarChart] rapport-d - Extracting data');
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data.length:', data.length);
+        const headerIndex = data[0]?.indexOf('% DOSSIER PERSONNEL');
+        console.log('  - headerIndex for "% DOSSIER PERSONNEL":', headerIndex);
         if (headerIndex !== -1) {
-        labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
+            console.log('  - data.slice(2):', data.slice(2));
+            labels = data.slice(2).map(row => row[0]).filter(l => l !== '');
             values = data.slice(2).map(row => row[headerIndex]).filter(v => v !== '');
+            console.log('  - labels after map/filter:', labels, 'length:', labels.length);
+            console.log('  - values after map/filter:', values, 'length:', values.length);
+        } else {
+            console.error('[createBarChart] rapport-d - Column "% DOSSIER PERSONNEL" not found in header!');
         }
     } else if (currentReportType === 'rapport-e') {
         // Grouped bar for personnel matrix
         chartType = 'bar';
         isHorizontal = false;
         chartTitle = 'Performance Personnel';
+        console.log('[createBarChart] rapport-e - Extracting data');
+        console.log('  - data:', data);
+        console.log('  - data.length:', data?.length);
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data[1]:', data[1]);
         if (data && data.length > 1) {
-            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
-            values = data[1].slice(2).filter(v => v !== '' && v !== '|');
+            console.log('  - data[0].slice(2):', data[0]?.slice(2));
+            console.log('  - data[1].slice(2):', data[1]?.slice(2));
+            labels = data[0]?.slice(2)?.filter(h => h !== '' && h !== '|') || [];
+            values = data[1]?.slice(2)?.filter(v => v !== '' && v !== '|') || [];
+            console.log('  - labels after filter:', labels, 'length:', labels.length);
+            console.log('  - values after filter:', values, 'length:', values.length);
+            console.log('  - First 5 labels:', labels.slice(0, 5));
+            console.log('  - First 5 values:', values.slice(0, 5));
+        } else {
+            console.error('[createBarChart] rapport-e - Insufficient data!');
+            console.error('  - data exists:', !!data);
+            console.error('  - data.length:', data?.length);
         }
     } else if (currentReportType === 'rapport-f') {
         // Grouped bar for ayant droits matrix
         chartType = 'bar';
         isHorizontal = false;
         chartTitle = 'Performance Ayant Droits';
+        console.log('[createBarChart] rapport-f - Extracting data');
+        console.log('  - data:', data);
+        console.log('  - data.length:', data?.length);
+        console.log('  - data[0]:', data[0]);
+        console.log('  - data[2]:', data[2]);
         if (data && data.length > 2) {
-            labels = data[0].slice(2).filter(h => h !== '' && h !== '|');
-            values = data[2].slice(2).filter(v => v !== '' && v !== '|');
+            console.log('  - data[0].slice(2):', data[0]?.slice(2));
+            console.log('  - data[2].slice(2):', data[2]?.slice(2));
+            labels = data[0]?.slice(2)?.filter(h => h !== '' && h !== '|') || [];
+            values = data[2]?.slice(2)?.filter(v => v !== '' && v !== '|') || [];
+            console.log('  - labels after filter:', labels, 'length:', labels.length);
+            console.log('  - values after filter:', values, 'length:', values.length);
+            console.log('  - First 5 labels:', labels.slice(0, 5));
+            console.log('  - First 5 values:', values.slice(0, 5));
+        } else {
+            console.error('[createBarChart] rapport-f - Insufficient data!');
+            console.error('  - data exists:', !!data);
+            console.error('  - data.length:', data?.length);
+            console.error('  - Need length > 2, got:', data?.length);
         }
     }
     
     // Check if we have data
+    console.log(`[createBarChart] ${currentReportType} - Before validation:`);
+    console.log(`  - labels type: ${typeof labels}, length: ${labels?.length}, content:`, labels);
+    console.log(`  - values type: ${typeof values}, length: ${values?.length}, content:`, values);
+    console.log(`  - labels check: ${!!labels}, length check: ${labels?.length > 0}`);
+    console.log(`  - values check: ${!!values}, length check: ${values?.length > 0}`);
+    
     if (!labels || labels.length === 0 || !values || values.length === 0) {
-        console.log('Bar Chart - No data to display. Labels:', labels, 'Values:', values);
+        console.error(`[createBarChart] ${currentReportType} - NO DATA TO DISPLAY!`);
+        console.error(`  - labels is falsy: ${!labels}, length: ${labels?.length}`);
+        console.error(`  - values is falsy: ${!values}, length: ${values?.length}`);
+        console.error(`  - Full context:`, { labels, values, data, currentReportType, chartType, isHorizontal });
         return;
     }
     
+    console.log(`[createBarChart] ${currentReportType} - Data validated, proceeding to create chart`);
+    console.log(`  - About to create ${chartType} chart (horizontal: ${isHorizontal}) with ${labels.length} labels and ${values.length} values`);
+    console.log(`  - Sample labels (first 5):`, labels.slice(0, 5));
+    console.log(`  - Sample values (first 5):`, values.slice(0, 5));
+    
+    // Process values for Chart.js
+    const processedValues = values.map(v => {
+        // Values should already be numbers after parsing in rapport-a
+        if (typeof v === 'number') {
+            return v;
+        }
+        // Convert to string first to handle numbers/strings
+        const vStr = String(v ?? '');
+        if (vStr.includes('%')) {
+            return parseFloat(vStr.replace('%', '')) || 0;
+        }
+        return parseFloat(vStr) || 0;
+    });
+    console.log(`  - Processed values for Chart.js:`, processedValues.slice(0, 5));
+    
     // Create chart
-    barChart = new Chart(ctx, {
+    try {
+        barChart = new Chart(ctx, {
         type: chartType,
         data: {
             labels: labels,
             datasets: [{
                 label: chartTitle,
-                data: values.map(v => {
-                    if (typeof v === 'string' && v.includes('%')) {
-                        return parseFloat(v.replace('%', ''));
-                    }
-                    return parseFloat(v) || 0;
-                }),
+                data: processedValues,
                 backgroundColor: 'rgba(54, 162, 235, 0.8)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 2
@@ -3193,9 +3393,18 @@ function createBarChart(data) {
             }
         }
     });
+        console.log(`[createBarChart] ${currentReportType} - Chart created successfully`);
+    } catch (error) {
+        console.error(`[createBarChart] ${currentReportType} - ERROR creating chart:`, error);
+        console.error(`  - Error details:`, error.message, error.stack);
+        console.error(`  - Chart config:`, { labels, values: processedValues, chartType, isHorizontal });
+    }
 }
 
 function createReportTable(data) {
+    console.log('[createReportTable] Called with data:', data);
+    console.log('[createReportTable] Data length:', data?.length);
+    
     const tbody = document.getElementById('reportTableBody');
     const thead = document.getElementById('reportTableHead');
     
@@ -3204,10 +3413,13 @@ function createReportTable(data) {
         return;
     }
     
+    console.log('[createReportTable] Found tbody and thead elements');
+    
     tbody.innerHTML = '';
     if (thead) thead.innerHTML = '';
     
     if (!data || data.length === 0) {
+        console.warn('[createReportTable] No data provided');
         const row = document.createElement('tr');
         row.innerHTML = '<td colspan="100%" class="text-center text-muted">Aucune donnée disponible</td>';
         tbody.appendChild(row);
@@ -3216,26 +3428,32 @@ function createReportTable(data) {
     
     // Create header row if data exists
     if (data.length > 0 && thead) {
-    const headerRow = document.createElement('tr');
-        data[0].forEach(header => {
-        const th = document.createElement('th');
+        console.log('[createReportTable] Creating header with', data[0].length, 'columns');
+        const headerRow = document.createElement('tr');
+        data[0].forEach((header, index) => {
+            const th = document.createElement('th');
             th.textContent = header;
-        headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        console.log('[createReportTable] Header created with', headerRow.children.length, 'cells');
     }
     
     // Create data rows
+    console.log('[createReportTable] Creating', data.length - 1, 'data rows');
     data.slice(1).forEach((row, rowIndex) => {
         const tr = document.createElement('tr');
         
         row.forEach(cell => {
             const td = document.createElement('td');
             
+            // Convert cell to string to avoid type errors
+            const cellStr = String(cell ?? '');
+            
             // Style cells based on content
-            if (cell.includes('%')) {
-                const percentage = parseFloat(cell.replace('%', ''));
-                td.textContent = cell;
+            if (cellStr.includes('%')) {
+                const percentage = parseFloat(cellStr.replace('%', ''));
+                td.textContent = cellStr;
                 if (percentage >= 70) {
                     td.className = 'text-success fw-bold';
                 } else if (percentage >= 50) {
@@ -3243,13 +3461,13 @@ function createReportTable(data) {
                 } else {
                     td.className = 'text-danger fw-bold';
                 }
-            } else if (cell.includes('|')) {
+            } else if (cellStr.includes('|')) {
                 td.textContent = '';
                 td.style.borderRight = '2px solid #dee2e6';
-            } else if (cell.trim() === '') {
+            } else if (cellStr.trim() === '') {
                 td.textContent = '';
             } else {
-                td.textContent = cell;
+                td.textContent = cellStr;
             }
             
             tr.appendChild(td);
@@ -3319,6 +3537,20 @@ async function openReportModal(reportType) {
             const response = await fetch(`/api/report/${reportType}`);
             const data = await response.json();
             
+            console.log('API Response:', data);
+            console.log('Data array:', data.data);
+            console.log('Data length:', data.data?.length);
+            if (data.data && data.data.length > 0) {
+                console.log('First row (header):', data.data[0]);
+                console.log('Second row (values):', data.data[1]);
+                if (data.data[0]) {
+                    console.log('Header slice(2):', data.data[0].slice(2));
+                }
+                if (data.data[1]) {
+                    console.log('Values slice(2):', data.data[1].slice(2));
+                }
+            }
+            
             // Update report data
             reportData[reportType] = { ...data, loaded: true };
             report = reportData[reportType];
@@ -3345,6 +3577,12 @@ async function openReportModal(reportType) {
 }
 
 function renderReportCharts(reportType, report) {
+    console.log(`[renderReportCharts] Called for ${reportType}`);
+    console.log('  - report object:', report);
+    console.log('  - report.data:', report?.data);
+    console.log('  - report.data type:', typeof report?.data);
+    console.log('  - report.data length:', report?.data?.length);
+    
     // Set chart titles based on report type
     const chartTitles = {
         'rapport-a': { chart1: '', chart2: 'Performance par Type de Contrat' },
@@ -3364,6 +3602,9 @@ function renderReportCharts(reportType, report) {
     // Wait for modal to be fully shown before creating charts
     const modalElement = document.getElementById('reportModal');
     const onModalShown = function() {
+        console.log(`[renderReportCharts] Modal shown for ${reportType}`);
+        console.log('  - About to call chart functions with report.data:', report.data);
+        
         // Remove event listener to avoid multiple calls
         modalElement.removeEventListener('shown.bs.modal', onModalShown);
         
@@ -3387,8 +3628,10 @@ function renderReportCharts(reportType, report) {
                 chartContainer.style.height = '600px';
             }
             
+            console.log(`[renderReportCharts] ${reportType} - Calling createBarChart`);
             createBarChart(report.data);
         } else {
+            console.log(`[renderReportCharts] ${reportType} - Calling createPieChart and createBarChart`);
             // Reset to original size for other reports
             const barChartContainer = document.querySelector('#reportModal .modal-body .row > .col-12');
             if (barChartContainer && barChartContainer.classList.contains('col-12') && !barChartContainer.classList.contains('col-lg-6')) {
@@ -3409,6 +3652,7 @@ function renderReportCharts(reportType, report) {
         }
         
         // Create table
+        console.log(`[renderReportCharts] ${reportType} - Calling createReportTable`);
         createReportTable(report.data);
     };
     

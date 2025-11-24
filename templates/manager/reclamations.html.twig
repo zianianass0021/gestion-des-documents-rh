@@ -3,83 +3,181 @@
 {% block title %}Mes Réclamations{% endblock %}
 
 {% block body %}
-<div class="row">
+<style>
+    body {
+        overflow: hidden !important;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .app-wrapper {
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .main-content {
+        overflow: hidden !important;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .navbar-area {
+        flex-shrink: 0;
+    }
+    
+    .main-area {
+        padding: 0 !important;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .main-area > .container-fluid {
+        padding: 0.5rem 0.75rem !important;
+        height: 100%;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .row.g-0 {
+        margin: 0;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .row.g-0 > .col-12 {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        height: 100%;
+    }
+</style>
+
+<div class="row g-0">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h1 class="mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
+        <div class="card compact-page">
+            <div class="card-header compact-header py-1 px-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h4 class="mb-0" style="font-size: 0.95rem;">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
                     Mes Réclamations
-                </h1>
-                <a href="{{ path('manager_add_reclamation') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Nouvelle Réclamation
-                </a>
-            </div>
-            <div class="card-body">
-                {% if reclamations is empty %}
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
+                </h4>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <!-- Search and Filters -->
+                    <form method="GET" action="{{ path('manager_reclamations') }}" class="d-flex align-items-center gap-1 flex-wrap">
+                        <div class="search-input-wrapper">
+                            <div class="input-group input-group-sm" style="width: 180px;">
+                                <span class="input-group-text" style="padding: 0.15rem 0.3rem; font-size: 0.65rem;">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control form-control-sm" 
+                                       id="search" 
+                                       name="search" 
+                                       value="{{ search }}" 
+                                       placeholder="Employé ou date"
+                                       style="font-size: 0.7rem; padding: 0.15rem 0.3rem;">
+                            </div>
                         </div>
-                        <h3>Aucune réclamation</h3>
-                        <p class="text-muted">Vous n'avez pas encore créé de réclamation.</p>
-                        <a href="{{ path('manager_add_reclamation') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>
-                            Créer ma première réclamation
+                        <select class="form-select form-select-sm" id="type" name="type" style="width: 140px; font-size: 0.7rem; padding: 0.15rem 0.3rem;">
+                            <option value="all" {% if typeFilter == 'all' %}selected{% endif %}>Tous types</option>
+                            <option value="assiduite" {% if typeFilter == 'assiduite' %}selected{% endif %}>Assiduité</option>
+                            <option value="accident_travail" {% if typeFilter == 'accident_travail' %}selected{% endif %}>Accident</option>
+                            <option value="performance" {% if typeFilter == 'performance' %}selected{% endif %}>Performance</option>
+                            <option value="conduite" {% if typeFilter == 'conduite' %}selected{% endif %}>Conduite</option>
+                        </select>
+                        <select class="form-select form-select-sm" id="statut" name="statut" style="width: 120px; font-size: 0.7rem; padding: 0.15rem 0.3rem;">
+                            <option value="all" {% if statutFilter == 'all' %}selected{% endif %}>Tous statuts</option>
+                            <option value="en_attente" {% if statutFilter == 'en_attente' %}selected{% endif %}>En Attente</option>
+                            <option value="en_cours" {% if statutFilter == 'en_cours' %}selected{% endif %}>En Cours</option>
+                            <option value="traitee" {% if statutFilter == 'traitee' %}selected{% endif %}>Traitée</option>
+                            <option value="rejetee" {% if statutFilter == 'rejetee' %}selected{% endif %}>Rejetée</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm" style="font-size: 0.7rem; padding: 0.15rem 0.4rem;">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                        {% if search or typeFilter != 'all' or statutFilter != 'all' %}
+                        <a href="{{ path('manager_reclamations') }}" class="btn btn-outline-secondary btn-sm" style="font-size: 0.7rem; padding: 0.15rem 0.4rem;" title="Réinitialiser">
+                            <i class="fas fa-times"></i>
                         </a>
+                        {% endif %}
+                    </form>
+                    <a href="{{ path('manager_add_reclamation') }}" class="btn btn-primary btn-xs" style="font-size: 0.7rem; padding: 0.15rem 0.4rem; white-space: nowrap;">
+                        <i class="fas fa-plus"></i> Nouvelle
+                    </a>
+                </div>
+            </div>
+            <div class="card-body compact-body p-2">
+                
+                {% if reclamations.items is empty %}
+                    <div class="alert alert-info alert-xs py-2 px-3 text-center mb-0">
+                        <small><i class="fas fa-info-circle me-1"></i>Aucune réclamation trouvée. <a href="{{ path('manager_add_reclamation') }}" class="alert-link">Créer une nouvelle réclamation</a></small>
                     </div>
                 {% else %}
                     <!-- Desktop Table View -->
-                    <div class="table-responsive desktop-view">
-                        <table class="table table-striped">
-                            <thead>
+                    <div class="compact-table desktop-view">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0 compact-table-inner">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Employé</th>
-                                    <th>Type</th>
-                                    <th>Date</th>
-                                    <th>Statut</th>
-                                    <th>Document</th>
-                                    <th>Actions</th>
+                                    <th style="padding: 0.3rem 0.25rem !important;">Employé</th>
+                                    <th style="padding: 0.3rem 0.25rem !important;">Type</th>
+                                    <th style="padding: 0.3rem 0.25rem !important;">Date</th>
+                                    <th style="padding: 0.3rem 0.25rem !important;">Statut</th>
+                                    <th style="padding: 0.3rem 0.25rem !important;">Document</th>
+                                    <th style="padding: 0.3rem 0.25rem !important;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for reclamation in reclamations %}
+                                {% for reclamation in reclamations.items %}
                                 <tr>
-                                    <td>
+                                    <td style="padding: 0.3rem 0.25rem !important;">
                                         <div class="d-flex align-items-center">
-                                            <div class="user-avatar me-2">
-                                                <span class="avatar-text">{{ reclamation.employe.prenom|first|upper }}{{ reclamation.employe.nom|first|upper }}</span>
+                                            <div class="user-avatar me-2" style="width: 30px; height: 30px;">
+                                                <span class="avatar-text" style="font-size: 0.7rem;">{{ reclamation.employe.prenom|first|upper }}{{ reclamation.employe.nom|first|upper }}</span>
                                             </div>
                                             <div>
-                                                <strong>{{ reclamation.employe.prenom }} {{ reclamation.employe.nom }}</strong><br>
-                                                <small class="text-muted">{{ reclamation.employe.email }}</small>
+                                                <strong style="font-size: 0.8rem; line-height: 1.25;">{{ reclamation.employe.prenom }} {{ reclamation.employe.nom }}</strong><br>
+                                                <small class="text-muted" style="font-size: 0.65rem; line-height: 1.15;">{{ reclamation.employe.email }}</small>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span class="type-badge type-{{ reclamation.typeReclamation }}">
+                                    <td style="padding: 0.3rem 0.25rem !important;">
+                                        <span class="type-badge type-{{ reclamation.typeReclamation }}" style="font-size: 0.65rem; padding: 0.15rem 0.3rem;">
                                             {{ reclamation.typeReclamationLabel }}
                                         </span>
                                     </td>
-                                    <td>{{ reclamation.dateCreation|date('d/m/Y H:i') }}</td>
-                                    <td>
-                                        <span class="status-badge status-{{ reclamation.statutBadgeClass }}">
-                                            <i class="fas fa-circle me-1"></i>
+                                    <td style="padding: 0.3rem 0.25rem !important; font-size: 0.8rem;">{{ reclamation.dateCreation|date('d/m/Y H:i') }}</td>
+                                    <td style="padding: 0.3rem 0.25rem !important;">
+                                        <span class="status-badge status-{{ reclamation.statutBadgeClass }}" style="font-size: 0.65rem; padding: 0.15rem 0.3rem;">
+                                            <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
                                             {{ reclamation.statutLabel }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td style="padding: 0.3rem 0.25rem !important;">
                                         {% if reclamation.documentPath %}
-                                            <a href="/uploads/reclamations/{{ reclamation.documentPath|split('/')|last }}" target="_blank" class="btn btn-sm btn-outline-info">
-                                                <i class="fas fa-file"></i> Voir
+                                            <a href="/uploads/reclamations/{{ reclamation.documentPath|split('/')|last }}" target="_blank" class="btn btn-xs btn-outline-info py-0 px-1">
+                                                <i class="fas fa-file" style="font-size: 0.65rem;"></i>
                                             </a>
                                         {% else %}
-                                            <span class="text-muted">Aucun</span>
+                                            <span class="text-muted" style="font-size: 0.7rem;">Aucun</span>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <a href="{{ path('manager_view_reclamation', {'id': reclamation.id}) }}" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-eye"></i> Voir
+                                    <td style="padding: 0.3rem 0.25rem !important;">
+                                        <a href="{{ path('manager_view_reclamation', {'id': reclamation.id}) }}" class="btn btn-xs btn-primary py-0 px-1">
+                                            <i class="fas fa-eye" style="font-size: 0.65rem;"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -87,41 +185,42 @@
                             </tbody>
                         </table>
                     </div>
+                    </div>
                     
                     <!-- Mobile Card View -->
                     <div class="mobile-view">
-                        {% for reclamation in reclamations %}
-                        <div class="reclamation-card mb-3">
+                        {% for reclamation in reclamations.items %}
+                        <div class="reclamation-card mb-2">
                             <div class="reclamation-card-header">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-user me-2"></i>
+                                        <h6 class="mb-1" style="font-size: 0.9rem;">
+                                            <i class="fas fa-user me-1"></i>
                                             {{ reclamation.employe.prenom }} {{ reclamation.employe.nom }}
                                         </h6>
-                                        <small class="text-muted">{{ reclamation.employe.email }}</small>
+                                        <small class="text-muted" style="font-size: 0.75rem;">{{ reclamation.employe.email }}</small>
                                     </div>
-                                    <span class="status-badge status-{{ reclamation.statutBadgeClass }}">
+                                    <span class="status-badge status-{{ reclamation.statutBadgeClass }}" style="font-size: 0.7rem;">
                                         {{ reclamation.statutLabel }}
                                     </span>
                                 </div>
                             </div>
                             <div class="reclamation-card-body">
                                 <div class="info-row">
-                                    <i class="fas fa-tag text-primary"></i>
-                                    <span class="type-badge type-{{ reclamation.typeReclamation }}">
+                                    <i class="fas fa-tag text-primary" style="font-size: 0.8rem;"></i>
+                                    <span class="type-badge type-{{ reclamation.typeReclamation }}" style="font-size: 0.7rem;">
                                         {{ reclamation.typeReclamationLabel }}
                                     </span>
                                 </div>
                                 <div class="info-row">
-                                    <i class="fas fa-calendar text-info"></i>
-                                    <span>{{ reclamation.dateCreation|date('d/m/Y H:i') }}</span>
+                                    <i class="fas fa-calendar text-info" style="font-size: 0.8rem;"></i>
+                                    <span style="font-size: 0.85rem;">{{ reclamation.dateCreation|date('d/m/Y H:i') }}</span>
                                 </div>
                                 <div class="info-row">
-                                    <i class="fas fa-file text-warning"></i>
-                                    <span>
+                                    <i class="fas fa-file text-warning" style="font-size: 0.8rem;"></i>
+                                    <span style="font-size: 0.85rem;">
                                         {% if reclamation.documentPath %}
-                                            <a href="/uploads/reclamations/{{ reclamation.documentPath|split('/')|last }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                            <a href="/uploads/reclamations/{{ reclamation.documentPath|split('/')|last }}" target="_blank" class="btn btn-xs btn-outline-info py-0">
                                                 <i class="fas fa-file"></i> Document
                                             </a>
                                         {% else %}
@@ -131,13 +230,13 @@
                                 </div>
                                 {% if reclamation.commentaire %}
                                 <div class="info-row">
-                                    <i class="fas fa-comment text-secondary"></i>
-                                    <span class="comment-preview">{{ reclamation.commentaire|length > 50 ? reclamation.commentaire|slice(0, 50) ~ '...' : reclamation.commentaire }}</span>
+                                    <i class="fas fa-comment text-secondary" style="font-size: 0.8rem;"></i>
+                                    <span class="comment-preview" style="font-size: 0.85rem;">{{ reclamation.commentaire|length > 50 ? reclamation.commentaire|slice(0, 50) ~ '...' : reclamation.commentaire }}</span>
                                 </div>
                                 {% endif %}
                             </div>
                             <div class="reclamation-card-actions">
-                                <a href="{{ path('manager_view_reclamation', {'id': reclamation.id}) }}" class="btn btn-sm btn-primary flex-fill">
+                                <a href="{{ path('manager_view_reclamation', {'id': reclamation.id}) }}" class="btn btn-xs btn-primary flex-fill py-0">
                                     <i class="fas fa-eye"></i> Voir Détails
                                 </a>
                             </div>
@@ -146,42 +245,206 @@
                     </div>
                 {% endif %}
             </div>
+            
+            {% if reclamations.pageCount > 1 %}
+                <div class="card-footer compact-footer py-1 px-2">
+                    <div class="d-flex justify-content-center">
+                        {{ knp_pagination_render(reclamations, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <style>
+    .compact-header {
+        flex-shrink: 0;
+        padding: 0.25rem 0.5rem !important;
+        background-color: #F8FAFC;
+        border-bottom: 1px solid #BCCCDC;
+    }
+    
+    .compact-header h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .compact-header form {
+        margin: 0;
+    }
+    
+    .search-input-wrapper {
+        display: inline-block;
+    }
+    
+    .compact-body {
+        padding: 0.3rem 0.3rem 0 !important;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+    
+    .compact-header .form-control,
+    .compact-header .form-select {
+        border-color: #BCCCDC;
+        font-size: 0.7rem;
+    }
+    
+    .compact-header .form-control:focus,
+    .compact-header .form-select:focus {
+        border-color: #9AA6B2;
+        box-shadow: 0 0 0 0.15rem rgba(154, 166, 178, 0.2);
+    }
+    
+    .compact-header .input-group-text {
+        background-color: #F8FAFC;
+        border-color: #BCCCDC;
+        color: #5a6672;
+    }
+    
+    .compact-header .btn {
+        line-height: 1.2;
+    }
+    
+    .compact-table {
+        margin: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: visible;
+        margin-bottom: 0;
+    }
+    
+    .compact-table .table-responsive {
+        flex: 1;
+        min-height: 0;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0;
+    }
+    
+    .compact-table .table-responsive table {
+        width: 100%;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .compact-table-inner {
+        margin-bottom: 0;
+        font-size: 0.875rem;
+    }
+    
+    .compact-table-inner tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .compact-table-inner tbody tr:last-child td {
+        padding-bottom: 0.3rem !important;
+    }
+    
+    .compact-table-inner th,
+    .compact-table-inner td {
+        font-size: 0.8rem;
+        vertical-align: middle;
+        padding: 0.3rem 0.25rem !important;
+        line-height: 1.3;
+    }
+    
+    .compact-table-inner tbody tr {
+        height: auto;
+    }
+    
+    .compact-table-inner thead th {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        background-color: #F8FAFC;
+        padding: 0.3rem 0.25rem !important;
+    }
+    
+    .btn-xs {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
+    }
+    
+    .alert-xs {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .compact-footer {
+        padding: 0.25rem 0.5rem !important;
+        background-color: #F8FAFC;
+        border-top: 1px solid #BCCCDC;
+        flex-shrink: 0;
+        margin-top: 0;
+    }
+    
+    .compact-footer .pagination {
+        margin-bottom: 0;
+    }
+    
+    .compact-footer .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .compact-page {
+        margin-bottom: 0;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .card {
+        margin-bottom: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
     .mobile-view { display: none; }
     
     .reclamation-card {
         background: white;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #BCCCDC;
         border-radius: 0.5rem;
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .reclamation-card-header {
-        padding: 1rem;
-        background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
-        border-bottom: 1px solid #e2e8f0;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, #D9EAFD 0%, #BCCCDC 100%);
+        border-bottom: 1px solid #BCCCDC;
     }
     
     .reclamation-card-header h6 {
-        color: #1e293b;
+        color: #000000;
         font-weight: 600;
     }
     
     .reclamation-card-body {
-        padding: 1rem;
+        padding: 0.75rem;
     }
     
     .info-row {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f1f5f9;
+        gap: 0.5rem;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #D9EAFD;
     }
     
     .info-row:last-child {
@@ -189,20 +452,19 @@
     }
     
     .info-row i {
-        width: 20px;
+        width: 18px;
         text-align: center;
     }
     
     .info-row span {
         flex: 1;
-        font-size: 0.9rem;
-        color: #475569;
+        color: #000000;
     }
     
     .reclamation-card-actions {
-        padding: 0.75rem 1rem;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
+        padding: 0.5rem 0.75rem;
+        background: #F8FAFC;
+        border-top: 1px solid #BCCCDC;
         display: flex;
         gap: 0.5rem;
     }
@@ -211,7 +473,7 @@
         width: 35px;
         height: 35px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -221,13 +483,13 @@
     .avatar-text {
         color: white;
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
     
     .type-badge {
-        padding: 0.3rem 0.6rem;
-        border-radius: 15px;
-        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
         font-weight: 500;
         display: inline-block;
     }
@@ -243,9 +505,9 @@
     }
     
     .status-badge {
-        padding: 0.3rem 0.6rem;
-        border-radius: 15px;
-        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
         font-weight: 500;
         display: inline-flex;
         align-items: center;
@@ -308,16 +570,16 @@
         .desktop-view { display: none !important; }
         .mobile-view { display: block !important; }
         
-        .card-header {
+        .compact-header {
             flex-direction: column !important;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
         
-        .card-header h1 {
-            font-size: 1.25rem !important;
+        .compact-header h4 {
+            font-size: 0.95rem !important;
         }
         
-        .card-header .btn {
+        .compact-header .btn {
             width: 100%;
         }
     }

@@ -141,4 +141,22 @@ class DossierRepository extends ServiceEntityRepository
             ->setParameter('search', '%' . $search . '%')
             ->orderBy('d.createdAt', 'DESC');
     }
+
+    /**
+     * Crée une QueryBuilder pour les dossiers d'un placard spécifique
+     * Avec eager loading des relations pour éviter N+1 queries
+     */
+    public function findByPlacardQuery($placard)
+    {
+        return $this->createQueryBuilder('d')
+            ->leftJoin('d.employe', 'e')
+            ->addSelect('e')
+            ->leftJoin('d.placard', 'p')
+            ->addSelect('p')
+            ->leftJoin('d.documents', 'doc')
+            ->addSelect('doc')
+            ->where('d.placard = :placard')
+            ->setParameter('placard', $placard)
+            ->orderBy('d.createdAt', 'DESC');
+    }
 }

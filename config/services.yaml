@@ -1,6 +1,14 @@
 parameters:
     documents_directory: '%kernel.project_dir%/public/uploads/documents'
     reclamations_directory: '%kernel.project_dir%/public/uploads/reclamations/'
+    
+    # ClickHouse OLAP Configuration
+    clickhouse.host: '%env(CLICKHOUSE_HOST)%'
+    clickhouse.port: '%env(int:CLICKHOUSE_PORT)%'
+    clickhouse.database: '%env(CLICKHOUSE_DATABASE)%'
+    clickhouse.username: '%env(CLICKHOUSE_USERNAME)%'
+    clickhouse.password: '%env(CLICKHOUSE_PASSWORD)%'
+    clickhouse.http_url: '%env(CLICKHOUSE_HTTP_URL)%'
 
 services:
     _defaults:
@@ -13,3 +21,13 @@ services:
 
     App\Command\CreateUserCommand:
         tags: ['console.command']
+    
+    # ClickHouse Client Service
+    App\Service\ClickHouseClient:
+        arguments:
+            $host: '%clickhouse.host%'
+            $port: '%clickhouse.port%'
+            $database: '%clickhouse.database%'
+            $username: '%clickhouse.username%'
+            $password: '%clickhouse.password%'
+            $httpUrl: '%clickhouse.http_url%'

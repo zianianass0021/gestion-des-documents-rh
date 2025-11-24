@@ -4,16 +4,21 @@ namespace App\Entity;
 
 use App\Repository\EmployeRepository;
 use App\Repository\NatureContratTypeDocumentRepository;
+use App\Entity\Traits\TimestampableTrait;
+use App\Entity\Traits\BlameableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\UserModule;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
-#[ORM\Table(name: 't_employe')]
+#[ORM\Table(name: 't_user')]
 class Employe implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    use TimestampableTrait;
+    use BlameableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -43,6 +48,8 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private bool $isActive = true;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $dossiersGeres = null;
 
     #[ORM\OneToMany(targetEntity: EmployeeContrat::class, mappedBy: 'employe', cascade: ['persist', 'remove'])]
     private Collection $employeeContrats;
@@ -53,10 +60,18 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Demande::class, mappedBy: 'employe', cascade: ['persist', 'remove'])]
     private Collection $demandes;
 
+    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private Collection $userModules;
+
+    #[ORM\OneToMany(targetEntity: ResponsableRhOrganisationPermission::class, mappedBy: 'responsable', cascade: ['persist', 'remove'])]
+    private Collection $organisationPermissions;
+
     public function __construct()
     {
         $this->employeeContrats = new ArrayCollection();
         $this->demandes = new ArrayCollection();
+        $this->userModules = new ArrayCollection();
+        $this->organisationPermissions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -189,6 +204,69 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Get managed dossier types (array of dossier codes)
+     * @return array|null
+     */
+    public function getDossiersGeres(): ?array
+    {
+        return $this->dossiersGeres;
+    }
+
+    /**
+     * Set managed dossier types (array of dossier codes)
+     * @param array|null $dossiersGeres
+     * @return $this
+     */
+    public function setDossiersGeres(?array $dossiersGeres): static
+    {
+        $this->dossiersGeres = $dossiersGeres;
+
+        return $this;
+    }
+
+    /**
+     * Check if manager manages a specific dossier type
+     * @param string $dossierCode
+     * @return bool
+     */
+    public function managesDossierType(string $dossierCode): bool
+    {
+        if (!$this->dossiersGeres || empty($this->dossiersGeres)) {
+            return false;
+        }
+        return in_array($dossierCode, $this->dossiersGeres, true);
+    }
+
+    /**
+     * Legacy method for backward compatibility
+     * @deprecated Use getDossiersGeres() instead
+     * @return string|null
+     */
+    public function getDossierGere(): ?string
+    {
+        if (!$this->dossiersGeres || empty($this->dossiersGeres)) {
+            return null;
+        }
+        // Return first dossier type for backward compatibility
+        return $this->dossiersGeres[0] ?? null;
+    }
+
+    /**
+     * Legacy method for backward compatibility
+     * @deprecated Use setDossiersGeres() instead
+     * @param string|null $dossierGere
+     * @return $this
+     */
+    public function setDossierGere(?string $dossierGere): static
+    {
+        if ($dossierGere === null) {
+            $this->dossiersGeres = null;
+        } else {
+            $this->dossiersGeres = [$dossierGere];
+        }
+        return $this;
+    }
 
     /**
      * @return Collection<int, EmployeeContrat>
@@ -307,5 +385,126 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->employeeContrats->filter(function($contrat) {
             return $contrat->isActive();
         });
+    }
+
+    /**
+     * @return Collection<int, UserModule>
+     */
+    public function getUserModules(): Collection
+    {
+        return $this->userModules;
+    }
+
+    public function addUserModule(UserModule $userModule): static
+    {
+        if (!$this->userModules->contains($userModule)) {
+            $this->userModules->add($userModule);
+            $userModule->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserModule(UserModule $userModule): static
+    {
+        if ($this->userModules->removeElement($userModule)) {
+            // set the owning side to null (unless already changed)
+            if ($userModule->getUser() === $this) {
+                $userModule->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ResponsableRhOrganisationPermission>
+     */
+    public function getOrganisationPermissions(): Collection
+    {
+        return $this->organisationPermissions;
+    }
+
+    public function addOrganisationPermission(ResponsableRhOrganisationPermission $organisationPermission): static
+    {
+        if (!$this->organisationPermissions->contains($organisationPermission)) {
+            $this->organisationPermissions->add($organisationPermission);
+            $organisationPermission->setResponsable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganisationPermission(ResponsableRhOrganisationPermission $organisationPermission): static
+    {
+        if ($this->organisationPermissions->removeElement($organisationPermission)) {
+            // set the owning side to null (unless already changed)
+            if ($organisationPermission->getResponsable() === $this) {
+                $organisationPermission->setResponsable(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get all modules assigned to this user
+     * @return Collection<int, Module>
+     */
+    public function getModules(): Collection
+    {
+        $modules = new ArrayCollection();
+        foreach ($this->userModules as $userModule) {
+            if ($userModule->getModule() && $userModule->getModule()->isActive()) {
+                $modules->add($userModule->getModule());
+            }
+        }
+        return $modules;
+    }
+
+    /**
+     * Check if user has access to a specific module by code
+     */
+    public function hasModule(string $moduleCode): bool
+    {
+        foreach ($this->userModules as $userModule) {
+            $module = $userModule->getModule();
+            if ($module && $module->getCode() === $moduleCode && $module->isActive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if user has access to a route by checking module route prefixes
+     */
+    public function hasAccessToRoute(string $routeName): bool
+    {
+        // Administrateur RH has access to everything
+        if (in_array('ROLE_ADMINISTRATEUR_RH', $this->roles)) {
+            return true;
+        }
+
+        // For Responsable RH, check module permissions
+        if (in_array('ROLE_RESPONSABLE_RH', $this->roles)) {
+            foreach ($this->userModules as $userModule) {
+                $module = $userModule->getModule();
+                if ($module && $module->isActive() && $module->getRoutePrefix()) {
+                    if (str_starts_with($routeName, $module->getRoutePrefix())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Managers and employees have access to employee routes (they are also employees)
+        if (in_array('ROLE_MANAGER', $this->roles) || in_array('ROLE_EMPLOYEE', $this->roles)) {
+            return true;
+        }
+
+        // Other roles - default behavior
+        return true;
     }
 }

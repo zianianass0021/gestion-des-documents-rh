@@ -117,4 +117,48 @@ class DemandeRepository extends ServiceEntityRepository
             ->setParameter('responsable', $responsable)
             ->orderBy('d.dateCreation', 'DESC');
     }
+
+    /**
+     * Crée une QueryBuilder pour toutes les demandes
+     * Optimisé avec eager loading des relations pour éviter N+1 queries
+     */
+    public function findAllQuery()
+    {
+        return $this->createQueryBuilder('d')
+            ->leftJoin('d.employe', 'e')
+            ->addSelect('e')
+            ->leftJoin('d.responsableRh', 'r')
+            ->addSelect('r')
+            ->orderBy('d.dateCreation', 'DESC');
+    }
+
+    /**
+     * Crée une QueryBuilder pour les demandes par statut
+     * Pour 'traitees', retourne toutes les demandes non en attente
+     * Optimisé avec eager loading des relations pour éviter N+1 queries
+     */
+    public function findByStatutQuery(string $filter)
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->leftJoin('d.employe', 'e')
+            ->addSelect('e')
+            ->leftJoin('d.responsableRh', 'r')
+            ->addSelect('r');
+        
+        if ($filter === 'en_attente') {
+            $qb->where('d.statut = :statut')
+               ->setParameter('statut', 'en_attente')
+               ->orderBy('d.dateCreation', 'DESC');
+        } elseif ($filter === 'traitees') {
+            $qb->where('d.statut != :statut')
+               ->setParameter('statut', 'en_attente')
+               ->orderBy('d.dateReponse', 'DESC')
+               ->addOrderBy('d.dateCreation', 'DESC');
+        } else {
+            // Toutes les demandes
+            $qb->orderBy('d.dateCreation', 'DESC');
+        }
+        
+        return $qb;
+    }
 }

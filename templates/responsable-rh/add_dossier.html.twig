@@ -17,8 +17,51 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            {{ form_label(form.employe, 'Employé', {'class': 'form-label'}) }}
-                            {{ form_widget(form.employe, {'class': 'form-select'}) }}
+                            <label class="form-label">Employé <span class="text-danger">*</span></label>
+                            
+                            <!-- Champ de recherche simple -->
+                            <div class="position-relative" id="employee-search-container">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" 
+                                           id="employee-search-input" 
+                                           class="form-control" 
+                                           placeholder="Tapez le nom ou prénom de l'employé (sans dossier)..."
+                                           autocomplete="off">
+                                    <button type="button" class="btn btn-outline-secondary" id="clear-search-btn" style="display:none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Zone de résultats -->
+                                <div id="employee-results" class="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-sm" style="display:none; max-height: 300px; overflow-y: auto; z-index: 1000; margin-top: -1px;"></div>
+                                
+                                <!-- Champ caché pour l'ID de l'employé -->
+                                <div class="d-none">
+                                    {{ form_widget(form.employe) }}
+                                </div>
+                            </div>
+                            
+                            <!-- Message d'état -->
+                            <small id="search-status-msg" class="form-text text-muted d-block mt-1">
+                                <i class="fas fa-info-circle"></i> Commencez à taper pour rechercher un employé sans dossier...
+                            </small>
+                            
+                            <!-- Employé sélectionné -->
+                            <div id="selected-employee-display" class="mt-2" style="display:none;">
+                                <div class="alert alert-success py-2 px-3 d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <strong id="selected-employee-name"></strong>
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="remove-selection-btn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
                             {{ form_errors(form.employe) }}
                         </div>
                     </div>
@@ -78,7 +121,238 @@
     </div>
 </div>
 
+<style>
+    /* Style pour les résultats de recherche */
+    #employee-results {
+        border: 1px solid #ced4da;
+        border-top: none;
+    }
+    
+    #employee-results .list-group-item {
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    #employee-results .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
 <script>
+// Recherche d'employé sans dossier
+(function() {
+    'use strict';
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    
+    function init() {
+        const searchInput = document.getElementById('employee-search-input');
+        const searchResults = document.getElementById('employee-results');
+        const searchStatus = document.getElementById('search-status-msg');
+        const clearBtn = document.getElementById('clear-search-btn');
+        const employeeIdInput = document.querySelector('select[name="dossier[employe]"]');
+        const selectedDisplay = document.getElementById('selected-employee-display');
+        const selectedName = document.getElementById('selected-employee-name');
+        const removeBtn = document.getElementById('remove-selection-btn');
+        
+        if (!searchInput || !searchResults || !employeeIdInput) {
+            return;
+        }
+        
+        let searchTimeout = null;
+        let employees = [];
+        let selectedIdx = -1;
+        
+        // Recherche AJAX
+        function doSearch(term) {
+            term = term.trim();
+            
+            if (!term) {
+                searchResults.style.display = 'none';
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher un employé sans dossier...';
+                }
+                return;
+            }
+            
+            if (searchStatus) {
+                searchStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche...';
+            }
+            
+            const url = '{{ path("responsable_api_search_employees_without_dossier") }}?search=' + encodeURIComponent(term);
+            
+            fetch(url)
+                .then(function(res) {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(function(data) {
+                    employees = data.employees || [];
+                    showResults(employees, term);
+                })
+                .catch(function(err) {
+                    console.error('Erreur recherche:', err);
+                    if (searchStatus) {
+                        searchStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Erreur de recherche';
+                    }
+                    searchResults.style.display = 'none';
+                });
+        }
+        
+        // Afficher les résultats
+        function showResults(emps, term) {
+            searchResults.innerHTML = '';
+            selectedIdx = -1;
+            
+            if (emps.length === 0) {
+                if (searchStatus) {
+                    searchStatus.innerHTML = '<i class="fas fa-info-circle"></i> Aucun employé sans dossier trouvé pour "' + term + '"';
+                }
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            if (searchStatus) {
+                searchStatus.innerHTML = '<i class="fas fa-check-circle text-success"></i> ' + emps.length + ' résultat(s)';
+            }
+            
+            emps.forEach(function(emp, idx) {
+                const div = document.createElement('div');
+                div.className = 'list-group-item list-group-item-action';
+                div.style.cssText = 'padding: 0.75rem; cursor: pointer; border-bottom: 1px solid #dee2e6;';
+                div.innerHTML = '<strong>' + emp.prenom + ' ' + emp.nom + '</strong><br><small class="text-muted">' + emp.email + '</small>';
+                
+                div.onclick = function() {
+                    selectEmp(emp);
+                };
+                
+                div.onmouseenter = function() {
+                    this.style.backgroundColor = '#f8f9fa';
+                };
+                
+                div.onmouseleave = function() {
+                    this.style.backgroundColor = '';
+                };
+                
+                searchResults.appendChild(div);
+            });
+            
+            searchResults.style.display = 'block';
+        }
+        
+        // Sélectionner un employé
+        function selectEmp(emp) {
+            if (employeeIdInput) {
+                employeeIdInput.value = emp.id;
+            }
+            
+            if (selectedName) {
+                selectedName.textContent = emp.prenom + ' ' + emp.nom + ' (' + emp.email + ')';
+            }
+            
+            if (selectedDisplay) {
+                selectedDisplay.style.display = 'block';
+            }
+            
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            if (clearBtn) clearBtn.style.display = 'none';
+            employees = [];
+            
+            if (searchStatus) {
+                searchStatus.innerHTML = '<i class="fas fa-check-circle text-success"></i> Employé sélectionné';
+            }
+        }
+        
+        // Event listeners
+        searchInput.addEventListener('input', function() {
+            const val = this.value.trim();
+            
+            if (clearBtn) {
+                clearBtn.style.display = val ? 'block' : 'none';
+            }
+            
+            clearTimeout(searchTimeout);
+            
+            if (val.length >= 1) {
+                searchTimeout = setTimeout(function() {
+                    doSearch(val);
+                }, 250);
+            } else {
+                searchResults.style.display = 'none';
+                employees = [];
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher un employé sans dossier...';
+                }
+            }
+        });
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                searchResults.style.display = 'none';
+                this.style.display = 'none';
+                employees = [];
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher un employé sans dossier...';
+                }
+                searchInput.focus();
+            });
+        }
+        
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                if (employeeIdInput) employeeIdInput.value = '';
+                if (selectedDisplay) selectedDisplay.style.display = 'none';
+                searchInput.value = '';
+                searchResults.style.display = 'none';
+                employees = [];
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher un employé sans dossier...';
+                }
+                searchInput.focus();
+            });
+        }
+        
+        // Fermer les résultats en cliquant dehors
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('employee-search-container');
+            if (container && !container.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+        
+        // Navigation clavier
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown' && employees.length > 0) {
+                e.preventDefault();
+                selectedIdx = Math.min(selectedIdx + 1, employees.length - 1);
+                updateHighlight();
+            } else if (e.key === 'ArrowUp' && employees.length > 0) {
+                e.preventDefault();
+                selectedIdx = Math.max(selectedIdx - 1, -1);
+                updateHighlight();
+            } else if (e.key === 'Enter' && selectedIdx >= 0 && selectedIdx < employees.length) {
+                e.preventDefault();
+                selectEmp(employees[selectedIdx]);
+            } else if (e.key === 'Escape') {
+                searchResults.style.display = 'none';
+            }
+        });
+        
+        function updateHighlight() {
+            const items = searchResults.children;
+            for (let i = 0; i < items.length; i++) {
+                items[i].style.backgroundColor = i === selectedIdx ? '#e9ecef' : '';
+            }
+        }
+    }
+})();
+
+// Gestion du placard (code existant)
 document.addEventListener('DOMContentLoaded', function() {
     const placardSelect = document.getElementById('placard-select');
     const emplacementContainer = document.getElementById('emplacement-container');
@@ -96,11 +370,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initial check
-    toggleEmplacementField();
-
-    // Listen for changes
-    placardSelect.addEventListener('change', toggleEmplacementField);
+    if (placardSelect && emplacementContainer && emplacementInput) {
+        toggleEmplacementField();
+        placardSelect.addEventListener('change', toggleEmplacementField);
+    }
 });
 </script>
 {% endblock %}

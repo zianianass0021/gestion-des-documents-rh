@@ -34,7 +34,7 @@ class CreateMissingDossiersSQLCommand extends Command
         // Compter les employés sans dossier
         $countSql = "
             SELECT COUNT(*) 
-            FROM t_employe e 
+            FROM t_user e 
             LEFT JOIN t_dossier d ON e.id = d.employe_id 
             WHERE d.id IS NULL 
             AND e.roles::text LIKE '%ROLE_EMPLOYEE%'
@@ -76,7 +76,7 @@ class CreateMissingDossiersSQLCommand extends Command
                 NOW() as created_at,
                 p_placards.id as placard_id,
                 NULL as emplacement
-            FROM t_employe e
+            FROM t_user e
             CROSS JOIN LATERAL (
                 SELECT id FROM p_placards 
                 ORDER BY random() 

@@ -5,13 +5,13 @@
 {% block body %}
 <div class="container-fluid dashboard-admin">
     <!-- Header Section -->
-    <div class="row mb-4">
+    <div class="row mb-2">
         <div class="col-12">
             <div class="dashboard-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h1 class="dashboard-title">
-                            <i class="fas fa-tachometer-alt me-3"></i>
+                            <i class="fas fa-tachometer-alt me-2"></i>
                             Dashboard Administrateur RH
                         </h1>
                         <p class="dashboard-subtitle text-muted mb-0">
@@ -19,8 +19,8 @@
                         </p>
                     </div>
                     <div class="dashboard-stats-badge">
-                        <span class="badge bg-primary fs-6 px-3 py-2">
-                            <i class="fas fa-users me-2"></i>
+                        <span class="badge bg-primary px-2 py-1" style="font-size: 0.875rem;">
+                            <i class="fas fa-users me-1"></i>
                             {{ totalResponsables }} Responsable{{ totalResponsables > 1 ? 's' : '' }} RH
                         </span>
                     </div>
@@ -30,22 +30,22 @@
     </div>
 
     <!-- KPIs Section -->
-    <div class="row mb-5">
+    <div class="row mb-2">
         <div class="col-12">
-            <h2 class="section-title mb-4">
-                <i class="fas fa-chart-bar me-2"></i>
+            <h2 class="section-title mb-2" style="font-size: 1.25rem;">
+                <i class="fas fa-chart-bar me-1"></i>
                 Indicateurs Clés
             </h2>
         </div>
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-4 col-md-6 mb-2">
             <div class="card kpi-card h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="kpi-icon-wrapper bg-primary">
-                        <i class="fas fa-user-tie"></i>
+                <div class="card-body d-flex align-items-center py-2 px-2">
+                    <div class="kpi-icon-wrapper bg-primary" style="width: 50px; height: 50px;">
+                        <i class="fas fa-user-tie" style="font-size: 1.2rem;"></i>
                     </div>
                     <div class="kpi-content">
-                        <h3 class="kpi-number">{{ totalResponsables }}</h3>
-                        <p class="kpi-label">Total Responsables RH</p>
+                        <h3 class="kpi-number" style="font-size: 1.75rem;">{{ totalResponsables }}</h3>
+                        <p class="kpi-label" style="font-size: 0.85rem; margin: 0.15rem 0;">Total Responsables RH</p>
                         <small class="kpi-trend {% if responsablesActifs == totalResponsables %}text-success{% else %}text-warning{% endif %}">
                             <i class="fas fa-{% if responsablesActifs == totalResponsables %}check-circle{% else %}exclamation-triangle{% endif %} me-1"></i>
                             {% if responsablesActifs == totalResponsables %}
@@ -59,15 +59,15 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-4 col-md-6 mb-2">
             <div class="card kpi-card h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="kpi-icon-wrapper bg-info">
-                        <i class="fas fa-user-plus"></i>
+                <div class="card-body d-flex align-items-center py-2 px-2">
+                    <div class="kpi-icon-wrapper bg-info" style="width: 50px; height: 50px;">
+                        <i class="fas fa-user-plus" style="font-size: 1.2rem;"></i>
                     </div>
                     <div class="kpi-content">
-                        <h3 class="kpi-number">{{ nouveauxCeMois }}</h3>
-                        <p class="kpi-label">Nouveaux ce mois</p>
+                        <h3 class="kpi-number" style="font-size: 1.75rem;">{{ nouveauxCeMois }}</h3>
+                        <p class="kpi-label" style="font-size: 0.85rem; margin: 0.15rem 0;">Nouveaux ce mois</p>
                         <small class="kpi-trend text-info">
                             <i class="fas fa-calendar-alt me-1"></i>
                             {% if nouveauxCeMois > 0 %}
@@ -81,15 +81,15 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-4 col-md-6 mb-2">
             <div class="card kpi-card h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="kpi-icon-wrapper bg-warning">
-                        <i class="fas fa-chart-line"></i>
+                <div class="card-body d-flex align-items-center py-2 px-2">
+                    <div class="kpi-icon-wrapper bg-warning" style="width: 50px; height: 50px;">
+                        <i class="fas fa-chart-line" style="font-size: 1.2rem;"></i>
                     </div>
                     <div class="kpi-content">
-                        <h3 class="kpi-number">{{ actionsRecentes }}</h3>
-                        <p class="kpi-label">Actions récentes</p>
+                        <h3 class="kpi-number" style="font-size: 1.75rem;">{{ actionsRecentes }}</h3>
+                        <p class="kpi-label" style="font-size: 0.85rem; margin: 0.15rem 0;">Actions récentes</p>
                         <small class="kpi-trend text-warning">
                             <i class="fas fa-clock me-1"></i>
                             {% if actionsRecentes > 0 %}
@@ -105,52 +105,52 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="row mb-5">
+    <div class="row mb-2">
         <div class="col-12">
             <div class="card border-0 shadow-lg">
-                <div class="card-header dark-header">
-                    <h2 class="section-title mb-0">
-                        <i class="fas fa-bolt me-2"></i>
+                <div class="card-header dark-header py-1.5 px-2">
+                    <h2 class="section-title mb-0" style="font-size: 1.25rem;">
+                        <i class="fas fa-bolt me-1"></i>
                         Actions Rapides
                     </h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-2">
                     <div class="row">
-                        <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-2">
                             <div class="action-card">
-                                <a href="{{ path('admin_add_responsable') }}" class="action-link">
-                                    <div class="action-icon bg-primary">
-                                        <i class="fas fa-user-plus"></i>
+                                <a href="{{ path('admin_add_responsable') }}" class="action-link" style="padding: 1rem;">
+                                    <div class="action-icon bg-primary" style="width: 45px; height: 45px;">
+                                        <i class="fas fa-user-plus" style="font-size: 1.1rem;"></i>
                                     </div>
                                     <div class="action-content">
-                                        <h5>Ajouter</h5>
-                                        <p>Nouveau Responsable RH</p>
+                                        <h5 style="font-size: 1rem; margin-bottom: 0.2rem;">Ajouter</h5>
+                                        <p style="font-size: 0.85rem; margin: 0;">Nouveau Responsable RH</p>
                                     </div>
                                 </a>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-2">
                             <div class="action-card">
-                                <a href="{{ path('admin_manage_responsables') }}" class="action-link">
-                                    <div class="action-icon bg-info">
-                                        <i class="fas fa-users"></i>
+                                <a href="{{ path('admin_manage_responsables') }}" class="action-link" style="padding: 1rem;">
+                                    <div class="action-icon bg-info" style="width: 45px; height: 45px;">
+                                        <i class="fas fa-users" style="font-size: 1.1rem;"></i>
                                     </div>
                                     <div class="action-content">
-                                        <h5>Gérer</h5>
-                                        <p>Responsables RH</p>
+                                        <h5 style="font-size: 1rem; margin-bottom: 0.2rem;">Gérer</h5>
+                                        <p style="font-size: 0.85rem; margin: 0;">Responsables RH</p>
                                     </div>
                                 </a>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-2">
                             <div class="action-card">
-                                <a href="{{ path('admin_manage_responsables') }}" class="action-link">
-                                    <div class="action-icon bg-success">
-                                        <i class="fas fa-chart-bar"></i>
+                                <a href="#" class="action-link" style="padding: 1rem;" data-bs-toggle="modal" data-bs-target="#traceabilityExportModal">
+                                    <div class="action-icon bg-success" style="width: 45px; height: 45px;">
+                                        <i class="fas fa-file-excel" style="font-size: 1.1rem;"></i>
                                     </div>
                                     <div class="action-content">
-                                        <h5>Statistiques</h5>
-                                        <p>Vue détaillée</p>
+                                        <h5 style="font-size: 1rem; margin-bottom: 0.2rem;">Export Traçabilité</h5>
+                                        <p style="font-size: 0.85rem; margin: 0;">Rapport d'audit Excel</p>
                                     </div>
                                 </a>
                             </div>
@@ -164,8 +164,8 @@
     <!-- Responsables RH récents -->
     <div class="row">
         <div class="col-12">
-            <h2 class="section-title mb-4">
-                <i class="fas fa-user-tie me-2"></i>
+            <h2 class="section-title mb-2" style="font-size: 1.25rem;">
+                <i class="fas fa-user-tie me-1"></i>
                 Responsables RH Récents
             </h2>
             {% if responsablesRecents is empty %}
@@ -184,27 +184,27 @@
                 <div class="card modern-table-card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="table table-sm table-hover mb-0">
                                 <thead class="table-header">
                                     <tr>
-                                        <th class="border-0">
-                                            <i class="fas fa-user me-2"></i>
+                                        <th class="border-0" style="padding: 0.5rem;">
+                                            <i class="fas fa-user me-1"></i>
                                             Responsable
                                         </th>
-                                        <th class="border-0">
-                                            <i class="fas fa-envelope me-2"></i>
+                                        <th class="border-0" style="padding: 0.5rem;">
+                                            <i class="fas fa-envelope me-1"></i>
                                             Contact
                                         </th>
-                                        <th class="border-0">
-                                            <i class="fas fa-phone me-2"></i>
+                                        <th class="border-0" style="padding: 0.5rem;">
+                                            <i class="fas fa-phone me-1"></i>
                                             Téléphone
                                         </th>
-                                        <th class="border-0">
-                                            <i class="fas fa-check-circle me-2"></i>
+                                        <th class="border-0" style="padding: 0.5rem;">
+                                            <i class="fas fa-check-circle me-1"></i>
                                             Statut
                                         </th>
-                                        <th class="border-0 text-center">
-                                            <i class="fas fa-cog me-2"></i>
+                                        <th class="border-0 text-center" style="padding: 0.5rem;">
+                                            <i class="fas fa-cog me-1"></i>
                                             Actions
                                         </th>
                                     </tr>
@@ -212,45 +212,45 @@
                                 <tbody>
                                     {% for responsable in responsablesRecents %}
                                     <tr class="table-row">
-                                        <td>
+                                        <td style="padding: 0.5rem;">
                                             <div class="d-flex align-items-center">
-                                                <div class="user-avatar">
-                                                    <span class="avatar-text">{{ responsable.prenom|first|upper }}{{ responsable.nom|first|upper }}</span>
+                                                <div class="user-avatar" style="width: 40px; height: 40px;">
+                                                    <span class="avatar-text" style="font-size: 0.8rem;">{{ responsable.prenom|first|upper }}{{ responsable.nom|first|upper }}</span>
                                                 </div>
                                                 <div class="user-info">
-                                                    <h6 class="user-name mb-0">{{ responsable.prenom }} {{ responsable.nom }}</h6>
-                                                    <small class="text-muted">Responsable RH</small>
+                                                    <h6 class="user-name mb-0" style="font-size: 0.9rem;">{{ responsable.prenom }} {{ responsable.nom }}</h6>
+                                                    <small class="text-muted" style="font-size: 0.75rem;">Responsable RH</small>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td style="padding: 0.5rem; font-size: 0.875rem;">
                                             <div class="contact-info">
                                                 <span class="email">{{ responsable.email }}</span>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td style="padding: 0.5rem; font-size: 0.875rem;">
                                             <span class="phone-number">
                                                 {{ responsable.telephone|default('Non renseigné') }}
                                             </span>
                                         </td>
-                                        <td>
-                                            <span class="status-badge status-active">
+                                        <td style="padding: 0.5rem;">
+                                            <span class="status-badge status-active" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">
                                                 <i class="fas fa-check-circle me-1"></i>
                                                 Actif
                                             </span>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center" style="padding: 0.5rem;">
                                             <div class="action-buttons">
                                                 <a href="{{ path('admin_edit_responsable', {'id': responsable.id}) }}" 
-                                                   class="btn btn-sm btn-outline-primary me-1" 
+                                                   class="btn btn-xs btn-outline-primary me-1 py-0 px-1" 
                                                    title="Modifier">
-                                                    <i class="fas fa-edit"></i>
+                                                    <i class="fas fa-edit" style="font-size: 0.7rem;"></i>
                                                 </a>
                                                 <a href="{{ path('admin_delete_responsable', {'id': responsable.id}) }}"
-                                                   class="btn btn-sm btn-outline-danger" 
+                                                   class="btn btn-xs btn-outline-danger py-0 px-1" 
                                                    title="Supprimer"
                                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce responsable RH ?')">
-                                                    <i class="fas fa-trash"></i>
+                                                    <i class="fas fa-trash" style="font-size: 0.7rem;"></i>
                                                 </a>
                                             </div>
                                         </td>
@@ -269,21 +269,21 @@
 <style>
 /* Dashboard Admin Styles */
 .dashboard-admin {
-    padding: 2rem 0;
+    padding: 1rem 0;
 }
 
 /* Header Styles */
 .dashboard-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 15px;
-    padding: 2rem;
+    background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
     color: white;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-title {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
     display: flex;
@@ -291,55 +291,55 @@
 }
 
 .dashboard-subtitle {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     opacity: 0.9;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
 }
 
 .dashboard-stats-badge {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
     backdrop-filter: blur(10px);
 }
 
 /* Section Titles */
 .section-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: #495057;
-    border-bottom: 3px solid #007bff;
-    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #9AA6B2;
+    padding-bottom: 0.4rem;
     display: inline-block;
 }
 
 /* KPI Cards */
 .kpi-card {
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     overflow: hidden;
 }
 
 .kpi-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .kpi-icon-wrapper {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1rem;
+    margin-right: 0.75rem;
     flex-shrink: 0;
 }
 
 .kpi-icon-wrapper i {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: white;
 }
 
@@ -348,73 +348,73 @@
 }
 
 .kpi-number {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     margin: 0;
     color: #495057;
 }
 
 .kpi-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #6c757d;
-    margin: 0.25rem 0;
+    margin: 0.15rem 0;
     font-weight: 500;
 }
 
 .kpi-trend {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 500;
 }
 
 /* Action Cards */
 .action-card {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     overflow: hidden;
     height: 100%;
 }
 
 .action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .action-link {
     display: flex;
     align-items: center;
-    padding: 1.5rem;
+    padding: 1rem;
     text-decoration: none;
     color: inherit;
     height: 100%;
 }
 
 .action-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1rem;
+    margin-right: 0.75rem;
     flex-shrink: 0;
 }
 
 .action-icon i {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: white;
 }
 
 .action-content h5 {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.2rem 0;
     color: #495057;
 }
 
 .action-content p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #6c757d;
     margin: 0;
 }
@@ -422,20 +422,21 @@
 /* Table Styles */
 .modern-table-card {
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
     overflow: hidden;
 }
 
 .table-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, #F8FAFC 0%, #D9EAFD 100%);
 }
 
 .table-header th {
     font-weight: 600;
     color: #495057;
-    padding: 1rem;
+    padding: 0.5rem;
     border: none;
+    font-size: 0.8rem;
 }
 
 .table-row {
@@ -443,26 +444,25 @@
 }
 
 .table-row:hover {
-    background-color: #f8f9fa;
-    transform: scale(1.01);
+    background-color: #F8FAFC;
 }
 
 .user-avatar {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    background: linear-gradient(135deg, #9AA6B2 0%, #7a8692 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1rem;
+    margin-right: 0.75rem;
     flex-shrink: 0;
 }
 
 .avatar-text {
     color: white;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .user-name {
@@ -471,7 +471,7 @@
 }
 
 .contact-info .email {
-    color: #007bff;
+    color: #9AA6B2;
     font-weight: 500;
 }
 
@@ -480,9 +480,9 @@
 }
 
 .status-badge {
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
@@ -494,13 +494,16 @@
 }
 
 .action-buttons .btn {
-    border-radius: 8px;
-    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
     transition: all 0.2s ease;
 }
 
-.action-buttons .btn:hover {
-    transform: scale(1.1);
+.btn-xs {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    border-radius: 0.2rem;
 }
 
 /* Empty State */
@@ -650,17 +653,17 @@
 
 /* Light mode - keep normal appearance */
 [data-bs-theme="light"] .dark-header {
-    background: #f8fafc !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    color: #1e293b !important;
+    background: #F8FAFC !important;
+    border-bottom: 1px solid #BCCCDC !important;
+    color: #000000 !important;
 }
 
 [data-bs-theme="light"] .dark-header h2 {
-    color: #1e293b !important;
+    color: #000000 !important;
 }
 
 [data-bs-theme="light"] .dark-header i {
-    color: #1e293b !important;
+    color: #000000 !important;
 }
 
 /* ===== MOBILE RESPONSIVE STYLES ===== */
@@ -729,4 +732,144 @@
     }
 }
 </style>
+
+<!-- Traceability Export Modal -->
+<div class="modal fade" id="traceabilityExportModal" tabindex="-1" aria-labelledby="traceabilityExportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="traceabilityExportModalLabel">
+                    <i class="fas fa-file-excel me-2"></i>
+                    Export de Traçabilité
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="traceabilityExportForm">
+                    <div class="mb-3">
+                        <label for="exportPeriod" class="form-label">Période</label>
+                        <select class="form-select" id="exportPeriod" name="period">
+                            <option value="all">Toutes les données</option>
+                            <option value="custom">Personnalisée</option>
+                            <option value="today">Aujourd'hui</option>
+                            <option value="week">Cette semaine</option>
+                            <option value="month">Ce mois</option>
+                            <option value="year">Cette année</option>
+                        </select>
+                    </div>
+                    <div class="row mb-3" id="customDateRange" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="startDate" class="form-label">Date de début</label>
+                            <input type="date" class="form-control" id="startDate" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="endDate" class="form-label">Date de fin</label>
+                            <input type="date" class="form-control" id="endDate" name="end_date">
+                        </div>
+                    </div>
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <small>L'export inclura toutes les entités avec leurs informations de traçabilité (créé le/par, modifié le/par, désactivé le/par).</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="exportTraceabilityBtn">
+                    <i class="fas fa-download me-2"></i>
+                    Exporter Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const exportPeriod = document.getElementById('exportPeriod');
+    const customDateRange = document.getElementById('customDateRange');
+    const exportBtn = document.getElementById('exportTraceabilityBtn');
+    const modal = document.getElementById('traceabilityExportModal');
+    
+    // Show/hide custom date range
+    exportPeriod.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customDateRange.style.display = 'flex';
+        } else {
+            customDateRange.style.display = 'none';
+        }
+    });
+    
+    // Set default dates for quick periods
+    exportPeriod.addEventListener('change', function() {
+        const today = new Date();
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        
+        switch(this.value) {
+            case 'today':
+                startDate.value = today.toISOString().split('T')[0];
+                endDate.value = today.toISOString().split('T')[0];
+                break;
+            case 'week':
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay());
+                startDate.value = weekStart.toISOString().split('T')[0];
+                endDate.value = today.toISOString().split('T')[0];
+                break;
+            case 'month':
+                startDate.value = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+                endDate.value = today.toISOString().split('T')[0];
+                break;
+            case 'year':
+                startDate.value = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
+                endDate.value = today.toISOString().split('T')[0];
+                break;
+        }
+    });
+    
+    // Export button click
+    exportBtn.addEventListener('click', function() {
+        const period = exportPeriod.value;
+        let url = '{{ path("admin_export_traceability") }}';
+        const params = new URLSearchParams();
+        
+        if (period === 'all') {
+            // No date filters
+        } else if (period === 'custom') {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+        } else {
+            // Quick period - dates are already set
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+        }
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+        
+        // Disable button and show loading
+        exportBtn.disabled = true;
+        exportBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Génération...';
+        
+        // Trigger download
+        window.location.href = url;
+        
+        // Re-enable button after a delay
+        setTimeout(function() {
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = '<i class="fas fa-download me-2"></i>Exporter Excel';
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+        }, 2000);
+    });
+});
+</script>
 {% endblock %}

@@ -38,7 +38,7 @@ class TestRhQueriesCommand extends Command
         // 1. STATISTIQUES GÉNÉRALES
         $io->section('📊 STATISTIQUES GÉNÉRALES');
         
-        $totalEmployes = $connection->executeQuery("SELECT COUNT(*) FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
+        $totalEmployes = $connection->executeQuery("SELECT COUNT(*) FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%'")->fetchOne();
         $totalDossiers = $connection->executeQuery("SELECT COUNT(*) FROM t_dossier")->fetchOne();
         $totalContrats = $connection->executeQuery("SELECT COUNT(*) FROM t_organisation_employee_contrat")->fetchOne();
         $totalOrganisations = $connection->executeQuery("SELECT COUNT(*) FROM p_organisation")->fetchOne();
@@ -71,7 +71,7 @@ class TestRhQueriesCommand extends Command
         $io->text("🔄 Test Dashboard RH - Statistiques en temps réel...");
         $dashboardQuery = "
             SELECT 
-                (SELECT COUNT(*) FROM t_employe WHERE roles::text LIKE '%ROLE_EMPLOYEE%') as total_employes,
+                (SELECT COUNT(*) FROM t_user WHERE roles::text LIKE '%ROLE_EMPLOYEE%') as total_employes,
                 (SELECT COUNT(*) FROM t_dossier) as total_dossiers,
                 (SELECT COUNT(*) FROM t_organisation_employee_contrat) as total_contrats,
                 (SELECT COUNT(*) FROM p_organisation) as total_organisations,
@@ -100,7 +100,7 @@ class TestRhQueriesCommand extends Command
         $io->text("🔄 Test Recherche avancée d'employés...");
         $searchQuery = "
             SELECT e.id, e.prenom, e.nom, e.email, e.username, e.telephone, e.is_active
-            FROM t_employe e 
+            FROM t_user e 
             WHERE e.roles::text LIKE '%ROLE_EMPLOYEE%'
             AND (e.nom ILIKE '%Mohamed%' OR e.prenom ILIKE '%Mohamed%' OR e.email ILIKE '%mohamed%')
             ORDER BY e.nom, e.prenom
@@ -226,7 +226,7 @@ class TestRhQueriesCommand extends Command
                     ELSE 'En cours'
                 END as statut_lisible
             FROM t_demandes d
-            LEFT JOIN t_employe e ON d.employe_id = e.id
+            LEFT JOIN t_user e ON d.employe_id = e.id
             ORDER BY d.date_creation DESC
         ";
         $io->text("📝 Description : Suivi des demandes RH en temps réel");
@@ -252,7 +252,7 @@ class TestRhQueriesCommand extends Command
             SELECT 
                 'Employés actifs' as metrique,
                 COUNT(*) as valeur
-            FROM t_employe 
+            FROM t_user 
             WHERE roles::text LIKE '%ROLE_EMPLOYEE%' AND is_active = true
             UNION ALL
             SELECT 

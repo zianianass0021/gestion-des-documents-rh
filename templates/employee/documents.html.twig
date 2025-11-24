@@ -3,89 +3,81 @@
 {% block title %}Mes Documents{% endblock %}
 
 {% block body %}
-<div class="row">
+<div class="row g-0">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h1 class="mb-0">
-                    <i class="fas fa-file-alt me-2"></i>
-                    Mes Documents
-                </h1>
-            </div>
-            
-            <!-- Barre de recherche -->
-            <div class="card-header bg-light">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-10">
-                        <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-search"></i>
+        <div class="card compact-page">
+            <div class="card-header compact-header py-2">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-alt me-1"></i>Mes Documents
+                    </h4>
+                    <form method="GET" class="d-flex gap-1 compact-search">
+                        <div class="input-group input-group-xs">
+                            <span class="input-group-text py-0 px-2">
+                                <i class="fas fa-search" style="font-size: 0.7rem;"></i>
                             </span>
                             <input type="text" 
-                                   class="form-control" 
+                                   class="form-control form-control-xs py-0" 
                                    name="search" 
                                    value="{{ search }}" 
-                                   placeholder="Rechercher par nom document, type, usage, dossier...">
+                                   placeholder="Rechercher...">
                         </div>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-search me-1"></i>Rechercher
+                        <button type="submit" class="btn btn-primary btn-xs py-0">
+                            <i class="fas fa-search"></i>
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
             
-            <div class="card-body">
+            <div class="card-body compact-body p-2">
                 {% if search %}
-                    <div class="alert alert-info">
-                        <i class="fas fa-search me-2"></i>
-                        Recherche pour : "<strong>{{ search }}</strong>" 
-                        ({{ documents|length }} résultat{{ documents|length > 1 ? 's' : '' }})
-                        <a href="{{ path('employee_documents') }}" class="btn btn-sm btn-outline-primary ms-2">
-                            <i class="fas fa-times"></i> Effacer
+                    <div class="alert alert-info alert-xs py-1 px-2 mb-2 d-flex align-items-center justify-content-between">
+                        <small class="mb-0">
+                            <i class="fas fa-search me-1"></i>
+                            "<strong>{{ search }}</strong>" ({{ documents|length }})
+                        </small>
+                        <a href="{{ path('employee_documents') }}" class="btn btn-xs btn-outline-primary py-0">
+                            <i class="fas fa-times"></i>
                         </a>
                     </div>
                 {% endif %}
                 
                 {% if documents is empty %}
-                    <div class="alert alert-info text-center">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Aucun document trouvé.
+                    <div class="alert alert-info alert-xs py-2 px-3 text-center mb-0">
+                        <small><i class="fas fa-info-circle me-1"></i>Aucun document trouvé.</small>
                     </div>
                 {% else %}
-                    <!-- Desktop Table View -->
-                    <div class="table-responsive desktop-view">
-                        <table class="table table-striped">
-                            <thead>
+                    <div class="table-responsive compact-table">
+                        <table class="table table-sm table-hover table-striped mb-0 compact-table-inner">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Référence</th>
-                                    <th>Nom du Fichier</th>
-                                    <th>Type</th>
-                                    <th>Dossier</th>
-                                    <th>Date d'Upload</th>
-                                    <th>Actions</th>
+                                    <th style="width: 80px; padding: 0.25rem;">Réf</th>
+                                    <th style="width: 200px; padding: 0.25rem;">Nom du Fichier</th>
+                                    <th style="width: 100px; padding: 0.25rem;">Type</th>
+                                    <th style="width: 120px; padding: 0.25rem;">Dossier</th>
+                                    <th style="width: 90px; padding: 0.25rem;">Date</th>
+                                    <th style="width: 80px; padding: 0.25rem;">Statut</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for document in documents %}
                                 <tr>
-                                    <td>{{ document.abbreviation }}</td>
-                                    <td>{{ document.libelleComplet }}</td>
-                                    <td>
-                                        <span class="badge bg-secondary">{{ document.typeDocument }}</span>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ document.abbreviation }}</td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ document.libelleComplet|slice(0, 30) }}{% if document.libelleComplet|length > 30 %}...{% endif %}</td>
+                                    <td style="padding: 0.25rem;">
+                                        <span class="badge bg-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">{{ document.typeDocument|slice(0, 12) }}</span>
                                     </td>
-                                    <td>{{ document.usage }}</td>
-                                    <td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ document.usage|slice(0, 15) }}{% if document.usage|length > 15 %}...{% endif %}</td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">
                                         {% if document.uploadedAt %}
-                                            {{ document.uploadedAt|date('d/m/Y H:i') }}
+                                            {{ document.uploadedAt|date('d/m/Y') }}
                                         {% else %}
-                                            <span class="text-muted">-</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">-</span>
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-eye"></i> Consultable
+                                    <td style="padding: 0.25rem;">
+                                        <span class="badge bg-success" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">
+                                            <i class="fas fa-eye"></i>
                                         </span>
                                     </td>
                                 </tr>
@@ -93,101 +85,104 @@
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!-- Mobile Card View -->
-                    <div class="mobile-view">
-                        {% for document in documents %}
-                        <div class="document-card mb-3">
-                            <div class="document-card-header">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1">{{ document.libelleComplet }}</h6>
-                                        <small class="text-muted">Réf: {{ document.abbreviation }}</small>
-                                    </div>
-                                    <span class="badge bg-secondary">{{ document.typeDocument }}</span>
-                                </div>
-                            </div>
-                            <div class="document-card-body">
-                                <div class="info-row">
-                                    <i class="fas fa-tag text-info"></i>
-                                    <span>{{ document.usage }}</span>
-                                </div>
-                            </div>
-                            <div class="document-card-actions">
-                                <span class="badge bg-success w-100 text-center">
-                                    <i class="fas fa-eye me-1"></i>Consultable
-                                </span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
                 {% endif %}
-                <div class="mt-3">
-                    <a href="{{ path('employee_dashboard') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Retour au Dashboard
-                    </a>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .mobile-view { display: none; }
-    
-    .document-card {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    .compact-page {
+        margin-bottom: 0;
     }
     
-    .document-card-header {
-        padding: 1rem;
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-        border-bottom: 1px solid #e2e8f0;
+    .compact-header {
+        padding: 0.5rem 0.75rem !important;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #bcccdc;
     }
     
-    .document-card-header h6 {
-        color: #1e293b;
+    .compact-header h4 {
+        font-size: 1.1rem;
         font-weight: 600;
     }
     
-    .document-card-body {
-        padding: 1rem;
+    .compact-body {
+        padding: 0.5rem !important;
+        max-height: calc(100vh - 280px);
+        overflow-y: auto;
     }
     
-    .info-row {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.5rem 0;
+    .compact-table {
+        margin: 0;
     }
     
-    .info-row i {
-        width: 20px;
-        text-align: center;
+    .compact-table-inner {
+        margin-bottom: 0;
+        font-size: 0.875rem;
     }
     
-    .info-row span {
-        flex: 1;
-        font-size: 0.9rem;
-        color: #475569;
+    .compact-table-inner th,
+    .compact-table-inner td {
+        font-size: 0.8rem;
+        vertical-align: middle;
     }
     
-    .document-card-actions {
-        padding: 0.75rem 1rem;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
+    .compact-table-inner thead th {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        background-color: #f8f9fa;
+    }
+    
+    .btn-xs {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
+    }
+    
+    .input-group-xs {
+        height: 24px;
+    }
+    
+    .input-group-xs .form-control,
+    .input-group-xs .input-group-text {
+        height: 24px;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .form-control-xs {
+        height: 24px;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .alert-xs {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .compact-search {
+        min-width: 200px;
     }
     
     @media (max-width: 767px) {
-        .desktop-view { display: none !important; }
-        .mobile-view { display: block !important; }
+        .compact-header .d-flex {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.5rem;
+        }
         
-        .card-header h1 {
-            font-size: 1.25rem !important;
+        .compact-search {
+            width: 100%;
+            min-width: 100%;
+        }
+        
+        .compact-body {
+            max-height: calc(100vh - 350px);
         }
     }
 </style>

@@ -62,4 +62,39 @@ class PlacardRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->orderBy('p.name', 'ASC');
     }
+
+    /**
+     * Crée une QueryBuilder pour les placards avec filtre actif/inactif
+     */
+    public function findAllQueryWithFilter(?string $status = 'all')
+    {
+        $qb = $this->createQueryBuilder('p');
+        
+        if ($status === 'active') {
+            $qb->where('p.isActive = :isActive')
+               ->setParameter('isActive', true);
+        } elseif ($status === 'inactive') {
+            $qb->where('p.isActive = :isActive')
+               ->setParameter('isActive', false);
+        }
+        // If status is 'all' or null, no filter is applied
+        
+        return $qb->orderBy('p.name', 'ASC');
+    }
+
+    /**
+     * Compte les placards actifs
+     */
+    public function countActive(): int
+    {
+        return $this->count(['isActive' => true]);
+    }
+
+    /**
+     * Compte les placards inactifs
+     */
+    public function countInactive(): int
+    {
+        return $this->count(['isActive' => false]);
+    }
 }

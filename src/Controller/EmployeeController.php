@@ -152,6 +152,28 @@ class EmployeeController extends AbstractController
         return $response;
     }
 
+    #[Route('/contrats/{id}', name: 'employee_view_contrat')]
+    public function viewContrat(int $id, EmployeeContratRepository $contratRepository): Response
+    {
+        $employee = $this->getUser();
+        $contrat = $contratRepository->find($id);
+
+        if (!$contrat || $contrat->getEmploye() !== $employee) {
+            $this->addFlash('error', 'Contrat non trouvé ou non autorisé !');
+            return $this->redirectToRoute('employee_contrats');
+        }
+
+        $response = $this->render('employee/view_contrat.html.twig', [
+            'contrat' => $contrat
+        ]);
+        
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+        
+        return $response;
+    }
+
     #[Route('/dossiers', name: 'employee_dossiers')]
     public function dossiers(DossierRepository $dossierRepository): Response
     {

@@ -22,7 +22,7 @@ class ExcelGeneratorService
             // Récupérer tous les employés
             $baseEmployees = $this->connection->executeQuery("
                 SELECT id, nom, prenom, email, telephone, is_active as statut
-                FROM t_employe
+                FROM t_user
                 WHERE roles::text LIKE '%ROLE_EMPLOYEE%'
                 ORDER BY id
             ")->fetchAllAssociative();

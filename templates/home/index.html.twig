@@ -3,6 +3,42 @@
 {% block title %}Accueil - Système RH{% endblock %}
 
 {% block body %}
+<!-- Page Transition Styles -->
+<style>
+    @keyframes pageFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pageFadeOut {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+
+    body {
+        animation: pageFadeIn 0.2s ease-out;
+    }
+</style>
+
+<!-- Page Transition Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Removed transition delays for faster navigation
+    });
+</script>
+
 <!-- Test Script -->
 <script>
     console.log('Page loading...');
@@ -13,34 +49,33 @@
 </script>
 
 <!-- Home Page Layout -->
-<div class="home-page-wrapper" style="min-height: 100vh; background: var(--gradient-hero); color: white; padding: 20px 0;">
-
+<div class="home-page-wrapper">
     <!-- Main Content -->
     <div class="container-fluid">
-        <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="row justify-content-center align-items-center hero-section">
             <div class="col-12">
-                <div class="text-center">
+                <div class="text-center hero-content-wrapper">
                     <!-- Logo -->
-                    <div class="logo-section mb-5">
+                    <div class="logo-section">
                         <div class="logo-circle animate-float">
-                            <img src="{{ asset('logo.png') }}" alt="Système RH" class="home-logo">
+                            <img src="{{ asset('logo.png') }}?v={{ 'now'|date('U') }}" alt="Système RH" class="home-logo">
                         </div>
                     </div>
 
                     <!-- Hero Content -->
                     <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
                     <!-- Main Title -->
-                        <h1 class="hero-title mb-4">
+                        <h1 class="hero-title">
                         Système RH Professionnel
                     </h1>
                     
                     <!-- Subtitle -->
-                        <p class="hero-subtitle mb-4">
+                        <p class="hero-subtitle">
                         Gestion Moderne des Ressources Humaines
                     </p>
 
                     <!-- Description -->
-                        <div class="hero-description mb-5">
+                        <div class="hero-description">
                             <p>
                                 Découvrez notre solution complète de gestion des ressources humaines. 
                                 Interface moderne, sécurisée et intuitive pour une gestion efficace de vos employés, 
@@ -49,147 +84,110 @@
                     </div>
 
                     <!-- CTA Buttons -->
-                        <div class="cta-buttons mb-5">
-                        <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg px-5 py-3 me-3 mb-3 cta-button-login">
+                        <div class="cta-buttons">
+                            <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg cta-button-login">
                             <i class="fas fa-sign-in-alt me-2"></i>
                             Se connecter
                         </a>
-                            <button class="btn btn-outline-light btn-lg px-5 py-3 mb-3 cta-button-discover" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+                            <button class="btn btn-outline-light btn-lg cta-button-discover" onclick="scrollToFeatures()">
                             <i class="fas fa-arrow-down me-2"></i>
                             Découvrir
                         </button>
                     </div>
                     </div>
-
-                    <!-- Trust Indicators -->
-                    <div class="trust-indicators">
-                        <div class="row justify-content-center">
-                                <div class="col-md-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="1000">
-                                    <div class="trust-item">
-                                        <div class="trust-icon">
-                                            <i class="fas fa-shield-alt fa-2x"></i>
-                                        </div>
-                                    <div class="trust-label">Sécurisé</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="1200">
-                                    <div class="trust-item">
-                                        <div class="trust-icon">
-                                            <i class="fas fa-clock fa-2x"></i>
-                                        </div>
-                                    <div class="trust-label">Disponible</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-6 mb-4" data-aos="fade-up" data-aos-delay="1400">
-                                    <div class="trust-item">
-                                        <div class="trust-icon">
-                                            <i class="fas fa-users fa-2x"></i>
-                                        </div>
-                                    <div class="trust-label">Professionnel</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Scroll Indicator -->
-    <div class="scroll-indicator" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);">
-        <button class="btn btn-outline-light btn-circle" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
-            <i class="fas fa-chevron-down"></i>
-        </button>
         </div>
     </div>
 
 <!-- Features Section -->
-<section id="features" class="features-section py-5" style="background: var(--bg-primary); backdrop-filter: blur(10px);">
+<section id="features" class="features-section">
     <div class="container">
         <div class="row">
-            <div class="col-12 text-center mb-5">
-                <h2 class="display-4 fw-bold text-gradient mb-4" data-aos="fade-up" style="color: var(--text-primary);">
+            <div class="col-12 text-center features-header">
+                <h2 class="features-title" data-aos="fade-up">
                     Fonctionnalités Principales
                 </h2>
-                <p class="lead" data-aos="fade-up" data-aos-delay="200" style="color: var(--text-secondary);">
+                <p class="features-subtitle" data-aos="fade-up" data-aos-delay="200">
                     Une suite complète d'outils pour gérer efficacement vos ressources humaines
                 </p>
             </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+        <div class="row features-grid">
+            <div class="col-xl-4 col-lg-4 col-md-4 col-12" data-aos="fade-up" data-aos-delay="300">
                 <div class="feature-card h-100">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-users fa-3x text-primary"></i>
+                    <div class="feature-icon">
+                        <i class="fas fa-users fa-2x text-primary"></i>
                             </div>
-                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion des Employés</h4>
-                    <p class="card-text" style="color: var(--text-secondary);">
+                    <h4 class="card-title fw-bold">Gestion des Employés</h4>
+                    <p class="card-text">
                             Gérez efficacement les profils, informations personnelles et professionnelles 
                             de tous vos employés avec une interface intuitive et sécurisée.
                         </p>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="col-xl-4 col-lg-4 col-md-4 col-12" data-aos="fade-up" data-aos-delay="400">
                 <div class="feature-card h-100">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-file-contract fa-3x text-success"></i>
+                    <div class="feature-icon">
+                        <i class="fas fa-file-contract fa-2x text-success"></i>
                             </div>
-                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion des Contrats</h4>
-                    <p class="card-text" style="color: var(--text-secondary);">
+                    <h4 class="card-title fw-bold">Gestion des Contrats</h4>
+                    <p class="card-text">
                         Suivez et gérez tous les contrats de travail, renouvellements et modifications
                         avec un système de notifications automatiques.
                     </p>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+            <div class="col-xl-4 col-lg-4 col-md-4 col-12" data-aos="fade-up" data-aos-delay="500">
                 <div class="feature-card h-100">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-chart-line fa-3x text-info"></i>
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line fa-2x text-info"></i>
                             </div>
-                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Tableaux de Bord</h4>
-                    <p class="card-text" style="color: var(--text-secondary);">
+                    <h4 class="card-title fw-bold">Tableaux de Bord</h4>
+                    <p class="card-text">
                         Visualisez les métriques clés et les indicateurs de performance
                         avec des graphiques interactifs et des rapports personnalisables.
                     </p>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+            <div class="col-xl-4 col-lg-4 col-md-4 col-12" data-aos="fade-up" data-aos-delay="600">
                 <div class="feature-card h-100">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-calendar-alt fa-3x text-danger"></i>
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt fa-2x text-danger"></i>
                             </div>
-                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion des Congés</h4>
-                    <p class="card-text" style="color: var(--text-secondary);">
+                    <h4 class="card-title fw-bold">Gestion des Congés</h4>
+                    <p class="card-text">
                         Planifiez et suivez les demandes de congés, absences et temps de travail
                         avec un système de validation automatisé.
                     </p>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="800">
+            <div class="col-xl-4 col-lg-4 col-md-4 col-12" data-aos="fade-up" data-aos-delay="700">
                 <div class="feature-card h-100">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-file-alt fa-3x text-secondary"></i>
+                    <div class="feature-icon">
+                        <i class="fas fa-file-alt fa-2x text-secondary"></i>
                             </div>
-                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Gestion Documentaire</h4>
-                    <p class="card-text" style="color: var(--text-secondary);">
+                    <h4 class="card-title fw-bold">Gestion Documentaire</h4>
+                    <p class="card-text">
                         Centralisez et organisez tous les documents RH : CV, diplômes, attestations
                         et contrats dans un espace sécurisé.
                     </p>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="800">
+            <div class="col-xl-4 col-lg-4 col-md-4 col-12" data-aos="fade-up" data-aos-delay="800">
                 <div class="feature-card h-100">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-bell fa-3x text-warning"></i>
+                    <div class="feature-icon">
+                        <i class="fas fa-bell fa-2x text-warning"></i>
                             </div>
-                    <h4 class="card-title fw-bold mb-3" style="color: var(--text-primary);">Notifications & Alertes</h4>
-                    <p class="card-text" style="color: var(--text-secondary);">
+                    <h4 class="card-title fw-bold">Notifications & Alertes</h4>
+                    <p class="card-text">
                         Recevez des alertes automatiques pour les échéances importantes,
                         renouvellements et événements RH critiques.
                     </p>
@@ -200,6 +198,29 @@
 </section>
 
 <script>
+    // Function to scroll to features section to show all 6 features
+    function scrollToFeatures() {
+        const featuresSection = document.getElementById('features');
+        if (featuresSection) {
+            // Get the position and dimensions
+            const sectionTop = featuresSection.getBoundingClientRect().top + window.pageYOffset;
+            const sectionHeight = featuresSection.offsetHeight;
+            const viewportHeight = window.innerHeight;
+            const headerOffset = 80; // Account for any fixed headers
+            
+            // Calculate scroll position to show the bottom of the features section
+            // This ensures all 6 features are visible without needing to scroll further
+            const scrollPosition = sectionTop + sectionHeight - viewportHeight + headerOffset;
+            
+            // Ensure we don't scroll to negative position
+            const finalScrollPosition = Math.max(0, scrollPosition);
+            
+            window.scrollTo({
+                top: finalScrollPosition,
+                behavior: 'smooth'
+            });
+        }
+    }
 
     // Initialize everything when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
@@ -219,100 +240,125 @@
 </script>
 
 <style>
-    /* Hero Section Styles */
-    .hero-title {
-        font-size: 3.5rem;
-        font-weight: 900;
-        color: #ffffff;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-        letter-spacing: 2px;
-        margin-bottom: 1.5rem;
+    /* Home Page Wrapper */
+    .home-page-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #5a6672 0%, #4a5662 50%, #3a4652 100%);
+        color: white;
+        position: relative;
+        padding: 0;
+        overflow-x: hidden;
     }
 
-    .hero-subtitle {
-        font-size: 1.8rem;
-        font-weight: 600;
-        color: #ffffff;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
-        letter-spacing: 1px;
-        margin-bottom: 2rem;
+    /* Hero Section */
+    .hero-section {
+        min-height: 100vh;
+        padding: 3rem 1rem;
+        display: flex;
+        align-items: center;
     }
 
-    .hero-description p {
-        font-size: 1.2rem;
-        font-weight: 500;
-        color: #ffffff;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        line-height: 1.6;
-        max-width: 800px;
+    .hero-content-wrapper {
+        max-width: 1200px;
         margin: 0 auto;
+        padding: 2rem 0;
     }
 
+    /* Logo Section */
+    .logo-section {
+        margin-bottom: 2.5rem;
+    }
 
-    /* Logo Styles */
     .logo-circle {
-        width: 170px;
-        height: 170px;
+        width: 130px;
+        height: 130px;
         background: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 2rem;
+        margin: 0 auto;
         border: 2px solid rgba(255, 255, 255, 0.3);
         backdrop-filter: blur(10px);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        text-align: center;
-    }
-
-    .logo-circle i {
-        color: #ffffff;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .home-logo {
-        width: 140px;
-        height: 140px;
+        width: 95px;
+        height: 95px;
         object-fit: contain;
         object-position: center;
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-        display: block;
-        margin: 0 auto;
-        transform: translate(5px, 3px);
     }
 
-    /* Trust Items */
-    .trust-item {
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 15px;
-        padding: 2rem;
-        backdrop-filter: blur(10px);
-        transition: none;
-        cursor: default;
+    /* Hero Content */
+    .hero-content {
+        margin-bottom: 3rem;
     }
 
-    .trust-icon {
+    .home-page-wrapper .hero-title,
+    .home-page-wrapper h1.hero-title {
+        font-size: 3.2rem;
+        font-weight: 900;
+        color: #e3e5e7 !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        letter-spacing: 1.5px;
         margin-bottom: 1rem;
-        color: #ffffff;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        line-height: 1.2;
     }
 
-    .trust-label {
-        color: #ffffff;
+    .home-page-wrapper .hero-subtitle,
+    .home-page-wrapper p.hero-subtitle {
+        font-size: 1.6rem;
         font-weight: 600;
-        font-size: 1.1rem;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        color: #e3e5e7 !important;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+        letter-spacing: 0.5px;
+        margin-bottom: 1.5rem;
+        line-height: 1.3;
     }
 
+    .hero-description {
+        margin-bottom: 2.5rem;
+    }
+
+    .hero-description p {
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: #e3e5e7 !important;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        line-height: 1.7;
+        max-width: 750px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
 
     /* CTA Buttons */
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 0;
+    }
+
+    .cta-button-login,
+    .cta-button-discover {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .cta-button-login {
         background: rgba(255, 255, 255, 0.2);
         border: 2px solid rgba(255, 255, 255, 0.3);
         color: white;
-        text-decoration: none;
-        transition: all 0.3s ease;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
 
@@ -322,13 +368,13 @@
         color: white;
         text-decoration: none;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .cta-button-discover {
         background: transparent;
         border: 2px solid rgba(255, 255, 255, 0.3);
         color: white;
-        transition: all 0.3s ease;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
 
@@ -337,51 +383,92 @@
         border-color: rgba(255, 255, 255, 0.5);
         color: white;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
 
-    /* Scroll Indicator */
-    .btn-circle {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Features Section */
+    .features-section {
+        background: var(--bg-primary);
+        backdrop-filter: blur(10px);
+        padding: 3rem 0;
+    }
+
+    .features-header {
+        margin-bottom: 2rem;
+    }
+
+    .features-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary) !important;
+        margin-bottom: 0.75rem;
+        line-height: 1.2;
+    }
+
+    .features-subtitle {
+        font-size: 1rem;
+        color: var(--text-secondary) !important;
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .features-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .features-grid > [class*="col-"] {
+        margin-bottom: 1.5rem;
+    }
+
+    /* Force 3 columns on large screens */
+    @media (min-width: 992px) {
+        .features-grid > [class*="col-"] {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
     }
 
     /* Feature Cards */
     .feature-card {
         background: var(--bg-primary);
         border: 1px solid var(--border-color);
-        border-radius: 15px;
-        padding: 2rem;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .feature-card:hover {
             transform: translateY(-5px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: var(--primary-300);
     }
 
     .feature-icon {
         text-align: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+        color: var(--text-primary) !important;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
 }
 
 .card-text {
         flex: 1;
-        color: var(--text-secondary);
+        color: var(--text-secondary) !important;
         line-height: 1.6;
-    }
-
-    .card-title {
-        color: var(--text-primary);
-}
-
-.features-section {
-        background: var(--bg-primary);
-        backdrop-filter: blur(10px);
+        font-size: 0.85rem;
+        margin: 0;
     }
 
     /* Animations */
@@ -395,12 +482,34 @@
     }
 
     /* Responsive */
-    @media (max-width: 768px) {
-        .hero-title {
+    @media (max-width: 992px) {
+        .hero-section {
+            padding: 2rem 1rem;
+        }
+
+        .hero-content-wrapper {
+            padding: 1.5rem 0;
+        }
+
+        .logo-section {
+            margin-bottom: 2rem;
+        }
+
+        .logo-circle {
+            width: 390px;
+            height: 390px;
+        }
+
+        .home-logo {
+            width: 315px;
+            height: 315px;
+        }
+
+        .home-page-wrapper .hero-title {
             font-size: 2.5rem;
         }
         
-        .hero-subtitle {
+        .home-page-wrapper .hero-subtitle {
             font-size: 1.4rem;
         }
         
@@ -409,98 +518,107 @@
         }
         
         .cta-buttons {
-            flex-direction: column;
-            align-items: center;
+            margin-bottom: 0;
         }
-        
-        .cta-buttons .btn {
-            width: 100%;
-            max-width: 300px;
-            margin: 0.5rem 0;
-        }
-        
-        .trust-indicators .row {
-            margin: 0 -10px;
-        }
-        
-        .trust-item {
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .logo-circle {
-            width: 100px;
-            height: 100px;
-        }
-        
-        .logo-circle i {
-            font-size: 2.5rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .hero-title {
-            font-size: 2rem;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.2rem;
-        }
-        
-        .hero-description p {
-            font-size: 0.9rem;
-            padding: 0 1rem;
-        }
-        
-        .cta-buttons .btn {
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
-        }
-        
-        .trust-item {
-            padding: 1rem;
-        }
-        
-        .trust-icon i {
-            font-size: 1.5rem;
-        }
-        
-        .trust-label {
-            font-size: 1rem;
-        }
-        
-        .logo-circle {
-            width: 80px;
-            height: 80px;
-        }
-        
-        .logo-circle i {
-            font-size: 2rem;
-        }
-        
-        .scroll-indicator {
-            bottom: 20px;
-        }
-        
-        .btn-circle {
-            width: 40px;
-            height: 40px;
-        }
-    }
-    
-    /* Features section responsive */
-    @media (max-width: 768px) {
+
         .features-section {
-            padding: 3rem 0;
+            padding: 2.5rem 0;
         }
-        
-        .feature-card {
-            padding: 1.5rem;
+
+        .features-title {
+            font-size: 1.75rem;
+        }
+
+        .features-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .features-grid {
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 1.5rem 1rem;
+            min-height: auto;
+        }
+
+        .logo-section {
             margin-bottom: 1.5rem;
         }
         
-        .feature-icon i {
+        .logo-circle {
+            width: 110px;
+            height: 110px;
+        }
+
+        .home-logo {
+            width: 90px;
+            height: 90px;
+        }
+
+        .home-page-wrapper .hero-title {
             font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .home-page-wrapper .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-description {
+            margin-bottom: 2rem;
+        }
+        
+        .hero-description p {
+            font-size: 0.95rem;
+            padding: 0 0.5rem;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-button-login,
+        .cta-button-discover {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+
+        .features-section {
+            padding: 2.5rem 0;
+        }
+
+        .features-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .features-title {
+            font-size: 1.5rem;
+        }
+        
+        .features-subtitle {
+            font-size: 0.9rem;
+            padding: 0 1rem;
+        }
+
+        .features-grid {
+            gap: 1rem;
+        }
+
+        .feature-card {
+            padding: 1rem;
+        }
+        
+        .feature-icon i {
+            font-size: 1.75rem;
         }
         
         .card-title {
@@ -513,25 +631,91 @@
     }
     
     @media (max-width: 576px) {
+        .hero-section {
+            padding: 1rem 0.75rem;
+        }
+
+        .hero-content-wrapper {
+            padding: 1rem 0;
+        }
+
+        .logo-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .logo-circle {
+            width: 95px;
+            height: 95px;
+        }
+
+        .home-logo {
+            width: 80px;
+            height: 80px;
+        }
+
+        .home-page-wrapper .hero-title {
+            font-size: 1.75rem;
+            letter-spacing: 1px;
+        }
+
+        .home-page-wrapper .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .hero-description p {
+            font-size: 0.9rem;
+        }
+
+        .cta-buttons {
+            margin-bottom: 0;
+        }
+
+        .cta-button-login,
+        .cta-button-discover {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+        }
+
+
         .features-section {
             padding: 2rem 0;
         }
-        
+
+        .features-header {
+            margin-bottom: 1.25rem;
+        }
+
+        .features-title {
+            font-size: 1.5rem;
+        }
+
+        .features-subtitle {
+            font-size: 0.85rem;
+        }
+
+        .features-grid {
+            gap: 0.75rem;
+        }
+
         .feature-card {
             padding: 1rem;
         }
+
+        .feature-icon {
+            margin-bottom: 0.5rem;
+        }
         
         .feature-icon i {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
         }
         
         .card-title {
             font-size: 1.1rem;
+            margin-bottom: 0.75rem;
         }
         
         .card-text {
             font-size: 0.85rem;
-        }
     }
 }
 </style>

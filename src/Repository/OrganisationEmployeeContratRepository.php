@@ -51,4 +51,23 @@ class OrganisationEmployeeContratRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Crée une QueryBuilder pour les contrats d'employés d'une organisation spécifique
+     * Avec eager loading des relations pour éviter N+1 queries
+     */
+    public function findByOrganisationQuery($organisation)
+    {
+        return $this->createQueryBuilder('oec')
+            ->leftJoin('oec.employeeContrat', 'ec')
+            ->addSelect('ec')
+            ->leftJoin('ec.employe', 'e')
+            ->addSelect('e')
+            ->leftJoin('ec.natureContrat', 'nc')
+            ->addSelect('nc')
+            ->where('oec.organisation = :organisation')
+            ->setParameter('organisation', $organisation)
+            ->orderBy('e.nom', 'ASC')
+            ->addOrderBy('e.prenom', 'ASC');
+    }
 }

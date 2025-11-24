@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+RAPPORT*.tex
+RAPPORT*.md
+rapport/
+*.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Symfony
+var/cache/*
+var/log/*
+var/tmp/*
+!var/cache/.gitkeep
+!var/log/.gitkeep
+!var/tmp/.gitkeep
+
+# Environment
+.env
+.env.local
+.env.local.php
+.env.*.local
+
+# Dependencies (will be installed in container)
+vendor/
+node_modules/
+
+# ClickHouse data (will be in separate volume)
+clickhouse_data/
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+

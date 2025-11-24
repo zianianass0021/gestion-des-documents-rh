@@ -3,52 +3,103 @@
 {% block title %}Nouvelle Réclamation{% endblock %}
 
 {% block body %}
-<div class="row justify-content-center">
+<div class="row g-0 justify-content-center">
     <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h1 class="mb-0">
-                    <i class="fas fa-plus me-2"></i>
+        <div class="card compact-page">
+            <div class="card-header compact-header py-2">
+                <h4 class="mb-0">
+                    <i class="fas fa-plus me-1"></i>
                     Nouvelle Réclamation
-                </h1>
+                </h4>
             </div>
-            <div class="card-body">
+            <div class="card-body compact-body p-2">
                 {{ form_start(form) }}
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form_label(form.employe) }}
-                            {{ form_widget(form.employe) }}
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Employé concerné <span class="text-danger">*</span></label>
+                            
+                            <!-- Bouton pour consulter la liste -->
+                            <div class="mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#employeesModal" id="view-employees-btn">
+                                    <i class="fas fa-list me-1"></i>
+                                    Consulter la liste des employés
+                                </button>
+                            </div>
+                            
+                            <!-- Champ de recherche simple -->
+                            <div class="position-relative" id="employee-search-container">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" 
+                                           id="employee-search-input" 
+                                           class="form-control form-control-sm" 
+                                           placeholder="Tapez le nom ou prénom de l'employé..."
+                                           autocomplete="off">
+                                    <button type="button" class="btn btn-outline-secondary" id="clear-search-btn" style="display:none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Zone de résultats -->
+                                <div id="employee-results" class="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-sm" style="display:none; max-height: 300px; overflow-y: auto; z-index: 1000; margin-top: -1px;"></div>
+                                
+                                <!-- Champ caché pour l'ID de l'employé -->
+                                <div class="d-none">
+                                    {{ form_widget(form.employe) }}
+                                </div>
+                            </div>
+                            
+                            <!-- Message d'état -->
+                            <small id="search-status-msg" class="form-text text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                <i class="fas fa-info-circle"></i> Commencez à taper pour rechercher...
+                            </small>
+                            
+                            <!-- Employé sélectionné -->
+                            <div id="selected-employee-display" class="mt-2" style="display:none;">
+                                <div class="alert alert-success py-2 px-3 d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <strong id="selected-employee-name"></strong>
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="remove-selection-btn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
                             {{ form_errors(form.employe) }}
                         </div>
                         
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-2">
                             {{ form_label(form.typeReclamation) }}
-                            {{ form_widget(form.typeReclamation) }}
+                            {{ form_widget(form.typeReclamation, {'attr': {'class': 'form-control form-control-sm'}}) }}
                             {{ form_errors(form.typeReclamation) }}
                         </div>
                     </div>
                     
-                    <div class="mb-3">
+                    <div class="mb-2">
                         {{ form_label(form.commentaire) }}
-                        {{ form_widget(form.commentaire) }}
+                        {{ form_widget(form.commentaire, {'attr': {'class': 'form-control form-control-sm', 'rows': 4}}) }}
                         {{ form_errors(form.commentaire) }}
                     </div>
                     
-                    <div class="mb-4">
+                    <div class="mb-2">
                         {{ form_label(form.document) }}
-                        {{ form_widget(form.document) }}
+                        {{ form_widget(form.document, {'attr': {'class': 'form-control form-control-sm'}}) }}
                         {{ form_errors(form.document) }}
-                        <small class="form-text text-muted">
+                        <small class="form-text text-muted" style="font-size: 0.75rem;">
                             Formats acceptés: JPG, PNG, GIF, PDF, DOC, DOCX (max 5MB)
                         </small>
                     </div>
                     
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ path('manager_reclamations') }}" class="btn btn-secondary me-md-2">
-                            <i class="fas fa-arrow-left me-2"></i>Retour
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                        <a href="{{ path('manager_reclamations') }}" class="btn btn-secondary btn-xs me-md-2">
+                            <i class="fas fa-arrow-left"></i> Retour
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Créer la Réclamation
+                        <button type="submit" class="btn btn-primary btn-xs">
+                            <i class="fas fa-save"></i> Créer la Réclamation
                         </button>
                     </div>
                 {{ form_end(form) }}
@@ -57,14 +108,153 @@
     </div>
 </div>
 
+<!-- Modal pour la liste des employés -->
+<div class="modal fade" id="employeesModal" tabindex="-1" aria-labelledby="employeesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeesModalLabel">
+                    <i class="fas fa-users me-2"></i>
+                    Mes Employés Assignés
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Barre de recherche dans le modal -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" 
+                               id="modal-search-input" 
+                               class="form-control" 
+                               placeholder="Rechercher par nom, prénom ou email...">
+                        <button type="button" class="btn btn-outline-secondary" id="modal-clear-search" style="display:none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Compteur -->
+                <div class="mb-3">
+                    <small class="text-muted">
+                        Total: <strong id="modal-total-count">0</strong> employé(s)
+                    </small>
+                </div>
+                
+                <!-- Tableau des employés -->
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-striped table-hover table-sm">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Email</th>
+                                <th>Type Dossier</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-employees-table">
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">Chargement...</span>
+                                    </div>
+                                    Chargement des employés...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Message si aucun résultat -->
+                <div id="modal-no-results" class="alert alert-info" style="display:none;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Aucun employé trouvé.
+                </div>
+                
+                <!-- Pagination -->
+                <nav id="modal-pagination" aria-label="Pagination" style="display:none;">
+                    <ul class="pagination justify-content-center mb-0 mt-3">
+                        <li class="page-item" id="modal-prev-page">
+                            <a class="page-link" href="#" onclick="return false;">
+                                <i class="fas fa-chevron-left"></i> Précédent
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link" id="modal-page-info">Page 1 sur 1</span>
+                        </li>
+                        <li class="page-item" id="modal-next-page">
+                            <a class="page-link" href="#" onclick="return false;">
+                                Suivant <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
+    .compact-page {
+        margin-bottom: 0;
+    }
+    
+    .compact-header {
+        padding: 0.4rem 0.75rem !important;
+        background-color: #F8FAFC;
+        border-bottom: 1px solid #BCCCDC;
+    }
+    
+    .compact-header h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .compact-body {
+        padding: 0.75rem !important;
+    }
+    
+    .form-control-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .btn-xs {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
+    }
+    
+    /* Style pour les résultats de recherche */
+    #employee-results {
+        border: 1px solid #ced4da;
+        border-top: none;
+    }
+    
+    #employee-results .list-group-item {
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    #employee-results .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    
     @media (max-width: 767px) {
         .col-md-8 {
             padding: 0 0.5rem;
         }
         
-        .card-header h1 {
-            font-size: 1.25rem !important;
+        .compact-header h4 {
+            font-size: 0.95rem !important;
         }
         
         .d-grid {
@@ -81,4 +271,500 @@
         }
     }
 </style>
+
+<script>
+(function() {
+    'use strict';
+    
+    // Attend le chargement du DOM
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    
+    function init() {
+        const searchInput = document.getElementById('employee-search-input');
+        const searchResults = document.getElementById('employee-results');
+        const searchStatus = document.getElementById('search-status-msg');
+        const clearBtn = document.getElementById('clear-search-btn');
+        const employeeIdInput = document.querySelector('select[name="reclamation[employe]"]');
+        const selectedDisplay = document.getElementById('selected-employee-display');
+        const selectedName = document.getElementById('selected-employee-name');
+        const removeBtn = document.getElementById('remove-selection-btn');
+        
+        if (!searchInput || !searchResults || !employeeIdInput) {
+            console.error('Éléments manquants dans le DOM');
+            return;
+        }
+        
+        let searchTimeout = null;
+        let employees = [];
+        let selectedIdx = -1;
+        
+        // Recherche AJAX
+        function doSearch(term) {
+            term = term.trim();
+            
+            if (!term) {
+                searchResults.style.display = 'none';
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher...';
+                }
+                return;
+            }
+            
+            if (searchStatus) {
+                searchStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche...';
+            }
+            
+            const url = '{{ path("manager_api_search_employees") }}?search=' + encodeURIComponent(term);
+            
+            console.log('Recherche employés - URL:', url);
+            console.log('Terme de recherche:', term);
+            
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+                .then(function(res) {
+                    console.log('Réponse API - Status:', res.status);
+                    if (!res.ok) {
+                        return res.json().then(function(data) {
+                            console.error('Erreur API:', data);
+                            throw new Error(data.error || 'HTTP ' + res.status);
+                        }).catch(function() {
+                            throw new Error('HTTP ' + res.status);
+                        });
+                    }
+                    return res.json();
+                })
+                .then(function(data) {
+                    console.log('Données reçues:', data);
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    employees = data.employees || [];
+                    console.log('Employés trouvés:', employees.length);
+                    showResults(employees, term);
+                })
+                .catch(function(err) {
+                    console.error('Erreur recherche:', err);
+                    if (searchStatus) {
+                        searchStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> ' + err.message;
+                    }
+                    searchResults.style.display = 'none';
+                    employees = [];
+                });
+        }
+        
+        // Afficher les résultats
+        function showResults(emps, term) {
+            searchResults.innerHTML = '';
+            selectedIdx = -1;
+            
+            if (emps.length === 0) {
+                if (searchStatus) {
+                    searchStatus.innerHTML = '<i class="fas fa-info-circle"></i> Aucun résultat pour "' + term + '"';
+                }
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            if (searchStatus) {
+                searchStatus.innerHTML = '<i class="fas fa-check-circle text-success"></i> ' + emps.length + ' résultat(s)';
+            }
+            
+            emps.forEach(function(emp, idx) {
+                const div = document.createElement('div');
+                div.className = 'list-group-item list-group-item-action';
+                div.style.cssText = 'padding: 0.75rem; cursor: pointer; border-bottom: 1px solid #dee2e6;';
+                div.innerHTML = '<strong>' + emp.prenom + ' ' + emp.nom + '</strong><br><small class="text-muted">' + emp.email + '</small>';
+                
+                div.onclick = function() {
+                    selectEmp(emp);
+                };
+                
+                div.onmouseenter = function() {
+                    this.style.backgroundColor = '#f8f9fa';
+                };
+                
+                div.onmouseleave = function() {
+                    this.style.backgroundColor = '';
+                };
+                
+                searchResults.appendChild(div);
+            });
+            
+            searchResults.style.display = 'block';
+        }
+        
+        // Sélectionner un employé
+        function selectEmp(emp) {
+            if (employeeIdInput) {
+                employeeIdInput.value = emp.id;
+            }
+            
+            if (selectedName) {
+                selectedName.textContent = emp.prenom + ' ' + emp.nom + ' (' + emp.email + ')';
+            }
+            
+            if (selectedDisplay) {
+                selectedDisplay.style.display = 'block';
+            }
+            
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            if (clearBtn) clearBtn.style.display = 'none';
+            employees = [];
+            
+            if (searchStatus) {
+                searchStatus.innerHTML = '<i class="fas fa-check-circle text-success"></i> Employé sélectionné';
+            }
+        }
+        
+        // Event listeners
+        searchInput.addEventListener('input', function() {
+            const val = this.value.trim();
+            
+            if (clearBtn) {
+                clearBtn.style.display = val ? 'block' : 'none';
+            }
+            
+            clearTimeout(searchTimeout);
+            
+            if (val.length >= 1) {
+                searchTimeout = setTimeout(function() {
+                    doSearch(val);
+                }, 250);
+            } else {
+                searchResults.style.display = 'none';
+                employees = [];
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher...';
+                }
+            }
+        });
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                searchResults.style.display = 'none';
+                this.style.display = 'none';
+                employees = [];
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher...';
+                }
+                searchInput.focus();
+            });
+        }
+        
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                if (employeeIdInput) employeeIdInput.value = '';
+                if (selectedDisplay) selectedDisplay.style.display = 'none';
+                searchInput.value = '';
+                searchResults.style.display = 'none';
+                employees = [];
+                if (searchStatus) {
+                    searchStatus.textContent = 'Commencez à taper pour rechercher...';
+                }
+                searchInput.focus();
+            });
+        }
+        
+        // Fermer les résultats en cliquant dehors
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('employee-search-container');
+            if (container && !container.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+        
+        // Navigation clavier
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown' && employees.length > 0) {
+                e.preventDefault();
+                selectedIdx = Math.min(selectedIdx + 1, employees.length - 1);
+                updateHighlight();
+            } else if (e.key === 'ArrowUp' && employees.length > 0) {
+                e.preventDefault();
+                selectedIdx = Math.max(selectedIdx - 1, -1);
+                updateHighlight();
+            } else if (e.key === 'Enter' && selectedIdx >= 0 && selectedIdx < employees.length) {
+                e.preventDefault();
+                selectEmp(employees[selectedIdx]);
+            } else if (e.key === 'Escape') {
+                searchResults.style.display = 'none';
+            }
+        });
+        
+        function updateHighlight() {
+            const items = searchResults.children;
+            for (let i = 0; i < items.length; i++) {
+                items[i].style.backgroundColor = i === selectedIdx ? '#e9ecef' : '';
+            }
+        }
+    }
+})();
+
+// Gestion du modal des employés
+(function() {
+    'use strict';
+    
+    const employeesModal = document.getElementById('employeesModal');
+    const modalSearchInput = document.getElementById('modal-search-input');
+    const modalClearSearch = document.getElementById('modal-clear-search');
+    const modalTableBody = document.getElementById('modal-employees-table');
+    const modalTotalCount = document.getElementById('modal-total-count');
+    const modalNoResults = document.getElementById('modal-no-results');
+    const modalPagination = document.getElementById('modal-pagination');
+    const modalPageInfo = document.getElementById('modal-page-info');
+    const modalPrevPage = document.getElementById('modal-prev-page');
+    const modalNextPage = document.getElementById('modal-next-page');
+    const employeeIdInput = document.querySelector('select[name="reclamation[employe]"]');
+    const selectedDisplay = document.getElementById('selected-employee-display');
+    const selectedName = document.getElementById('selected-employee-name');
+    const searchInput = document.getElementById('employee-search-input');
+    const searchResults = document.getElementById('employee-results');
+    const searchStatus = document.getElementById('search-status-msg');
+    
+    let currentPage = 1;
+    let totalPages = 1;
+    let modalSearchTimeout = null;
+    
+    // Charger les employés quand le modal s'ouvre
+    if (employeesModal) {
+        employeesModal.addEventListener('show.bs.modal', function() {
+            // Réinitialiser la recherche dans le modal
+            if (modalSearchInput) {
+                modalSearchInput.value = '';
+            }
+            if (modalClearSearch) {
+                modalClearSearch.style.display = 'none';
+            }
+            currentPage = 1;
+            loadModalEmployees('', 1);
+        });
+        
+        // Charger aussi au moment où le modal devient visible
+        employeesModal.addEventListener('shown.bs.modal', function() {
+            if (modalTableBody && modalTableBody.innerHTML.trim() === '') {
+                currentPage = 1;
+                loadModalEmployees('', 1);
+            }
+        });
+    }
+    
+    // Fonction pour charger les employés dans le modal avec pagination
+    function loadModalEmployees(search, page) {
+        if (!modalTableBody) return;
+        
+        modalTableBody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border spinner-border-sm"></div> Chargement...</td></tr>';
+        modalNoResults.style.display = 'none';
+        if (modalPagination) modalPagination.style.display = 'none';
+        
+        const params = new URLSearchParams();
+        if (search) {
+            params.append('search', search);
+        }
+        if (page && page > 1) {
+            params.append('page', page);
+        }
+        
+        const url = '{{ path("manager_api_list_employees") }}' + (params.toString() ? '?' + params.toString() : '');
+        
+        fetch(url)
+            .then(function(res) {
+                if (!res.ok) {
+                    return res.json().then(function(data) {
+                        throw new Error(data.error || 'HTTP ' + res.status);
+                    });
+                }
+                return res.json();
+            })
+            .then(function(data) {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const employees = data.employees || [];
+                currentPage = data.page || 1;
+                totalPages = data.totalPages || 1;
+                
+                if (modalTotalCount) {
+                    modalTotalCount.textContent = data.total || 0;
+                }
+                
+                if (employees.length === 0) {
+                    modalTableBody.innerHTML = '';
+                    modalNoResults.style.display = 'block';
+                    if (modalPagination) modalPagination.style.display = 'none';
+                } else {
+                    displayModalEmployees(employees);
+                    modalNoResults.style.display = 'none';
+                    updatePagination();
+                }
+            })
+            .catch(function(err) {
+                console.error('Erreur chargement employés:', err);
+                modalTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Erreur: ' + err.message + '</td></tr>';
+                if (modalPagination) modalPagination.style.display = 'none';
+            });
+    }
+    
+    // Mettre à jour l'affichage de la pagination
+    function updatePagination() {
+        if (!modalPagination || !modalPageInfo || !modalPrevPage || !modalNextPage) return;
+        
+        // Afficher la pagination seulement s'il y a plus d'une page
+        if (totalPages > 1) {
+            modalPagination.style.display = 'block';
+            
+            // Mettre à jour l'info de page
+            modalPageInfo.textContent = 'Page ' + currentPage + ' sur ' + totalPages;
+            
+            // Gérer les boutons précédent/suivant
+            if (currentPage <= 1) {
+                modalPrevPage.classList.add('disabled');
+            } else {
+                modalPrevPage.classList.remove('disabled');
+            }
+            
+            if (currentPage >= totalPages) {
+                modalNextPage.classList.add('disabled');
+            } else {
+                modalNextPage.classList.remove('disabled');
+            }
+        } else {
+            modalPagination.style.display = 'none';
+        }
+    }
+    
+    // Afficher les employés dans le tableau du modal
+    function displayModalEmployees(emps) {
+        modalTableBody.innerHTML = '';
+        
+        emps.forEach(function(emp) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + emp.id + '</td>' +
+                          '<td><strong>' + emp.nom + '</strong></td>' +
+                          '<td>' + emp.prenom + '</td>' +
+                          '<td><a href="mailto:' + emp.email + '">' + emp.email + '</a></td>' +
+                          '<td><span class="badge bg-info">' + (emp.dossier_code || 'N/A') + '</span></td>' +
+                          '<td><button type="button" class="btn btn-sm btn-primary select-employee-btn" data-employee-id="' + emp.id + '" data-employee-nom="' + emp.nom + '" data-employee-prenom="' + emp.prenom + '" data-employee-email="' + emp.email + '">Sélectionner</button></td>';
+            modalTableBody.appendChild(tr);
+        });
+        
+        // Ajouter les event listeners aux boutons de sélection
+        document.querySelectorAll('.select-employee-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const empId = this.getAttribute('data-employee-id');
+                const empNom = this.getAttribute('data-employee-nom');
+                const empPrenom = this.getAttribute('data-employee-prenom');
+                const empEmail = this.getAttribute('data-employee-email');
+                
+                // Sélectionner l'employé dans le formulaire
+                if (employeeIdInput) {
+                    employeeIdInput.value = empId;
+                }
+                
+                if (selectedName) {
+                    selectedName.textContent = empPrenom + ' ' + empNom + ' (' + empEmail + ')';
+                }
+                
+                if (selectedDisplay) {
+                    selectedDisplay.style.display = 'block';
+                }
+                
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                
+                if (searchResults) {
+                    searchResults.style.display = 'none';
+                }
+                
+                if (searchStatus) {
+                    searchStatus.innerHTML = '<i class="fas fa-check-circle text-success"></i> Employé sélectionné';
+                }
+                
+                // Fermer le modal
+                const modalInstance = bootstrap.Modal.getInstance(employeesModal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+        });
+    }
+    
+        // Recherche dans le modal
+        if (modalSearchInput) {
+            modalSearchInput.addEventListener('input', function() {
+                const val = this.value.trim();
+                
+                if (modalClearSearch) {
+                    modalClearSearch.style.display = val ? 'block' : 'none';
+                }
+                
+                clearTimeout(modalSearchTimeout);
+                
+                modalSearchTimeout = setTimeout(function() {
+                    currentPage = 1; // Réinitialiser à la première page lors d'une nouvelle recherche
+                    loadModalEmployees(val, 1);
+                }, 300);
+            });
+        }
+        
+        if (modalClearSearch) {
+            modalClearSearch.addEventListener('click', function() {
+                if (modalSearchInput) {
+                    modalSearchInput.value = '';
+                    this.style.display = 'none';
+                    currentPage = 1;
+                    loadModalEmployees('', 1);
+                }
+            });
+        }
+        
+        // Gestion des boutons de pagination
+        if (modalPrevPage) {
+            const prevLink = modalPrevPage.querySelector('a');
+            if (prevLink) {
+                prevLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        const search = modalSearchInput ? modalSearchInput.value.trim() : '';
+                        loadModalEmployees(search, currentPage - 1);
+                        // Scroll vers le haut du tableau
+                        if (modalTableBody) {
+                            modalTableBody.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+                });
+            }
+        }
+        
+        if (modalNextPage) {
+            const nextLink = modalNextPage.querySelector('a');
+            if (nextLink) {
+                nextLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        const search = modalSearchInput ? modalSearchInput.value.trim() : '';
+                        loadModalEmployees(search, currentPage + 1);
+                        // Scroll vers le haut du tableau
+                        if (modalTableBody) {
+                            modalTableBody.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+                });
+            }
+        }
+})();
+</script>
 {% endblock %}

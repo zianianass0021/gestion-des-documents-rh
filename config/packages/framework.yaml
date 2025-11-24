@@ -15,7 +15,7 @@ framework:
     
     # HTTP Cache configuration for performance
     http_cache:
-        enabled: true
+        enabled: false
         debug: '%kernel.debug%'
 
     #esi: true

@@ -3,214 +3,107 @@
 {% block title %}Gestion des Organisations{% endblock %}
 
 {% block body %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="h3 mb-2">
-                <i class="fas fa-sitemap me-2"></i>
-                Gestion des Organisations
-            </h1>
-            <p class="text-muted mb-3">Structure organisationnelle de l'entreprise</p>
-            <div class="d-flex gap-2 mb-3">
-                <a href="{{ path('responsable_assign_organisation') }}" class="btn btn-info">
-                    <i class="fas fa-user-plus me-2"></i>Assigner Employé
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par nom, DAS, employé...">
-                <button class="btn btn-outline-secondary" onclick="clearSearch()">
-                    <i class="fas fa-times"></i> Effacer
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-sitemap fa-2x text-primary mb-2"></i>
-                    <h4 class="text-primary">
-                        {{ organisations.totalItemCount }}
-                    </h4>
-                    <p class="text-muted mb-0">Total Organisations</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-layer-group fa-2x text-success mb-2"></i>
-                    <h4 class="text-success">
-                        {% set das_unique = [] %}
-                        {% for org in organisations %}
-                            {% if org.das not in das_unique %}
-                                {% set das_unique = das_unique|merge([org.das]) %}
-                            {% endif %}
-                        {% endfor %}
-                        {{ das_unique|length }}
-                    </h4>
-                    <p class="text-muted mb-0">DAS Uniques</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-users fa-2x text-info mb-2"></i>
-                    <h4 class="text-info">
-                        {% set groupements_unique = [] %}
-                        {% for org in organisations %}
-                            {% if org.groupement not in groupements_unique %}
-                                {% set groupements_unique = groupements_unique|merge([org.groupement]) %}
-                            {% endif %}
-                        {% endfor %}
-                        {{ groupements_unique|length }}
-                    </h4>
-                    <p class="text-muted mb-0">Groupements</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-user-tie fa-2x text-warning mb-2"></i>
-                    <h4 class="text-warning">
-                        {% set total_employees = 0 %}
-                        {% for org in organisations %}
-                            {% set total_employees = total_employees + org.organisationEmployeeContrats|length %}
-                        {% endfor %}
-                        {{ total_employees }}
-                    </h4>
-                    <p class="text-muted mb-0">Employés Assignés</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Organisations List -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-list me-2"></i>
-                        Liste des Organisations
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% if organisations is empty %}
-                        <div class="alert alert-info text-center">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Aucune organisation trouvée.
+<div class="row g-0">
+    <div class="col-12">
+        <div class="card compact-page">
+            <div class="card-header compact-header py-2">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <h4 class="mb-0">
+                            <i class="fas fa-sitemap me-1"></i>Gestion des Organisations
+                        </h4>
+                        <div class="d-flex align-items-center gap-2">
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-sitemap text-primary"></i> {{ organisations.totalItemCount }}
+                            </small>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-layer-group text-success"></i> {{ dasUnique }} DAS
+                            </small>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-users text-info"></i> {{ groupementsUnique }} Groupements
+                            </small>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-user-tie text-warning"></i> {{ totalEmployees }} Employés
+                            </small>
                         </div>
-                    {% else %}
-                        <!-- Desktop Table View -->
-                        <div class="table-responsive desktop-view">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>DAS</th>
-                                        <th>Division</th>
-                                        <th>Groupement</th>
-                                        <th>Dossier</th>
-                                        <th>Désignation</th>
-                                        <th class="text-center">Employés</th>
-                                        <th class="text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for organisation in organisations %}
-                                        <tr>
-                                            <td><span class="badge bg-primary">{{ organisation.code }}</span></td>
-                                            <td><span class="badge bg-info">{{ organisation.das }}</span></td>
-                                            <td><strong>{{ organisation.divisionActivitesStrategiques }}</strong></td>
-                                            <td><span class="badge bg-secondary">{{ organisation.groupement }}</span></td>
-                                            <td><span class="badge bg-warning">{{ organisation.dossier }}</span></td>
-                                            <td><strong>{{ organisation.dossierDesignation }}</strong></td>
-                                            <td class="text-center">
-                                                <span class="badge bg-success">{{ organisation.organisationEmployeeContrats|length }}</span>
-                                            </td>
-                                            <td class="text-center">
-                                                <a href="{{ path('responsable_view_organisation', {'id': organisation.id}) }}" 
-                                                   class="btn btn-info btn-sm">
-                                                    <i class="fas fa-eye me-1"></i>Voir
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                    </div>
+                    <div class="d-flex gap-1 align-items-center">
+                        <div class="input-group input-group-xs">
+                            <span class="input-group-text py-0 px-2">
+                                <i class="fas fa-search" style="font-size: 0.7rem;"></i>
+                            </span>
+                            <input type="text" id="searchInput" class="form-control form-control-xs py-0" placeholder="Rechercher...">
                         </div>
-                        
-                        <!-- Mobile Card View -->
-                        <div class="mobile-view">
-                            {% for organisation in organisations %}
-                            <div class="card mb-3">
-                                <div class="card-header bg-primary text-white">
-                                    <h6 class="mb-0">
-                                        <i class="fas fa-building me-2"></i>
-                                        {{ organisation.dossierDesignation }}
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <strong>Code:</strong><br>
-                                            <span class="badge bg-primary">{{ organisation.code }}</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <strong>DAS:</strong><br>
-                                            <span class="badge bg-info">{{ organisation.das }}</span>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <strong>Division:</strong><br>
-                                            {{ organisation.divisionActivitesStrategiques }}
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <strong>Groupement:</strong><br>
-                                            <span class="badge bg-secondary">{{ organisation.groupement }}</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <strong>Employés:</strong><br>
-                                            <span class="badge bg-success">{{ organisation.organisationEmployeeContrats|length }}</span>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <div class="text-center">
+                        <button class="btn btn-outline-secondary btn-xs py-0" onclick="clearSearch()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <a href="{{ path('responsable_assign_organisation') }}" class="btn btn-info btn-xs">
+                            <i class="fas fa-user-plus"></i> Assigner
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body compact-body p-2">
+                {% if organisations is empty %}
+                    <div class="alert alert-info alert-xs py-2 px-3 text-center mb-0">
+                        <small><i class="fas fa-info-circle me-1"></i>Aucune organisation trouvée.</small>
+                    </div>
+                {% else %}
+                    <div class="table-responsive compact-table">
+                        <table class="table table-sm table-hover table-striped mb-0 compact-table-inner">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 70px; padding: 0.25rem;">Code</th>
+                                    <th style="width: 80px; padding: 0.25rem;">DAS</th>
+                                    <th style="width: 150px; padding: 0.25rem;">Division</th>
+                                    <th style="width: 100px; padding: 0.25rem;">Groupement</th>
+                                    <th style="width: 80px; padding: 0.25rem;">Dossier</th>
+                                    <th style="width: 180px; padding: 0.25rem;">Désignation</th>
+                                    <th style="width: 70px; padding: 0.25rem;">Employés</th>
+                                    <th style="width: 70px; padding: 0.25rem;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for organisation in organisations %}
+                                <tr>
+                                    <td style="padding: 0.25rem;"><span class="badge bg-primary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">{{ organisation.code }}</span></td>
+                                    <td style="padding: 0.25rem;"><span class="badge bg-info" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">{{ organisation.das|slice(0, 8) }}</span></td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ organisation.divisionActivitesStrategiques|slice(0, 20) }}{% if organisation.divisionActivitesStrategiques|length > 20 %}...{% endif %}</td>
+                                    <td style="padding: 0.25rem;"><span class="badge bg-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">{{ organisation.groupement|slice(0, 10) }}</span></td>
+                                    <td style="padding: 0.25rem;"><span class="badge bg-warning" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">{{ organisation.dossier|slice(0, 8) }}</span></td>
+                                    <td style="padding: 0.25rem; font-size: 0.875rem;">{{ organisation.dossierDesignation|slice(0, 25) }}{% if organisation.dossierDesignation|length > 25 %}...{% endif %}</td>
+                                    <td style="padding: 0.25rem;" class="text-center"><span class="badge bg-success" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">{{ organisation.organisationEmployeeContrats|length }}</span></td>
+                                    <td style="padding: 0.25rem;">
                                         <a href="{{ path('responsable_view_organisation', {'id': organisation.id}) }}" 
-                                           class="btn btn-info">
-                                            <i class="fas fa-eye me-1"></i>Voir Détails
+                                           class="btn btn-info btn-xs py-0 px-1">
+                                            <i class="fas fa-eye" style="font-size: 0.7rem;"></i>
                                         </a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
-                    <!-- Pagination -->
-                    {% if not showAll and organisations.pageCount > 1 %}
-                        <div class="d-flex justify-content-center mt-4">
-                            {{ knp_pagination_render(organisations) }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer compact-footer py-1 px-2">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="perPageSelect" class="mb-0 small text-muted" style="font-size: 0.75rem;">
+                            <i class="fas fa-list-ul"></i> Par page:
+                        </label>
+                        <select id="perPageSelect" class="form-select form-select-sm" style="width: auto; font-size: 0.75rem; padding: 0.125rem 1.5rem 0.125rem 0.5rem;" onchange="changePerPage(this.value)">
+                            <option value="10" {{ (perPage ?? 10) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="20" {{ (perPage ?? 10) == 20 ? 'selected' : '' }}>20</option>
+                            <option value="30" {{ (perPage ?? 10) == 30 ? 'selected' : '' }}>30</option>
+                            <option value="50" {{ (perPage ?? 10) == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ (perPage ?? 10) == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                    </div>
+                    {% if organisations.pageCount > 1 %}
+                        <div>
+                            {{ knp_pagination_render(organisations, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
                         </div>
                     {% endif %}
                 </div>
@@ -222,77 +115,302 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
-    const organizationCards = document.querySelectorAll('.mobile-view .card');
-    const tableRows = document.querySelectorAll('.desktop-view tbody tr');
+    const tableRows = document.querySelectorAll('.compact-table-inner tbody tr');
+    const tableContainer = document.querySelector('.compact-table');
     
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
+    // Adjust table height based on number of visible rows
+    function adjustTableHeight() {
+        if (!tableContainer) return;
         
-        // Search in mobile cards
-        organizationCards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
+        const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+        const rowCount = visibleRows.length;
         
-        // Search in desktop table
-        tableRows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+        // If there are 5 or fewer rows, don't stretch the table
+        if (rowCount <= 5) {
+            tableContainer.classList.add('has-few-rows');
+        } else {
+            tableContainer.classList.remove('has-few-rows');
+        }
+    }
+    
+    // Initial adjustment
+    adjustTableHeight();
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Re-adjust after filtering
+            adjustTableHeight();
         });
-    });
+    }
 });
 
 function clearSearch() {
-    document.getElementById('searchInput').value = '';
-    document.querySelectorAll('.mobile-view .card, .desktop-view tbody tr').forEach(element => {
-        element.style.display = '';
-    });
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+        document.querySelectorAll('.compact-table-inner tbody tr').forEach(row => {
+            row.style.display = '';
+        });
+        // Re-adjust table height after clearing search
+        const tableContainer = document.querySelector('.compact-table');
+        if (tableContainer) {
+            const visibleRows = document.querySelectorAll('.compact-table-inner tbody tr:not([style*="display: none"])');
+            const rowCount = visibleRows.length;
+            if (rowCount <= 5) {
+                tableContainer.classList.add('has-few-rows');
+            } else {
+                tableContainer.classList.remove('has-few-rows');
+            }
+        }
+    }
+}
+
+function changePerPage(value) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('perPage', value);
+    url.searchParams.set('page', '1'); // Reset to first page when changing perPage
+    window.location.href = url.toString();
 }
 </script>
 
 <style>
-.mobile-view { display: none; }
-
-@media (max-width: 767px) {
-    .desktop-view { display: none !important; }
-    .mobile-view { display: block !important; }
+    .app-wrapper {
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .main-content {
+        overflow: hidden !important;
+        height: 100vh;
+    }
+    
+    .navbar-area {
+        flex-shrink: 0;
+    }
+    
+    .main-area {
+        padding: 0 !important;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
     
     .container-fluid {
-        padding: 0.5rem;
+        padding: 0.5rem 0.75rem !important;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
     
-    h1.h3 {
-        font-size: 1.5rem;
+    .row.g-0 {
+        margin: 0;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
     }
     
-    .btn {
-        width: 100%;
-        margin-bottom: 0.5rem;
+    .row.g-0 > .col-12 {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
     }
     
-    .input-group {
-        margin-bottom: 1rem;
+    .compact-page {
+        margin-bottom: 0;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
     }
     
     .card {
-        margin-bottom: 1rem;
+        margin-bottom: 0;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
     }
     
-    .card-header h6 {
+    .compact-header {
+        padding: 0.4rem 0.75rem !important;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #bcccdc;
+        flex-shrink: 0;
+    }
+    
+    .compact-header h4 {
         font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
     }
     
-    .badge {
-        font-size: 0.8rem;
+    .compact-body {
+        padding: 0.4rem !important;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
     }
-}
+    
+    .compact-table {
+        margin: 0;
+        overflow-x: visible;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+    
+    .compact-table table {
+        width: 100%;
+        margin-bottom: 0;
+        table-layout: fixed;
+        height: 100%;
+    }
+    
+    /* When there are few rows (5 or fewer), don't stretch the table */
+    .compact-table.has-few-rows {
+        flex: 0 1 auto;
+        align-self: flex-start;
+    }
+    
+    .compact-table.has-few-rows table {
+        height: auto;
+        table-layout: auto;
+    }
+    
+    /* When there are 6+ rows, stretch to fill available space (default) */
+    .compact-table:not(.has-few-rows) {
+        flex: 1 1 auto;
+    }
+    
+    .compact-table:not(.has-few-rows) table {
+        display: table;
+    }
+    
+    @media (max-width: 768px) {
+        .compact-table {
+            overflow-x: auto;
+        }
+    }
+    
+    .compact-table-inner {
+        margin-bottom: 0;
+        font-size: 0.875rem;
+    }
+    
+    .compact-table-inner th,
+    .compact-table-inner td {
+        font-size: 0.8rem;
+        vertical-align: middle;
+        padding: 0.2rem 0.25rem !important;
+        line-height: 1.3;
+    }
+    
+    .compact-table-inner thead th {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        background-color: #f8f9fa;
+    }
+    
+    .compact-table-inner tbody tr {
+        background-color: #ffffff;
+    }
+    
+    .compact-table-inner tbody tr:hover {
+        background-color: #d9eafd !important;
+    }
+    
+    .btn-xs {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
+    }
+    
+    .input-group-xs {
+        height: 24px;
+    }
+    
+    .input-group-xs .form-control,
+    .input-group-xs .input-group-text {
+        height: 24px;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .form-control-xs {
+        height: 24px;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .compact-footer {
+        padding: 0.2rem 0.5rem !important;
+        background-color: #f8f9fa;
+        border-top: 1px solid #bcccdc;
+        flex-shrink: 0;
+    }
+    
+    .compact-footer .pagination {
+        margin-bottom: 0;
+    }
+    
+    .compact-footer .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .pagination {
+        font-size: 0.75rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.2rem 0.4rem;
+    }
+    
+    @media (max-width: 767px) {
+        .container-fluid {
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .compact-header {
+            padding: 0.3rem 0.5rem !important;
+        }
+        
+        .compact-header .d-flex {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.5rem;
+        }
+        
+        .compact-body {
+            padding: 0.3rem !important;
+        }
+        
+        .compact-table {
+            overflow-x: auto;
+        }
+    }
 </style>
 {% endblock %}
