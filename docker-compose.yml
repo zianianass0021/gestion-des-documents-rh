@@ -1,0 +1,129 @@
+name: UDOC
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    container_name: UDOC_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rh_docs}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB:-rh_docs} -U ${POSTGRES_USER:-app}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - UDOC_network
+    restart: unless-stopped
+
+  # ClickHouse Database
+  clickhouse:
+    image: clickhouse/clickhouse-server:${CLICKHOUSE_VERSION:-latest}
+    container_name: UDOC_clickhouse
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2.5G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DATABASE:-rh_olap}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USERNAME:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse:rw
+      - ./olap:/docker-entrypoint-initdb.d:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - UDOC_network
+    restart: unless-stopped
+
+  # Symfony Application
+  symfony:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: UDOC_symfony
+    depends_on:
+      database:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2.5G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      # Symfony Environment
+      APP_ENV: ${APP_ENV:-prod}
+      APP_SECRET: ${APP_SECRET:-!ChangeMe!}
+      APP_DEBUG: ${APP_DEBUG:-0}
+      
+      # Database Connection (using host.docker.internal to access host machine's existing PostgreSQL)
+      DATABASE_URL: "postgresql://postgres:udoc0021@host.docker.internal:5432/app?serverVersion=16&charset=utf8"
+      
+      # ClickHouse Connection (using service name, not localhost)
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: ${CLICKHOUSE_NATIVE_PORT:-9000}
+      CLICKHOUSE_DATABASE: ${CLICKHOUSE_DATABASE:-rh_olap}
+      CLICKHOUSE_USERNAME: ${CLICKHOUSE_USERNAME:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+      CLICKHOUSE_HTTP_URL: "http://clickhouse:8123"
+    ports:
+      - "${SYMFONY_PORT:-8000}:80"
+    volumes:
+      # Mount code for development (cached for better performance on Windows)
+      - .:/var/www/html:rw,cached
+      # Mount uploads directory
+      - ./public/uploads:/var/www/html/public/uploads:rw,cached
+      # Note: var directory is NOT mounted to avoid Windows permission issues
+      # Cache and logs will be stored inside the container
+    networks:
+      - UDOC_network
+    restart: unless-stopped
+
+volumes:
+  database_data:
+    driver: local
+  clickhouse_data:
+    driver: local
+
+networks:
+  UDOC_network:
+    name: UDOC_network
+    driver: bridge
+
