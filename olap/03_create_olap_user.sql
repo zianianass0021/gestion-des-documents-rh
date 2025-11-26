@@ -3,7 +3,7 @@
 
 -- Create read-write user for OLAP operations
 CREATE USER IF NOT EXISTS rh_olap_app
-IDENTIFIED WITH sha256_password BY 'CHANGE_ME_IN_PRODUCTION'
+IDENTIFIED WITH sha256_password BY 'udoc0021'
 SETTINGS
     max_query_size = 100000000,
     max_execution_time = 300,
@@ -14,7 +14,7 @@ GRANT ALL ON rh_olap.* TO rh_olap_app;
 
 -- Optional: Create a read-only user for reporting/replication
 CREATE USER IF NOT EXISTS rh_olap_readonly
-IDENTIFIED WITH sha256_password BY 'CHANGE_ME_IN_PRODUCTION_READONLY'
+IDENTIFIED WITH sha256_password BY 'udoc0021'
 SETTINGS
     max_query_size = 100000000,
     max_execution_time = 300,

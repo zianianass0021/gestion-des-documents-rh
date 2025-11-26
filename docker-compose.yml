@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-rh_docs}
       POSTGRES_USER: ${POSTGRES_USER:-app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-udoc0021}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -90,11 +90,11 @@ services:
     environment:
       # Symfony Environment
       APP_ENV: ${APP_ENV:-prod}
-      APP_SECRET: ${APP_SECRET:-!ChangeMe!}
+      APP_SECRET: ${APP_SECRET:-udoc0021}
       APP_DEBUG: ${APP_DEBUG:-0}
       
-      # Database Connection (using host.docker.internal to access host machine's existing PostgreSQL)
-      DATABASE_URL: "postgresql://postgres:udoc0021@host.docker.internal:5432/app?serverVersion=16&charset=utf8"
+      # Database Connection (using Docker service name for portability)
+      DATABASE_URL: "postgresql://app:udoc0021@database:5432/rh_docs?serverVersion=16&charset=utf8"
       
       # ClickHouse Connection (using service name, not localhost)
       CLICKHOUSE_HOST: clickhouse
