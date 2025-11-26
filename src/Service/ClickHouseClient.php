@@ -214,14 +214,18 @@ class ClickHouseClient
         // Replace parameter placeholders in the query
         $processedQuery = $this->processQuery($query, $params);
         
-        // Build URL with query parameters
-        $url = $this->httpUrl . '?database=' . urlencode($this->database);
+        // Build URL with query parameters (ClickHouse HTTP API uses query params for auth)
+        $url = $this->httpUrl . '?database=' . urlencode($this->database) . 
+               '&user=' . urlencode($this->username);
+        
+        // Add password to URL if provided (ClickHouse HTTP API authentication)
+        if (!empty($this->password)) {
+            $url .= '&password=' . urlencode($this->password);
+        }
         
         $response = $this->httpClient->request('POST', $url, [
             'headers' => [
                 'Content-Type' => 'text/plain',
-                'X-ClickHouse-User' => $this->username,
-                'X-ClickHouse-Key' => $this->password,
             ],
             'body' => $processedQuery,
             'timeout' => 30,
